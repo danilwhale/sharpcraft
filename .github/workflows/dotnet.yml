@@ -29,7 +29,7 @@ jobs:
     - name: Publish
       run: dotnet publish SharpCraft/SharpCraft.csproj -c Release -o Build --nologo
     - name: Upload Build Artifact
-      uses: actions/upload-artifact@4.3.1
+      uses: actions/upload-artifact@v4.3.1
       with:
         name: BuildArtifact
         path: /home/runner/work/SharpCraft/SharpCraft/Build/
