@@ -26,10 +26,17 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
-    - name: Publish
-      run: dotnet publish SharpCraft/SharpCraft.csproj -c Release -o Build --nologo
-    - name: Upload Build Artifact
+    - name: Publish Linux (x64)
+      run: dotnet publish SharpCraft/SharpCraft.csproj -c Release -o Build/Linux/ --nologo -r linux-x64 --self-contained
+    - name: Upload Linux (x64) Build Artifact
       uses: actions/upload-artifact@v4.3.1
       with:
-        name: BuildArtifact
-        path: /home/runner/work/SharpCraft/SharpCraft/Build/
+        name: SharpCraft-linux-x64
+        path: /home/runner/work/SharpCraft/SharpCraft/Build/Linux/
+    - name: Publish Windows (x64)
+      run: dotnet publish SharpCraft/SharpCraft.csproj -c Release -o Build/Windows/ --nologo -r win-x64 --self-contained
+    - name: Upload Windows (x64) Build Artifact
+      uses: actions/upload-artifact@v4.3.1
+      with:
+        name: SharpCraft-win-x64
+        path: /home/runner/work/SharpCraft/SharpCraft/Build/Windows/
