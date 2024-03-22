@@ -2,20 +2,20 @@
 
 namespace SharpCraft;
 
-public struct Frustum()
+public readonly struct Frustum()
 {
-    private static Frustum _instance = new();
+    private static readonly Frustum FInstance = new();
 
     public static Frustum Instance
     {
         get
         {
-            _instance.Recalculate();
-            return _instance;
+            FInstance.Recalculate();
+            return FInstance;
         }
     }
 
-    private Plane[] _planes = new Plane[6];
+    private readonly Plane[] _planes = new Plane[6];
     
     private void Recalculate()
     {

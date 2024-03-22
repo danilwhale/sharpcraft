@@ -4,30 +4,26 @@ namespace SharpCraft;
 
 public class MeshBuilder : IDisposable
 {
-    private const int PositionsIndex = 0;
-    private const int TexCoordsIndex = 1;
-    private const int ColorsIndex = 3;
-    
-    public Mesh Mesh;
+    private Mesh _mesh;
     private Mesh _oldMesh;
 
     private Vector2 _texCoords;
     private Color _color;
     private int _index;
 
-    public unsafe void Begin(int triangles)
+    public void Begin(int triangles)
     {
         Clear();
 
-        if (Mesh.VertexCount != 0)
+        if (_mesh.VertexCount != 0)
         {
-            _oldMesh = Mesh;
+            _oldMesh = _mesh;
         }
         
-        Mesh = new Mesh(triangles * 3, triangles);
-        Mesh.AllocVertices();
-        Mesh.AllocTexCoords();
-        Mesh.AllocColors();
+        _mesh = new Mesh(triangles * 3, triangles);
+        _mesh.AllocVertices();
+        _mesh.AllocTexCoords();
+        _mesh.AllocColors();
     }
 
     public void TexCoords(float u, float v)
@@ -42,9 +38,9 @@ public class MeshBuilder : IDisposable
 
     public void Vertex(float x, float y, float z)
     {
-        Mesh.VerticesAs<Vector3>()[_index] = new Vector3(x, y, z);
-        Mesh.TexCoordsAs<Vector2>()[_index] = _texCoords;
-        Mesh.ColorsAs<Color>()[_index] = _color;
+        _mesh.VerticesAs<Vector3>()[_index] = new Vector3(x, y, z);
+        _mesh.TexCoordsAs<Vector2>()[_index] = _texCoords;
+        _mesh.ColorsAs<Color>()[_index] = _color;
         
         _index++;
     }
@@ -59,7 +55,7 @@ public class MeshBuilder : IDisposable
     {
         if (_oldMesh.VaoId != 0) UnloadMesh(ref _oldMesh);
         
-        UploadMesh(ref Mesh, false);
+        UploadMesh(ref _mesh, false);
     }
 
     private void Clear()
@@ -72,16 +68,16 @@ public class MeshBuilder : IDisposable
     public void Draw(Material mat)
     {
         if (_oldMesh.VaoId != 0) DrawMesh(_oldMesh, mat, Matrix4x4.Transpose(Matrix4x4.Identity));
-        if (Mesh.VaoId == 0) return;
+        if (_mesh.VaoId == 0) return;
 
-        DrawMesh(Mesh, mat, Matrix4x4.Transpose(Matrix4x4.Identity));
+        DrawMesh(_mesh, mat, Matrix4x4.Transpose(Matrix4x4.Identity));
     }
 
     public void Dispose()
     {
         if (_oldMesh.VaoId != 0) UnloadMesh(ref _oldMesh);
-        if (Mesh.VaoId == 0) return;
+        if (_mesh.VaoId == 0) return;
 
-        UnloadMesh(ref Mesh);
+        UnloadMesh(ref _mesh);
     }
 }

@@ -8,10 +8,10 @@ public class Player
     private const float HalfWidth = 0.3f;
     private const float HalfHeight = 0.9f;
 
-    public Vector3 LastPosition;
+    private Vector3 _lastPosition;
     public Vector3 Position;
-    public Vector3 Direction;
-    public BoundingBox BBox;
+    private Vector3 _direction;
+    private BoundingBox _bbox;
 
     public Camera3D Camera;
 
@@ -39,7 +39,7 @@ public class Player
     private void MoveTo(Vector3 newPosition)
     {
         Position = newPosition;
-        BBox = new BoundingBox(
+        _bbox = new BoundingBox(
             newPosition - new Vector3(HalfWidth, HalfHeight, HalfWidth),
             newPosition + new Vector3(HalfWidth, HalfHeight, HalfWidth)
         );
@@ -55,7 +55,7 @@ public class Player
 
     public void MoveCamera(float lastDelta)
     {
-        Camera.Position = LastPosition + (Position - LastPosition) * lastDelta;
+        Camera.Position = _lastPosition + (Position - _lastPosition) * lastDelta;
 
         var rotation = Matrix4x4.CreateFromYawPitchRoll(
             _yaw * DEG2RAD,
@@ -70,7 +70,7 @@ public class Player
 
     public void Tick()
     {
-        LastPosition = Position;
+        _lastPosition = Position;
         
         if (IsKeyDown(KeyboardKey.R)) MoveToRandom();
 
@@ -84,16 +84,16 @@ public class Player
 
         if (_isOnGround && (IsKeyDown(KeyboardKey.Space) || IsKeyDown(KeyboardKey.LeftSuper)))
         {
-            Direction.Y = 0.12f;
+            _direction.Y = 0.12f;
         }
 
         MoveRelative(x, z, _isOnGround ? 0.02f : 0.005f);
-        Direction.Y -= 0.005f;
-        Move(Direction.X, Direction.Y, Direction.Z);
+        _direction.Y -= 0.005f;
+        Move(_direction.X, _direction.Y, _direction.Z);
         
-        Direction *= new Vector3(0.91f, 0.98f, 0.91f);
+        _direction *= new Vector3(0.91f, 0.98f, 0.91f);
 
-        if (_isOnGround) Direction *= new Vector3(0.8f, 1.0f, 0.8f);
+        if (_isOnGround) _direction *= new Vector3(0.8f, 1.0f, 0.8f);
     }
 
     private void Move(float x, float y, float z)
@@ -102,27 +102,29 @@ public class Player
         var oldY = y;
         var oldZ = z;
 
-        var boxes = _level.GetBoxes(BBox.Expand(x, y, z));
+        var boxes = _level.GetBoxes(_bbox.Expand(x, y, z));
         
         foreach (var box in boxes)
         {
-            x = box.ClipXCollide(BBox, x);
-            y = box.ClipYCollide(BBox, y);
-            z = box.ClipZCollide(BBox, z);
+            x = box.ClipXCollide(_bbox, x);
+            y = box.ClipYCollide(_bbox, y);
+            z = box.ClipZCollide(_bbox, z);
         }
 
-        BBox.Move(x, y, z);
+        _bbox.Move(x, y, z);
 
+        // ReSharper disable CompareOfFloatsByEqualityOperator
         _isOnGround = oldY != y && oldY < 0.0f;
 
-        Direction.X = oldX != x ? 0.0f : Direction.X;
-        Direction.Y = oldY != y ? 0.0f : Direction.Y;
-        Direction.Z = oldZ != z ? 0.0f : Direction.Z;
+        _direction.X = oldX != x ? 0.0f : _direction.X;
+        _direction.Y = oldY != y ? 0.0f : _direction.Y;
+        _direction.Z = oldZ != z ? 0.0f : _direction.Z;
+        // ReSharper restore CompareOfFloatsByEqualityOperator
 
         Position = new Vector3(
-            (BBox.Min.X + BBox.Max.X) / 2.0f,
-            BBox.Min.Y + 1.62f,
-            (BBox.Min.Z + BBox.Max.Z) / 2.0f
+            (_bbox.Min.X + _bbox.Max.X) / 2.0f,
+            _bbox.Min.Y + 1.62f,
+            (_bbox.Min.Z + _bbox.Max.Z) / 2.0f
         );
     }
 
@@ -140,7 +142,7 @@ public class Player
         var sin = MathF.Sin(_yaw * DEG2RAD);
         var cos = MathF.Cos(_yaw * DEG2RAD);
 
-        Direction.X += x * cos + z * sin;
-        Direction.Z += z * cos - x * sin;
+        _direction.X += x * cos + z * sin;
+        _direction.Z += z * cos - x * sin;
     }
 }

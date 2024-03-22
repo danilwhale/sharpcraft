@@ -6,10 +6,8 @@ public class Tile(int textureIndex)
     private const float Darker = 0.8f;
     private const float Light = 1.0f;
 
-    public static Tile Rock = new(0);
-    public static Tile Grass = new(1);
-
-    private readonly int _textureIndex = textureIndex;
+    public static readonly Tile Rock = new(0);
+    public static readonly Tile Grass = new(1);
 
     public void Build(MeshBuilder builder, Level level, BlockPosition position)
     {

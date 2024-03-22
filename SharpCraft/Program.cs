@@ -4,12 +4,12 @@ using System.Numerics;
 
 namespace SharpCraft;
 
-class Program
+internal static class Program
 {
-    private static Timer _timer;
-    private static Level _level;
-    private static LevelRenderer _levelRenderer;
-    private static Player _player;
+    private static Timer _timer = null!;
+    private static Level _level = null!;
+    private static LevelRenderer _levelRenderer = null!;
+    private static Player _player = null!;
     private static RayCollision _rayCast;
 
     private static void Main()

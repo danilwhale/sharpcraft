@@ -4,11 +4,11 @@ namespace SharpCraft;
 
 public static class ResourceManager
 {
-    private static Dictionary<string, Texture2D> _textures = new();
+    private static readonly Dictionary<string, Texture2D> Textures = new();
     
     public static Texture2D GetTexture(string path)
     {
-        if (_textures.TryGetValue(path, out var texture)) return texture;
+        if (Textures.TryGetValue(path, out var texture)) return texture;
 
         using var stream = Assembly.GetExecutingAssembly()
             .GetManifestResourceStream(typeof(ResourceManager), path.Replace(Path.PathSeparator, '.'));
@@ -21,14 +21,10 @@ public static class ResourceManager
         _ = stream.Read(bytes, 0, bytes.Length);
 
         var image = LoadImageFromMemory(Path.GetExtension(path), bytes);
-        if (!IsImageReady(image)) throw new Exception("failed to load image");
-        
         texture = LoadTextureFromImage(image);
-        if (!IsTextureReady(texture)) throw new Exception("failed to load texture");
-        
         UnloadImage(image);
 
-        _textures[path] = texture;
+        Textures[path] = texture;
         return texture;
     }
 
@@ -47,7 +43,7 @@ public static class ResourceManager
 
     public static void Unload()
     {
-        foreach (var keyValue in _textures)
+        foreach (var keyValue in Textures)
         {
             UnloadTexture(keyValue.Value);
         }

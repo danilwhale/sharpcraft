@@ -6,8 +6,8 @@ public class Chunk : IDisposable
 {
     public const int Size = 16;
 
-    public static int Updates = 0;
-    public static int Rebuilds = 0;
+    public static int Updates;
+    public static int Rebuilds;
 
     public readonly int X;
     public readonly int Y;
@@ -21,7 +21,7 @@ public class Chunk : IDisposable
     public bool IsDirty = true;
 
     private readonly Level _level;
-    private MeshBuilder _builder = new();
+    private readonly MeshBuilder _builder = new();
 
     public Chunk(Level level, int x, int y, int z)
     {

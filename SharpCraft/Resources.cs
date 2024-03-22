@@ -1,6 +1,4 @@
-﻿using System.Numerics;
-
-namespace SharpCraft;
+﻿namespace SharpCraft;
 
 public static class Resources
 {

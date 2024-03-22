@@ -4,8 +4,8 @@ namespace SharpCraft;
 
 public class Timer(float ticksPerSecond)
 {
-    public const long NanosecondsPerSecond = TimeSpan.TicksPerSecond * TimeSpan.NanosecondsPerTick;
-    public const int MaxTicks = 100;
+    private const long NanosecondsPerSecond = TimeSpan.TicksPerSecond * TimeSpan.NanosecondsPerTick;
+    private const int MaxTicks = 100;
     
     private const float TimeScale = 1.0f;
     

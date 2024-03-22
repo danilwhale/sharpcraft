@@ -11,12 +11,12 @@ public class Level
 
     public delegate void OnEverythingChangedEvent();
 
-    public const float LightValue = 1.0f;
-    public const float DarkValue = 0.4f;
+    private const float LightValue = 1.0f;
+    private const float DarkValue = 0.4f;
 
     // I use 1d array only because it's easier to load/save level
-    public readonly byte[] Data;
-    public readonly int[] LightLevels;
+    private readonly byte[] _data;
+    private readonly int[] _lightLevels;
 
     public readonly int Width;
     public readonly int Height;
@@ -32,8 +32,8 @@ public class Level
         Height = height;
         Length = length;
 
-        Data = new byte[width * height * length];
-        LightLevels = new int[width * length];
+        _data = new byte[width * height * length];
+        _lightLevels = new int[width * length];
 
         if (!TryLoad())
         {
@@ -43,12 +43,12 @@ public class Level
                 {
                     for (var z = 0; z < length; z++)
                     {
-                        Data[GetDataIndex(new BlockPosition(x, y, z))] = (byte)(y > height * 2 / 3 ? 0 : 1);
+                        _data[GetDataIndex(new BlockPosition(x, y, z))] = (byte)(y > height * 2 / 3 ? 0 : 1);
                     }
                 }
             }
         }
-
+        
         UpdateLightLevels(0, 0, width, length);
     }
 
@@ -60,7 +60,9 @@ public class Level
         {
             using var fileStream = File.OpenRead(path);
             using var stream = new GZipStream(fileStream, CompressionMode.Decompress);
-            stream.ReadExactly(Data);
+            stream.ReadExactly(_data);
+            
+            OnEverythingChanged?.Invoke();
 
             return true;
         }
@@ -78,7 +80,7 @@ public class Level
         {
             using var fileStream = File.OpenWrite(path);
             using var stream = new GZipStream(fileStream, CompressionMode.Compress);
-            stream.Write(Data);
+            stream.Write(_data);
         }
         catch (Exception e)
         {
@@ -86,13 +88,13 @@ public class Level
         }
     }
 
-    public void UpdateLightLevels(int x, int z, int width, int length)
+    private void UpdateLightLevels(int x, int z, int width, int length)
     {
         for (var i = x; i < x + width; i++)
         {
             for (var j = z; j < z + length; j++)
             {
-                var oldY = LightLevels[i + Width * j];
+                var oldY = _lightLevels[i + Width * j];
 
                 var y = Height;
                 for (; y > 0 && !IsLightBlocker(new BlockPosition(i, y, j)); y--)
@@ -105,7 +107,7 @@ public class Level
                 var maxY = Math.Max(y, oldY);
 
                 OnLightLevelChanged?.Invoke(i, j, minY, maxY);
-                LightLevels[i + Width * j] = y;
+                _lightLevels[i + Width * j] = y;
             }
         }
     }
@@ -114,7 +116,7 @@ public class Level
     {
         if (!BlockPosition.IsInRange(position, new BlockPosition(0, 0, 0), new BlockPosition(Width, Height, Length)))
             return false;
-        return Data[GetDataIndex(position)] == 1;
+        return _data[GetDataIndex(position)] == 1;
     }
 
     public bool IsSolidTile(BlockPosition position)
@@ -161,14 +163,14 @@ public class Level
     public float GetBrightness(BlockPosition position)
     {
         if (!BlockPosition.IsInRange(position, new BlockPosition(0, 0, 0), new BlockPosition(Width, Height, Length))) return LightValue;
-        return LightLevels[position.X + Width * position.Z] >= position.Y ? DarkValue : LightValue;
+        return _lightLevels[position.X + Width * position.Z] >= position.Y ? DarkValue : LightValue;
     }
 
     public void SetTile(BlockPosition position, byte value)
     {
         if (!BlockPosition.IsInRange(position, new BlockPosition(0, 0, 0), new BlockPosition(Width, Height, Length))) return;
 
-        Data[GetDataIndex(position)] = value;
+        _data[GetDataIndex(position)] = value;
         UpdateLightLevels(position.X, position.Z, 1, 1);
         OnTileChanged?.Invoke(position);
     }
