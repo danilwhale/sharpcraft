@@ -54,8 +54,8 @@ public class Chunk : IDisposable
                 {
                     if (!_level.IsTile(new TilePosition(x, y, z))) continue;
                     
-                    if (y == _level.Height * 2 / 3) Tile.Rock.Build(_builder, _level, new TilePosition(x, y, z));
-                    else Tile.Grass.Build(_builder, _level, new TilePosition(x, y, z));
+                    if (y == _level.Height * 2 / 3) Tile.Grass.Build(_builder, _level, new TilePosition(x, y, z));
+                    else Tile.Rock.Build(_builder, _level, new TilePosition(x, y, z));
                 }
             }
         }
