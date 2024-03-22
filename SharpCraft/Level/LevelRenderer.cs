@@ -9,6 +9,9 @@ public class LevelRenderer : IDisposable
     public readonly int ChunksY;
     public readonly int ChunksZ;
 
+    private readonly TilePosition _min;
+    private readonly TilePosition _max;
+    
     private readonly Chunk[][][] _chunks;
 
     public readonly Level Level;
@@ -33,6 +36,9 @@ public class LevelRenderer : IDisposable
         ChunksX = level.Width / Chunk.Size;
         ChunksY = level.Height / Chunk.Size;
         ChunksZ = level.Length / Chunk.Size;
+
+        _min = new TilePosition(0, 0, 0);
+        _max = new TilePosition(level.Width, level.Height, level.Length);
 
         _chunks = new Chunk[ChunksX][][];
         for (var x = 0; x < ChunksX; x++)
@@ -73,13 +79,13 @@ public class LevelRenderer : IDisposable
         min = TilePosition.Clamp(
             TilePosition.ToChunkPosition(min),
             new TilePosition(0, 0, 0),
-            new TilePosition(ChunksX, ChunksY, ChunksZ)
+            new TilePosition(ChunksX - 1, ChunksY - 1, ChunksZ - 1)
         );
         
         max = TilePosition.Clamp(
             TilePosition.ToChunkPosition(max),
             new TilePosition(0, 0, 0),
-            new TilePosition(ChunksX, ChunksY, ChunksZ)
+            new TilePosition(ChunksX - 1, ChunksY - 1, ChunksZ - 1)
         );
 
         for (var x = min.X; x <= max.X; x++)
