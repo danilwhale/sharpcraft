@@ -1,4 +1,4 @@
-﻿namespace SharpCraft;
+﻿namespace SharpCraft.Level;
 
 public enum Face
 {

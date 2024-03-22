@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace SharpCraft;
+namespace SharpCraft.Utilities;
 
 public class Timer(float ticksPerSecond)
 {

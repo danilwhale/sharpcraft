@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using SharpCraft.Physics;
 
 namespace SharpCraft;
 
@@ -19,9 +20,9 @@ public class Player
     private float _pitch;
     private bool _isOnGround;
 
-    private readonly Level _level;
+    private readonly Level.Level _level;
 
-    public Player(Level level)
+    public Player(Level.Level level)
     {
         _level = level;
         Camera = new Camera3D(Vector3.Zero, Vector3.Zero, Vector3.UnitY, 70.0f, CameraProjection.Perspective);

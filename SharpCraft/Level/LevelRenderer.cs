@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
+using SharpCraft.Rendering;
 
-namespace SharpCraft;
+namespace SharpCraft.Level;
 
 public class LevelRenderer : IDisposable
 {
@@ -17,15 +18,15 @@ public class LevelRenderer : IDisposable
         Level = level;
         level.OnEverythingChanged += () =>
         {
-            SetDirtyArea(new BlockPosition(0, 0, 0), new BlockPosition(level.Width, level.Height, level.Length));
+            SetDirtyArea(new TilePosition(0, 0, 0), new TilePosition(level.Width, level.Height, level.Length));
         };
         level.OnLightLevelChanged += (x, z, minY, maxY) =>
         {
-            SetDirtyArea(new BlockPosition(x - 1, minY, z - 1), new BlockPosition(x + 1, maxY, z + 1));
+            SetDirtyArea(new TilePosition(x - 1, minY, z - 1), new TilePosition(x + 1, maxY, z + 1));
         };
         level.OnTileChanged += (position) =>
         {
-            SetDirtyArea(position - BlockPosition.One, position + BlockPosition.One);
+            SetDirtyArea(position - TilePosition.One, position + TilePosition.One);
         };
 
         ChunksX = level.Width / Chunk.Size;
@@ -66,18 +67,18 @@ public class LevelRenderer : IDisposable
         }
     }
 
-    public void SetDirtyArea(BlockPosition min, BlockPosition max)
+    public void SetDirtyArea(TilePosition min, TilePosition max)
     {
-        min = BlockPosition.Clamp(
-            BlockPosition.ToChunkPosition(min),
-            new BlockPosition(0, 0, 0),
-            new BlockPosition(ChunksX, ChunksY, ChunksZ)
+        min = TilePosition.Clamp(
+            TilePosition.ToChunkPosition(min),
+            new TilePosition(0, 0, 0),
+            new TilePosition(ChunksX, ChunksY, ChunksZ)
         );
         
-        max = BlockPosition.Clamp(
-            BlockPosition.ToChunkPosition(max),
-            new BlockPosition(0, 0, 0),
-            new BlockPosition(ChunksX, ChunksY, ChunksZ)
+        max = TilePosition.Clamp(
+            TilePosition.ToChunkPosition(max),
+            new TilePosition(0, 0, 0),
+            new TilePosition(ChunksX, ChunksY, ChunksZ)
         );
 
         for (var x = min.X; x <= max.X; x++)
@@ -99,7 +100,7 @@ public class LevelRenderer : IDisposable
         Rlgl.Begin(DrawMode.Quads);
         Rlgl.Color4f(1.0f, 1.0f, 1.0f, alpha);
 
-        var position = (BlockPosition)(hit.Point - hit.Normal / 2.0f);
+        var position = (TilePosition)(hit.Point - hit.Normal / 2.0f);
         
         if (hit.Normal == new Vector3(1.0f, 0.0f, 0.0f)) Tile.Rock.DrawRlGlFace(position, Face.Right);
         else if (hit.Normal == new Vector3(-1.0f, 0.0f, 0.0f)) Tile.Rock.DrawRlGlFace(position, Face.Left);

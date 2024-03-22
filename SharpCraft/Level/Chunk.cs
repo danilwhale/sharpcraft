@@ -1,6 +1,8 @@
 ﻿using System.Numerics;
+using SharpCraft.Rendering;
+using SharpCraft.Utilities;
 
-namespace SharpCraft;
+namespace SharpCraft.Level;
 
 public class Chunk : IDisposable
 {
@@ -50,10 +52,10 @@ public class Chunk : IDisposable
             {
                 for (var z = Z; z < MaxZ; z++)
                 {
-                    if (!_level.IsTile(new BlockPosition(x, y, z))) continue;
+                    if (!_level.IsTile(new TilePosition(x, y, z))) continue;
                     
-                    if (y == _level.Height * 2 / 3) Tile.Rock.Build(_builder, _level, new BlockPosition(x, y, z));
-                    else Tile.Grass.Build(_builder, _level, new BlockPosition(x, y, z));
+                    if (y == _level.Height * 2 / 3) Tile.Rock.Build(_builder, _level, new TilePosition(x, y, z));
+                    else Tile.Grass.Build(_builder, _level, new TilePosition(x, y, z));
                 }
             }
         }
@@ -82,10 +84,10 @@ public class Chunk : IDisposable
             {
                 for (var z = Z; z < MaxZ; z++)
                 {
-                    if (!_level.IsTile(new BlockPosition(x, y, z))) continue;
+                    if (!_level.IsTile(new TilePosition(x, y, z))) continue;
 
-                    if (y == _level.Height * 2 / 3) count += Tile.Grass.GetFaceCount(_level, new BlockPosition(x, y, z));
-                    else count += Tile.Rock.GetFaceCount(_level, new BlockPosition(x, y, z));
+                    if (y == _level.Height * 2 / 3) count += Tile.Grass.GetFaceCount(_level, new TilePosition(x, y, z));
+                    else count += Tile.Rock.GetFaceCount(_level, new TilePosition(x, y, z));
                 }
             }
         }

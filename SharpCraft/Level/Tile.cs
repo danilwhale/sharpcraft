@@ -1,4 +1,6 @@
-﻿namespace SharpCraft;
+﻿using SharpCraft.Rendering;
+
+namespace SharpCraft.Level;
 
 public class Tile(int textureIndex)
 {
@@ -9,7 +11,7 @@ public class Tile(int textureIndex)
     public static readonly Tile Rock = new(0);
     public static readonly Tile Grass = new(1);
 
-    public void Build(MeshBuilder builder, Level level, BlockPosition position)
+    public void Build(MeshBuilder builder, Level level, TilePosition position)
     {
         var u0 = textureIndex % 16.0f / 16.0f;
         var u1 = u0 + 1.0f / 16;
@@ -23,9 +25,9 @@ public class Tile(int textureIndex)
         var y1 = position.Y + 1;
         var z1 = position.Z + 1;
 
-        if (!level.IsSolidTile(position - BlockPosition.UnitX))
+        if (!level.IsSolidTile(position - TilePosition.UnitX))
         {
-            var b = level.GetBrightness(position - BlockPosition.UnitX) * Darkest;
+            var b = level.GetBrightness(position - TilePosition.UnitX) * Darkest;
 
             builder.Color(b, b, b);
 
@@ -38,9 +40,9 @@ public class Tile(int textureIndex)
             builder.VertexWithTex(x0, y1, z0, u0, v0);
         }
 
-        if (!level.IsSolidTile(position + BlockPosition.UnitX))
+        if (!level.IsSolidTile(position + TilePosition.UnitX))
         {
-            var b = level.GetBrightness(position + BlockPosition.UnitX) * Darkest;
+            var b = level.GetBrightness(position + TilePosition.UnitX) * Darkest;
 
             builder.Color(b, b, b);
 
@@ -53,9 +55,9 @@ public class Tile(int textureIndex)
             builder.VertexWithTex(x1, y0, z1, u0, v1);
         }
 
-        if (!level.IsSolidTile(position + BlockPosition.UnitY))
+        if (!level.IsSolidTile(position + TilePosition.UnitY))
         {
-            var b = level.GetBrightness(position + BlockPosition.UnitY) * Light;
+            var b = level.GetBrightness(position + TilePosition.UnitY) * Light;
             
             builder.Color(b, b, b);
 
@@ -68,9 +70,9 @@ public class Tile(int textureIndex)
             builder.VertexWithTex(x1, y1, z0, u1, v0);
         }
 
-        if (!level.IsSolidTile(position - BlockPosition.UnitY))
+        if (!level.IsSolidTile(position - TilePosition.UnitY))
         {
-            var b = level.GetBrightness(position - BlockPosition.UnitY) * Light;
+            var b = level.GetBrightness(position - TilePosition.UnitY) * Light;
 
             builder.Color(b, b, b);
 
@@ -83,9 +85,9 @@ public class Tile(int textureIndex)
             builder.VertexWithTex(x0, y0, z1, u1, v1);
         }
 
-        if (!level.IsSolidTile(position + BlockPosition.UnitZ))
+        if (!level.IsSolidTile(position + TilePosition.UnitZ))
         {
-            var b = level.GetBrightness(position + BlockPosition.UnitZ) * Darker;
+            var b = level.GetBrightness(position + TilePosition.UnitZ) * Darker;
 
             builder.Color(b, b, b);
 
@@ -98,9 +100,9 @@ public class Tile(int textureIndex)
             builder.VertexWithTex(x0, y1, z1, u0, v0);
         }
 
-        if (!level.IsSolidTile(position - BlockPosition.UnitZ))
+        if (!level.IsSolidTile(position - TilePosition.UnitZ))
         {
-            var b = level.GetBrightness(position - BlockPosition.UnitZ) * Darker;
+            var b = level.GetBrightness(position - TilePosition.UnitZ) * Darker;
 
             builder.Color(b, b, b);
 
@@ -114,32 +116,32 @@ public class Tile(int textureIndex)
         }
     }
 
-    public int GetFaceCount(Level level, BlockPosition position)
+    public int GetFaceCount(Level level, TilePosition position)
     {
         var count = 0;
 
         // check right side
-        if (!level.IsSolidTile(position + BlockPosition.UnitX)) count++;
+        if (!level.IsSolidTile(position + TilePosition.UnitX)) count++;
 
         // check left side
-        if (!level.IsSolidTile(position - BlockPosition.UnitX)) count++;
+        if (!level.IsSolidTile(position - TilePosition.UnitX)) count++;
 
         // check top side
-        if (!level.IsSolidTile(position + BlockPosition.UnitY)) count++;
+        if (!level.IsSolidTile(position + TilePosition.UnitY)) count++;
 
         // check bottom side
-        if (!level.IsSolidTile(position - BlockPosition.UnitY)) count++;
+        if (!level.IsSolidTile(position - TilePosition.UnitY)) count++;
 
         // check front side
-        if (!level.IsSolidTile(position + BlockPosition.UnitZ)) count++;
+        if (!level.IsSolidTile(position + TilePosition.UnitZ)) count++;
 
         // check back side
-        if (!level.IsSolidTile(position - BlockPosition.UnitZ)) count++;
+        if (!level.IsSolidTile(position - TilePosition.UnitZ)) count++;
 
         return count;
     }
 
-    public void DrawRlGlFace(BlockPosition position, Face face)
+    public void DrawRlGlFace(TilePosition position, Face face)
     {
         var x0 = position.X;
         var y0 = position.Y;

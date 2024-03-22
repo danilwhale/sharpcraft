@@ -1,4 +1,4 @@
-﻿namespace SharpCraft;
+﻿namespace SharpCraft.Utilities;
 
 public static class Resources
 {

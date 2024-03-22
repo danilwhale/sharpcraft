@@ -1,13 +1,16 @@
 ﻿global using static Raylib_cs.Raylib;
 global using Raylib_cs;
 using System.Numerics;
+using SharpCraft.Level;
+using SharpCraft.Utilities;
+using Timer = SharpCraft.Utilities.Timer;
 
 namespace SharpCraft;
 
 internal static class Program
 {
     private static Timer _timer = null!;
-    private static Level _level = null!;
+    private static Level.Level _level = null!;
     private static LevelRenderer _levelRenderer = null!;
     private static Player _player = null!;
     private static RayCollision _rayCast;
@@ -20,7 +23,7 @@ internal static class Program
         Resources.Load();
 
         _timer = new Timer(60.0f);
-        _level = new Level(256, 64, 256);
+        _level = new Level.Level(256, 64, 256);
         _levelRenderer = new LevelRenderer(_level);
         _player = new Player(_level);
 

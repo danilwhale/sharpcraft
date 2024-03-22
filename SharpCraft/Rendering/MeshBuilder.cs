@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace SharpCraft;
+namespace SharpCraft.Rendering;
 
 public class MeshBuilder : IDisposable
 {

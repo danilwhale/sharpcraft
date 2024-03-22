@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace SharpCraft;
+namespace SharpCraft.Physics;
 
 /// <summary>
 /// math™
