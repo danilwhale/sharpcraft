@@ -71,7 +71,8 @@ public class Chunk : IDisposable
         {
             Rebuild();
         }
-        else _builder.Draw(Resources.DefaultTerrainMaterial);
+        
+        _builder.Draw(Resources.DefaultTerrainMaterial);
     }
 
     private int GetFaceCount()

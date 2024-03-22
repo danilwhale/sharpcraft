@@ -15,7 +15,7 @@ public class MeshBuilder : IDisposable
     {
         Clear();
 
-        if (_mesh.VertexCount != 0)
+        if (_mesh.VaoId != 0)
         {
             _oldMesh = _mesh;
         }
@@ -53,9 +53,11 @@ public class MeshBuilder : IDisposable
 
     public void End()
     {
-        if (_oldMesh.VaoId != 0) UnloadMesh(ref _oldMesh);
-        
         UploadMesh(ref _mesh, false);
+
+        if (_oldMesh.VaoId == 0) return;
+        UnloadMesh(ref _oldMesh);
+        _oldMesh.VaoId = 0;
     }
 
     private void Clear()
