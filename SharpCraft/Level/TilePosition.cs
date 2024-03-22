@@ -32,18 +32,12 @@ public struct TilePosition(int x, int y, int z)
 
     public static TilePosition Min(TilePosition a, TilePosition b)
     {
-        return 
-            a < b ? a 
-            : b < a ? b 
-            : a;
+        return a <= b ? a : b;
     }
     
     public static TilePosition Max(TilePosition a, TilePosition b)
     {
-        return 
-            a > b ? a 
-            : b > a ? b 
-            : a;
+        return a >= b ? a : b;
     }
 
     public override bool Equals(object? obj)
