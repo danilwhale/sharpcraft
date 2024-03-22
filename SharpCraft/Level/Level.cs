@@ -5,7 +5,7 @@ namespace SharpCraft.Level;
 
 public class Level
 {
-    public delegate void OnTileChangedEvent(TilePosition position);
+    public delegate void OnTileChangedEvent(int x, int y, int z);
 
     public delegate void OnLightLevelChangedEvent(int x, int z, int minY, int maxY);
 
@@ -43,7 +43,7 @@ public class Level
                 {
                     for (var z = 0; z < length; z++)
                     {
-                        _data[GetDataIndex(new TilePosition(x, y, z))] = (byte)(y > height * 2 / 3 ? 0 : 1);
+                        _data[GetDataIndex(x, y, z)] = (byte)(y > height * 2 / 3 ? 0 : 1);
                     }
                 }
             }
@@ -97,7 +97,7 @@ public class Level
                 var oldY = _lightLevels[i + Width * j];
 
                 var y = Height;
-                for (; y > 0 && !IsLightBlocker(new TilePosition(i, y, j)); y--)
+                for (; y > 0 && !IsLightBlocker(i, y, j); y--)
                 {
                 }
 
@@ -112,22 +112,21 @@ public class Level
         }
     }
 
-    public bool IsTile(TilePosition position)
+    public bool IsTile(int x, int y, int z)
     {
-        if (!TilePosition.IsInRange(position, new TilePosition(0, 0, 0), new TilePosition(Width, Height, Length)))
-            return false;
-        return _data[GetDataIndex(position)] == 1;
+        if (!IsInRange(x, y, z)) return false;
+        return _data[GetDataIndex(x, y, z)] == 1;
     }
 
-    public bool IsSolidTile(TilePosition position)
-    {
-        return IsTile(position);
-    }
+    public bool IsTile(TilePosition position) => IsTile(position.X, position.Y, position.Z);
 
-    public bool IsLightBlocker(TilePosition position)
-    {
-        return IsSolidTile(position);
-    }
+    public bool IsSolidTile(int x, int y, int z) => IsTile(x, y, z);
+
+    public bool IsSolidTile(TilePosition position) => IsSolidTile(position.X, position.Y, position.Z);
+
+    public bool IsLightBlocker(int x, int y, int z) => IsSolidTile(x, y, z);
+
+    public bool IsLightBlocker(TilePosition position) => IsLightBlocker(position.X, position.Y, position.Z);
 
     public List<BoundingBox> GetBoxes(BoundingBox area)
     {
@@ -150,7 +149,7 @@ public class Level
             {
                 for (var z = minZ; z <= maxZ; z++)
                 {
-                    if (!IsSolidTile(new TilePosition(x, y, z))) continue;
+                    if (!IsSolidTile(x, y, z)) continue;
 
                     boxes.Add(new BoundingBox(new Vector3(x, y, z), new Vector3(x + 1, y + 1, z + 1)));
                 }
@@ -160,20 +159,24 @@ public class Level
         return boxes;
     }
 
-    public float GetBrightness(TilePosition position)
+    public float GetBrightness(int x, int y, int z)
     {
-        if (!TilePosition.IsInRange(position, new TilePosition(0, 0, 0), new TilePosition(Width, Height, Length))) return LightValue;
-        return _lightLevels[position.X + Width * position.Z] >= position.Y ? DarkValue : LightValue;
+        if (!IsInRange(x, y, z)) return LightValue;
+        return _lightLevels[x + Width * z] >= y ? DarkValue : LightValue;
     }
 
-    public void SetTile(TilePosition position, byte value)
-    {
-        if (!TilePosition.IsInRange(position, new TilePosition(0, 0, 0), new TilePosition(Width, Height, Length))) return;
+    public float GetBrightness(TilePosition position) => GetBrightness(position.X, position.Y, position.Z);
 
-        _data[GetDataIndex(position)] = value;
-        UpdateLightLevels(position.X, position.Z, 1, 1);
-        OnTileChanged?.Invoke(position);
+    public void SetTile(int x, int y, int z, byte value)
+    {
+        if (!IsInRange(x, y, z)) return;
+        
+        _data[GetDataIndex(x, y, z)] = value;
+        UpdateLightLevels(x, z, 1, 1);
+        OnTileChanged?.Invoke(x, y, z);
     }
+
+    public void SetTile(TilePosition position, byte value) => SetTile(position.X, position.Y, position.Z, value);
 
     public RayCollision DoRayCast(Ray ray, float maxDistance)
     {
@@ -205,7 +208,7 @@ public class Level
 
         while (t <= maxDistance)
         {
-            if (IsSolidTile(new TilePosition(ix, iy, iz)))
+            if (IsSolidTile(ix, iy, iz))
             {
                 col.Point = ray.Position + t * ray.Direction;
 
@@ -276,6 +279,8 @@ public class Level
         }
     }
 
+    private bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Length;
+    
     // use original indexing to have compatibility with original levels
-    private int GetDataIndex(TilePosition position) => (position.Y * Length + position.Z) * Width + position.X;
+    private int GetDataIndex(int x, int y, int z) => (y * Length + z) * Width + x;
 }

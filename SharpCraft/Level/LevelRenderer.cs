@@ -24,8 +24,9 @@ public class LevelRenderer : IDisposable
         {
             SetDirtyArea(new TilePosition(x - 1, minY, z - 1), new TilePosition(x + 1, maxY, z + 1));
         };
-        level.OnTileChanged += (position) =>
+        level.OnTileChanged += (x, y, z) =>
         {
+            var position = new TilePosition(x, y, z);
             SetDirtyArea(position - TilePosition.One, position + TilePosition.One);
         };
 
