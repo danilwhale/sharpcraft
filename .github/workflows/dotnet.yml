@@ -32,7 +32,7 @@ jobs:
       uses: actions/upload-artifact@v4.3.1
       with:
         name: SharpCraft-win-x64
-        path: ${GITHUB_WORKSPACE}/SharpCraft/Build/Windows/
+        path: ${{GITHUB_WORKSPACE}}/SharpCraft/Build/Windows/
   build-linux:
 
     runs-on: ubuntu-latest
@@ -55,4 +55,4 @@ jobs:
       uses: actions/upload-artifact@v4.3.1
       with:
         name: SharpCraft-linux-x64
-        path: ${GITHUB_WORKSPACE}/SharpCraft/Build/Linux/
+        path: ${{GITHUB_WORKSPACE}}/SharpCraft/Build/Linux/
