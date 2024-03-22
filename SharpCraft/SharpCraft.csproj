@@ -15,11 +15,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="terrain.png" />
-      <EmbeddedResource Include="terrain.png">
+      <EmbeddedResource Include="Assets\*.*">
         <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       </EmbeddedResource>
-      <None Remove="Fog.vert" />
     </ItemGroup>
 
 </Project>
