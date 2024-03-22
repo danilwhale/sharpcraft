@@ -7,8 +7,9 @@ to newer versions (at least to last pre-classic version lmao)
 
 ## todo
 - [ ] fix flashing chunks on block placing/removing
-- [ ] refactor code a lot
-- [ ] make github actions work (build for linux and windows)
+- [ ] find out why chunks goes black sometimes
+- [x] refactor code a lot
+- [x] make github actions work (build for linux and windows)
 
 ## how to get latest version??????
 [click here to go to github actions](https://github.com/danilwhale/SharpCraft/actions/),
