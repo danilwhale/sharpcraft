@@ -2,7 +2,7 @@
 
 namespace SharpCraft.Level;
 
-public struct TilePosition(int x, int y, int z)
+public readonly struct TilePosition(int x, int y, int z)
 {
     public static readonly TilePosition One = new(1, 1, 1);
     public static readonly TilePosition Zero = new(0, 0, 0);
@@ -11,9 +11,9 @@ public struct TilePosition(int x, int y, int z)
     public static readonly TilePosition UnitY = new(0, 1, 0);
     public static readonly TilePosition UnitZ = new(0, 0, 1);
 
-    public int X = x;
-    public int Y = y;
-    public int Z = z;
+    public readonly int X = x;
+    public readonly int Y = y;
+    public readonly int Z = z;
 
     public static bool IsInRange(TilePosition value, TilePosition min, TilePosition max)
     {
