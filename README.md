@@ -14,7 +14,7 @@ to newer versions (at least to last pre-classic version lmao)
 ## how to get latest version??????
 [click here to go to github actions](https://github.com/danilwhale/SharpCraft/actions/),
 then select top most link with checkmark from left, click on it, scroll down, download artifact for your platform (windows or linux)
-> ⚠️ this is untested, if not working, build it yourself using instructions below
+> ⚠️ linux build is untested, if not working, build it yourself using instructions below
 
 ## how to build™
 1. clone repo (using download button, git clone or ide's vcs clone system)
