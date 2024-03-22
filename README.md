@@ -6,8 +6,9 @@ I need to polish base game, so it will be easier to update this clone
 to newer versions (at least to last pre-classic version lmao)
 
 ## todo
-- [ ] fix flashing chunks on update
-- [ ] refactor code a little
+- [ ] fix flashing chunks on block placing/removing
+- [ ] refactor code a lot
+- [ ] make github actions work (build for linux and windows)
 
 ## how to build™
 1. clone repo (using download button, git clone or ide's vcs clone system)
