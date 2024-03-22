@@ -85,8 +85,8 @@ public static class BoundingBoxExtensions
 
     public static float ClipZCollide(this BoundingBox bbox, BoundingBox other, float z)
     {
-        if (other.Max.X < bbox.Min.X || other.Min.X > bbox.Max.X) return z;
-        if (other.Max.Y < bbox.Min.Y || other.Min.Y > bbox.Max.Y) return z;
+        if (other.Max.X <= bbox.Min.X || other.Min.X >= bbox.Max.X) return z;
+        if (other.Max.Y <= bbox.Min.Y || other.Min.Y >= bbox.Max.Y) return z;
 
         float max;
         
