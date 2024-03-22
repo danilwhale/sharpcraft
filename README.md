@@ -6,8 +6,8 @@ I need to polish base game, so it will be easier to update this clone
 to newer versions (at least to last pre-classic version lmao)
 
 ## todo
-- [ ] fix flashing chunks on block placing/removing
-- [ ] find out why chunks goes black sometimes
+- [x] fix flashing chunks on block placing/removing
+- [x] find out why chunks goes black sometimes
 - [x] refactor code a lot
 - [x] make github actions work (build for linux and windows)
 
