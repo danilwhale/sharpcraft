@@ -21,16 +21,15 @@ public class LevelRenderer : IDisposable
         Level = level;
         level.OnEverythingChanged += () =>
         {
-            SetDirtyArea(new TilePosition(0, 0, 0), new TilePosition(level.Width, level.Height, level.Length));
+            SetDirtyArea(0, 0, 0, level.Width, level.Height, level.Length);
         };
         level.OnLightLevelChanged += (x, z, minY, maxY) =>
         {
-            SetDirtyArea(new TilePosition(x - 1, minY, z - 1), new TilePosition(x + 1, maxY, z + 1));
+            SetDirtyArea(x - 1, minY, z - 1, x + 1, maxY, z + 1);
         };
         level.OnTileChanged += (x, y, z) =>
         {
-            var position = new TilePosition(x, y, z);
-            SetDirtyArea(position - TilePosition.One, position + TilePosition.One);
+            SetDirtyArea(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
         };
 
         ChunksX = level.Width / Chunk.Size;
@@ -74,25 +73,21 @@ public class LevelRenderer : IDisposable
         }
     }
 
-    public void SetDirtyArea(TilePosition min, TilePosition max)
+    public void SetDirtyArea(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {
-        min = TilePosition.Clamp(
-            TilePosition.ToChunkPosition(min),
-            new TilePosition(0, 0, 0),
-            new TilePosition(ChunksX - 1, ChunksY - 1, ChunksZ - 1)
-        );
-        
-        max = TilePosition.Clamp(
-            TilePosition.ToChunkPosition(max),
-            new TilePosition(0, 0, 0),
-            new TilePosition(ChunksX - 1, ChunksY - 1, ChunksZ - 1)
-        );
+        minX = Math.Clamp(minX / Chunk.Size, 0, ChunksX - 1);
+        minY = Math.Clamp(minY / Chunk.Size, 0, ChunksY - 1);
+        minZ = Math.Clamp(minZ / Chunk.Size, 0, ChunksZ - 1);
 
-        for (var x = min.X; x <= max.X; x++)
+        maxX = Math.Clamp(maxX / Chunk.Size, 0, ChunksX - 1);
+        maxY = Math.Clamp(maxY / Chunk.Size, 0, ChunksY - 1);
+        maxZ = Math.Clamp(maxZ / Chunk.Size, 0, ChunksZ - 1);
+        
+        for (var x = minX; x <= maxX; x++)
         {
-            for (var y = min.Y; y <= max.Y; y++)
+            for (var y = minY; y <= maxY; y++)
             {
-                for (var z = min.Z; z <= max.Z; z++)
+                for (var z = minZ; z <= maxZ; z++)
                 {
                     _chunks[x][y][z].IsDirty = true;
                 }
