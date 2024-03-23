@@ -8,9 +8,12 @@ only some parts are ~~stolen~~ grabbed from original source code, because I have
 please report it in issues!!!!!!!
 
 ## known bugs
-- [ ] you can go through a block if you walk diagonally into it (cant reproduce in original)
-- [ ] no shadows like in the original (I'm already working on this, this thing made me rewrite half of the level code lmao)
+- you can go through a block if you walk diagonally into it (can't reproduce in original)
 
+## won't fix
+- no shadows like in the original
+  - this is a second implementation attempt, I had to do a lot of optimizations, yet it still runs like a shit.
+  - TLDR: nop, I won't add them
 ## how to get the latest version??????
 [click here to go to GitHub actions](https://github.com/danilwhale/SharpCraft/actions/),
 then select top most link with checkmark from the left, click on it,
