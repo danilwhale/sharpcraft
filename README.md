@@ -32,3 +32,5 @@ scroll down, download artifact for your platform (windows or linux)
 - [x] find out why chunks go black sometimes
 - [x] refactor code a lot
 - [x] make GitHub actions work (build for linux and windows)
+
+NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT
