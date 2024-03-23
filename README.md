@@ -18,7 +18,20 @@ please report it in issues!!!!!!!
 [click here to go to GitHub actions](https://github.com/danilwhale/SharpCraft/actions/),
 then select top most link with checkmark from the left, click on it,
 scroll down, download artifact for your platform (windows or linux)
-> ⚠️ linux build is untested, if not working, build it yourself using the instructions below
+
+> ⚠️ read a section below before downloading and running the game
+
+> ⚠️ linux build is untested, if not working, build it yourself using the instructions in 'how to build' section
+
+## assets
+now you need to extract assets from the original game yourselves.
+this is done so microsoft won't murder me for using their assets in my project.
+
+find and open rd-132211.jar in any archiver (for example, 7-zip)
+and extract the following files:
+- terrain.png
+
+after this, move them to 'Assets' inside SharpCraft's directory
 
 ## how to build
 1. clone repo (using download button, git clone or ide's vcs clone system)
@@ -33,4 +46,4 @@ scroll down, download artifact for your platform (windows or linux)
 - [x] refactor code a lot
 - [x] make GitHub actions work (build for linux and windows)
 
-NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT
+**NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT**
