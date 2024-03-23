@@ -21,7 +21,11 @@ internal static class Program
         
         Resources.Load();
 
-        Scene = new SplashScene();
+        if (!Directory.Exists("Assets"))
+        {
+            Scene = new NoAssetsScene();
+        }
+        else Scene = new SplashScene();
 
         while (!WindowShouldClose())
         {
