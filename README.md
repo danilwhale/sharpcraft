@@ -8,7 +8,7 @@ only some parts are ~~stolen~~ grabbed from original source code, because I have
 please report it in issues!!!!!!!
 
 ## known bugs
-- you can go through a block if you walk diagonally into it (can't reproduce in original)
+idk
 
 ## won't fix
 - no shadows like in the original
@@ -41,6 +41,7 @@ after this, move them to 'Assets' inside SharpCraft's directory
    - no ide? dotnet build inside project's folder
 
 ## fixed bugs/finished tasks
+- [x] you can go through a block if you walk diagonally into it (can't reproduce in original)
 - [x] fix flashing chunks on block placing/removing
 - [x] find out why chunks go black sometimes
 - [x] refactor code a lot

@@ -90,36 +90,46 @@ public class Player
 
         MoveRelative(x, z, _isOnGround ? 0.02f : 0.005f);
         _direction.Y -= 0.005f;
-        Move(_direction.X, _direction.Y, _direction.Z);
+        Move(_direction);
         
         _direction *= new Vector3(0.91f, 0.98f, 0.91f);
 
         if (_isOnGround) _direction *= new Vector3(0.8f, 1.0f, 0.8f);
     }
 
-    private void Move(float x, float y, float z)
+    private void Move(Vector3 direction)
     {
-        var oldX = x;
-        var oldY = y;
-        var oldZ = z;
+        var oldDirection = direction;
 
-        var boxes = _level.GetBoxes(_bbox.Expand(x, y, z));
+        var boxes = _level.GetBoxes(_bbox.Expand(direction));
         
         foreach (var box in boxes)
         {
-            x = box.ClipXCollide(_bbox, x);
-            y = box.ClipYCollide(_bbox, y);
-            z = box.ClipZCollide(_bbox, z);
+            direction.X = box.ClipXCollide(_bbox, direction.X);
         }
 
-        _bbox.Move(x, y, z);
+        _bbox.Move(direction.X, 0.0f, 0.0f);
+        
+        foreach (var box in boxes)
+        {
+            direction.Y = box.ClipYCollide(_bbox, direction.Y);
+        }
+
+        _bbox.Move(0.0f, direction.Y, 0.0f);
+        
+        foreach (var box in boxes)
+        {
+            direction.Z = box.ClipZCollide(_bbox, direction.Z);
+        }
+
+        _bbox.Move(0.0f, 0.0f, direction.Z);
 
         // ReSharper disable CompareOfFloatsByEqualityOperator
-        _isOnGround = oldY != y && oldY < 0.0f;
+        _isOnGround = oldDirection.Y != direction.Y && oldDirection.Y < 0.0f;
 
-        _direction.X = oldX != x ? 0.0f : _direction.X;
-        _direction.Y = oldY != y ? 0.0f : _direction.Y;
-        _direction.Z = oldZ != z ? 0.0f : _direction.Z;
+        _direction.X = oldDirection.X != direction.X ? 0.0f : direction.X;
+        _direction.Y = oldDirection.Y != direction.Y ? 0.0f : direction.Y;
+        _direction.Z = oldDirection.Z != direction.Z ? 0.0f : direction.Z;
         // ReSharper restore CompareOfFloatsByEqualityOperator
 
         Position = new Vector3(

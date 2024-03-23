@@ -24,9 +24,19 @@ public static class BoundingBoxExtensions
         return new BoundingBox(min, max);
     }
 
+    public static BoundingBox Expand(this BoundingBox bbox, Vector3 expandVector)
+    {
+        return Expand(bbox, expandVector.X, expandVector.Y, expandVector.Z);
+    }
+
     public static BoundingBox Grow(this BoundingBox bbox, float x, float y, float z)
     {
         return new BoundingBox(bbox.Min - new Vector3(x, y, z), bbox.Max + new Vector3(x, y, z));
+    }
+
+    public static BoundingBox Grow(this BoundingBox bbox, Vector3 growVector)
+    {
+        return new BoundingBox(bbox.Min - growVector, bbox.Max + growVector);
     }
 
     public static float ClipXCollide(this BoundingBox bbox, BoundingBox other, float x)
@@ -114,5 +124,11 @@ public static class BoundingBoxExtensions
     {
         bbox.Min += new Vector3(x, y, z);
         bbox.Max += new Vector3(x, y, z);
+    }
+
+    public static void Move(this ref BoundingBox bbox, Vector3 moveVector)
+    {
+        bbox.Min += moveVector;
+        bbox.Max += moveVector;
     }
 }
