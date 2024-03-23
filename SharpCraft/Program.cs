@@ -1,9 +1,12 @@
 ﻿global using static Raylib_cs.Raylib;
 global using Raylib_cs;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using SharpCraft.Level;
 using SharpCraft.Utilities;
 using Timer = SharpCraft.Utilities.Timer;
+
+[assembly: DisableRuntimeMarshalling]
 
 namespace SharpCraft;
 

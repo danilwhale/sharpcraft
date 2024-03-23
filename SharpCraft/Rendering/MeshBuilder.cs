@@ -1,9 +1,15 @@
 ﻿using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Security;
 
 namespace SharpCraft.Rendering;
 
-public class MeshBuilder : IDisposable
+[SuppressUnmanagedCodeSecurity]
+public partial class MeshBuilder : IDisposable
 {
+    [LibraryImport(NativeLibName)]
+    private static partial void UploadMesh(ref Mesh mesh, [MarshalAs(UnmanagedType.I1)] bool isDynamic);
+    
     private Mesh _mesh;
     private Mesh _oldMesh;
 
