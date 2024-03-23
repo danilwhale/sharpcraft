@@ -15,9 +15,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Include="Assets\*.*">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      </EmbeddedResource>
+      <Content Include="Assets\*.*">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

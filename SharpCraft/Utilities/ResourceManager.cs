@@ -10,23 +10,7 @@ public static class ResourceManager
     {
         if (Textures.TryGetValue(path, out var texture)) return texture;
 
-        using var stream = Assembly.GetExecutingAssembly()
-            .GetManifestResourceStream(
-                typeof(Program),
-                "Assets." + path.Replace(Path.PathSeparator, '.')
-            );
-        
-        if (stream == null)
-        {
-            throw new Exception("explod no such resource explod explod!!");
-        }
-
-        var bytes = new byte[stream.Length];
-        _ = stream.Read(bytes, 0, bytes.Length);
-
-        var image = LoadImageFromMemory(Path.GetExtension(path), bytes);
-        texture = LoadTextureFromImage(image);
-        UnloadImage(image);
+        texture = LoadTexture(Path.Join("Assets", path));
 
         Textures[path] = texture;
         return texture;
@@ -34,19 +18,12 @@ public static class ResourceManager
 
     public static string GetText(string path)
     {
-        using var stream = Assembly.GetExecutingAssembly()
-            .GetManifestResourceStream(
-                typeof(Program),
-                "Assets." + path.Replace(Path.PathSeparator, '.')
-            );
-        
-        if (stream == null)
+        if (!File.Exists(path))
         {
             throw new Exception("explod no such resource explod explod!!");
         }
 
-        using var reader = new StreamReader(stream);
-        return reader.ReadToEnd();
+        return File.ReadAllText(Path.Join("Assets", path));
     }
 
     public static void Unload()
