@@ -92,53 +92,28 @@ public readonly struct Frustum()
 
         return true;
     }
-
-    public bool IsCubeFullyVisible(BoundingBox bbox)
-    {
-        foreach (var p in _planes)
-        {
-            var allOutside = true;
-
-            for (var i = 0; i < 8; i++)
-            {
-                var x = (i & 1) == 0 ? bbox.Min.X : bbox.Max.X;
-                var y = (i & 2) == 0 ? bbox.Min.Y : bbox.Max.Y;
-                var z = (i & 4) == 0 ? bbox.Min.Z : bbox.Max.Z;
-
-                var distance = DistanceToPoint(p, x, y, z);
-                if (distance >= 0.0f)
-                {
-                    allOutside = false;
-                    break;
-                }
-            }
-
-            if (allOutside) return false;
-        }
-
-        return true;
-    }
     
     public bool IsCubeVisible(BoundingBox bbox)
     {
+        var x0 = bbox.Min.X;
+        var y0 = bbox.Min.Y;
+        var z0 = bbox.Min.Z;
+        
+        var x1 = bbox.Max.X;
+        var y1 = bbox.Max.Y;
+        var z1 = bbox.Max.Z;
+        
         foreach (var p in _planes)
         {
-            var allOutside = true;
-
-            for (var i = 0; i < 8; i++)
-            {
-                var x = (i & 1) == 0 ? bbox.Min.X : bbox.Max.X;
-                var y = (i & 2) == 0 ? bbox.Min.Y : bbox.Max.Y;
-                var z = (i & 4) == 0 ? bbox.Min.Z : bbox.Max.Z;
-
-                var distance = DistanceToPoint(p, x, y, z);
-                if (distance >= 0.0f)
-                {
-                    allOutside = false;
-                }
-            }
-
-            if (allOutside) return false;
+            if (DistanceToPoint(p, x1, y1, z1) < 0.0f &&
+                DistanceToPoint(p, x0, y1, z1) < 0.0f &&
+                DistanceToPoint(p, x1, y0, z1) < 0.0f &&
+                DistanceToPoint(p, x0, y0, z1) < 0.0f &&
+                DistanceToPoint(p, x1, y1, z0) < 0.0f &&
+                DistanceToPoint(p, x0, y1, z0) < 0.0f &&
+                DistanceToPoint(p, x1, y0, z0) < 0.0f &&
+                DistanceToPoint(p, x0, y0, z0) < 0.0f)
+                return false;
         }
 
         return true;
