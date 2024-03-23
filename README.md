@@ -27,11 +27,15 @@ scroll down, download artifact for your platform (windows or linux)
 now you need to extract assets from the original game yourselves.
 this is done so microsoft won't murder me for using their assets in my project.
 
+where to find rd-132211.jar:
+official launcher: `%appdata%/.minecraft/versions/rd-132211` (can't tell path on linux)
+prism launcher: `%appdata%/PrismLauncher/libraries/com/mojang/minecraft` (can't tell path on linux)
+
 find and open rd-132211.jar in any archiver (for example, 7-zip)
 and extract the following files:
 - terrain.png
 
-after this, move them to 'Assets' inside SharpCraft's directory
+after this, create folder 'Assets' inside SharpCraft's directory and move them to this folder
 
 ## how to build
 1. clone repo (using download button, git clone or ide's vcs clone system)
