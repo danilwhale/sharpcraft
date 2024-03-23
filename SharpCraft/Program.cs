@@ -18,6 +18,10 @@ internal static class Program
     private static Player _player = null!;
     private static RayCollision _rayCast;
 
+    private static int _fps;
+    private static int _frames;
+    private static double _lastSecondTime;
+
     private static void Main()
     {
         InitWindow(1024, 768, "Minecraft");
@@ -63,11 +67,24 @@ internal static class Program
 
         EndMode3D();
 
-        DrawFPS(0, 0);
+        DrawText($"{_fps} FPS, {Chunk.Updates} chunk updates", 0, 0, 24, Color.White);
     }
 
     private static void Update()
     {
+        _frames++;
+        
+        var time = GetTime();
+        if (time - _lastSecondTime >= 1.0)
+        {
+            _fps = _frames;
+            _frames = 0;
+            
+            Chunk.Updates = 0;
+            
+            _lastSecondTime = time;
+        }
+        
         var mouseDelta = GetMouseDelta();
         _player.Rotate(mouseDelta.Y, mouseDelta.X);
         
