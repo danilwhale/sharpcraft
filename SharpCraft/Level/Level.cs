@@ -1,5 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace SharpCraft.Level;
 
@@ -279,8 +280,10 @@ public class Level
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Length;
     
     // use original indexing to have compatibility with original levels
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private int GetDataIndex(int x, int y, int z) => (y * Length + z) * Width + x;
 }
