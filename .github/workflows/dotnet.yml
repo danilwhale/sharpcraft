@@ -6,8 +6,10 @@ name: .NET
 on:
   push:
     branches: [ "master" ]
+    paths: [ 'SharpCraft/**' ]
   pull_request:
     branches: [ "master" ]
+    paths: [ 'SharpCraft/**' ]
 
 jobs:
   build-windows:
