@@ -17,7 +17,7 @@ internal static class Program
 
     private static void Main()
     {
-        InitWindow(1024, 768, "Minecraft");
+        InitWindow(1024, 768, "SharpCraft");
         
         Resources.Load();
 
