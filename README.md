@@ -28,8 +28,8 @@ now you need to extract assets from the original game yourselves.
 this is done so microsoft won't murder me for using their assets in my project.
 
 where to find rd-132211.jar:
-official launcher: `%appdata%/.minecraft/versions/rd-132211` (can't tell path on linux)
-prism launcher: `%appdata%/PrismLauncher/libraries/com/mojang/minecraft` (can't tell path on linux)
+- official launcher: `%appdata%/.minecraft/versions/rd-132211` (can't tell path on linux)
+- prism launcher: `%appdata%/PrismLauncher/libraries/com/mojang/minecraft` (can't tell path on linux)
 
 find and open rd-132211.jar in any archiver (for example, 7-zip)
 and extract the following files:
