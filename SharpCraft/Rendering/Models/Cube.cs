@@ -211,43 +211,43 @@ public readonly struct Cube
         var leftSource = new Rectangle(
             sourceX,
             sourceY + size.Z,
-            sourceX + size.Z,
-            sourceY + size.Z + size.Y
+            size.Z,
+            size.Y
         );
 
         var rightSource = new Rectangle(
             sourceX + size.Z + size.X,
             sourceY + size.Z,
-            sourceX + size.Z + size.X + size.Z,
-            sourceY + size.Z + size.Y
+            size.Z,
+            size.Y
         );
 
         var topSource = new Rectangle(
             sourceX + size.Z + size.X,
             sourceY,
-            sourceX + size.Z + size.X + size.X,
-            sourceY + size.Z
+            size.X,
+            size.Z
         );
 
         var bottomSource = new Rectangle(
             sourceX + size.Z,
             sourceY,
-            sourceX + size.Z + size.X,
-            sourceY + size.Z
+            size.X,
+            size.Z
         );
 
         var frontSource = new Rectangle(
             sourceX + size.Z + size.X + size.Z,
             sourceY + size.Z,
-            sourceX + size.Z + size.X + size.Z + size.X,
-            sourceY + size.Z + size.Y
+            size.X,
+            size.Y
         );
 
         var backSource = new Rectangle(
             sourceX + size.Z,
             sourceY + size.Z,
-            sourceX + size.Z + size.X,
-            sourceY + size.Z + size.Y
+            size.X,
+            size.Y
         );
 
         leftSource.Position /= textureSize;
