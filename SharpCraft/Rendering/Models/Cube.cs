@@ -36,7 +36,7 @@ public readonly struct Cube
                     position.X,
                     position.Y + size.Y,
                     position.Z + size.Z,
-                    leftSource.X + leftSource.Height,
+                    leftSource.X + leftSource.Width,
                     leftSource.Y),
                 new Vertex(
                     position.X,
@@ -69,7 +69,7 @@ public readonly struct Cube
                 new Vertex(
                     position.X + size.X,
                     position.Y,
-                    position.Z + size.X,
+                    position.Z + size.Z,
                     rightSource.X,
                     rightSource.Y + rightSource.Height)
             ),
@@ -209,28 +209,28 @@ public readonly struct Cube
         var textureSize = new Vector2(textureWidth, textureHeight);
 
         var leftSource = new Rectangle(
-            sourceX,
+            sourceX + size.Z + size.X,
             sourceY + size.Z,
             size.Z,
             size.Y
         );
 
         var rightSource = new Rectangle(
-            sourceX + size.Z + size.X,
+            sourceX,
             sourceY + size.Z,
             size.Z,
             size.Y
         );
 
         var topSource = new Rectangle(
-            sourceX + size.Z + size.X,
+            sourceX + size.Z,
             sourceY,
             size.X,
             size.Z
         );
 
         var bottomSource = new Rectangle(
-            sourceX + size.Z,
+            sourceX + size.Z + size.X,
             sourceY,
             size.X,
             size.Z
