@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
-using SharpCraft.Physics;
 
-namespace SharpCraft;
+namespace SharpCraft.Entities;
 
 public class Player : Entity
 {

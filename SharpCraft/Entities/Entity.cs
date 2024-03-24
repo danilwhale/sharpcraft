@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using SharpCraft.Physics;
 
-namespace SharpCraft;
+namespace SharpCraft.Entities;
 
 public class Entity(Level.Level level, float halfWidth, float halfHeight)
 {
