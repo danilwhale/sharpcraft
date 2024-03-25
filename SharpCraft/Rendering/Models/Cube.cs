@@ -187,12 +187,11 @@ public readonly struct Cube
         ];
     }
 
-    public void Add(Mesh mesh, int index)
+    public void Draw()
     {
-        for (var i = 0; i < _polygons.Length; i++)
+        foreach (var p in _polygons)
         {
-            var p = _polygons[i];
-            p.Add(mesh, index + i * 6);
+            p.Draw();
         }
     }
 

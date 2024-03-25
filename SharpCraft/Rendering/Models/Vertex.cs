@@ -10,10 +10,10 @@ public readonly struct Vertex(Vector3 position, Vector2 texCoords)
     public Vertex(float x, float y, float z, float u, float v)
         : this(new Vector3(x, y, z), new Vector2(u, v)) { }
 
-    public void Add(Mesh mesh, int index)
+    public void Draw()
     {
-        mesh.VerticesAs<Vector3>()[index] = Position;
-        mesh.TexCoordsAs<Vector2>()[index] = TexCoords;
+        Rlgl.TexCoord2f(TexCoords.X, TexCoords.Y);
+        Rlgl.Vertex3f(Position.X, Position.Y, Position.Z);
     }
 
     public Vertex Move(float x, float y, float z)

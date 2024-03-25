@@ -7,15 +7,15 @@ public readonly struct Polygon(Vertex a, Vertex b, Vertex c, Vertex d)
     public readonly Vertex C = c;
     public readonly Vertex D = d;
 
-    public void Add(Mesh mesh, int index)
+    public void Draw()
     {
-        A.Add(mesh, index);
-        B.Add(mesh, index + 1);
-        C.Add(mesh, index + 2);
+        A.Draw();
+        B.Draw();
+        C.Draw();
         
-        A.Add(mesh, index + 3);
-        C.Add(mesh, index + 4);
-        D.Add(mesh, index + 5);
+        A.Draw();
+        C.Draw();
+        D.Draw();
     }
 
     public Polygon Move(float x, float y, float z)
