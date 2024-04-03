@@ -48,7 +48,7 @@ public class SplashScene : IScene
             }
         }
         
-        DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(), Color.Blank, ColorAlpha(Color.Black, 0.6f));
+        DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(), Color.Blank, Color.Black);
         
         DrawTextCentered("sharpcraft", 48, 0, Color.White);
         DrawTextCentered("comically long splash screen for fun", 16, GetScreenHeight() / 2 - 48, Color.White);
