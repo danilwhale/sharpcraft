@@ -37,8 +37,6 @@ public class SplashScene : IScene
         }
         
         DrawTextCentered("sharpcraft", 48, 0, Color.White);
-        
-        DrawTextCentered("NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT", 16, GetScreenHeight() / 2 - 18, Color.LightGray);
     }
 
     private void DrawTextCentered(string text, int fontSize, int yOffset, Color color)

@@ -20,12 +20,8 @@ internal static class Program
         InitWindow(1024, 768, "SharpCraft");
         
         Resources.Load();
-
-        if (!Directory.Exists("Assets"))
-        {
-            Scene = new NoAssetsScene();
-        }
-        else Scene = new SplashScene();
+        
+        Scene = new SplashScene();
 
         while (!WindowShouldClose())
         {
