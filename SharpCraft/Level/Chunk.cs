@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using SharpCraft.Level.Tiles;
 using SharpCraft.Rendering;
 using SharpCraft.Utilities;
 
@@ -54,8 +55,7 @@ public class Chunk : IDisposable
                 {
                     if (!_level.IsTile(x, y, z)) continue;
                     
-                    if (y == _level.Height * 2 / 3) Tile.Grass.Build(_builder, _level, x, y, z);
-                    else Tile.Rock.Build(_builder, _level, x, y, z);
+                    TileRegistry.Tiles[_level.GetTile(x, y, z)].Build(_builder, _level, x, y, z);
                 }
             }
         }
@@ -87,8 +87,7 @@ public class Chunk : IDisposable
                 {
                     if (!_level.IsTile(x, y, z)) continue;
 
-                    if (y == _level.Height * 2 / 3) count += Tile.Grass.GetFaceCount(_level, x, y, z);
-                    else count += Tile.Rock.GetFaceCount(_level, x, y, z);
+                    count += TileRegistry.Tiles[_level.GetTile(x, y, z)].GetFaceCount(_level, x, y, z);
                 }
             }
         }

@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using SharpCraft.Level.Tiles;
 using SharpCraft.Rendering;
 
 namespace SharpCraft.Level;
@@ -104,12 +105,12 @@ public class LevelRenderer : IDisposable
 
         var position = (TilePosition)(hit.Point - hit.Normal / 2.0f);
         
-        if (hit.Normal == new Vector3(1.0f, 0.0f, 0.0f)) Tile.Rock.DrawRlGlFace(position, Face.Right);
-        else if (hit.Normal == new Vector3(-1.0f, 0.0f, 0.0f)) Tile.Rock.DrawRlGlFace(position, Face.Left);
-        else if (hit.Normal == new Vector3(0.0f, 1.0f, 0.0f)) Tile.Rock.DrawRlGlFace(position, Face.Top);
-        else if (hit.Normal == new Vector3(0.0f, -1.0f, 0.0f)) Tile.Rock.DrawRlGlFace(position, Face.Bottom);
-        else if (hit.Normal == new Vector3(0.0f, 0.0f, 1.0f)) Tile.Rock.DrawRlGlFace(position, Face.Front);
-        else if (hit.Normal == new Vector3(0.0f, 0.0f, -1.0f)) Tile.Rock.DrawRlGlFace(position, Face.Back);
+        if (hit.Normal == new Vector3(1.0f, 0.0f, 0.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Right);
+        else if (hit.Normal == new Vector3(-1.0f, 0.0f, 0.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Left);
+        else if (hit.Normal == new Vector3(0.0f, 1.0f, 0.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Top);
+        else if (hit.Normal == new Vector3(0.0f, -1.0f, 0.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Bottom);
+        else if (hit.Normal == new Vector3(0.0f, 0.0f, 1.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Front);
+        else if (hit.Normal == new Vector3(0.0f, 0.0f, -1.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Back);
         
         Rlgl.End();
     }

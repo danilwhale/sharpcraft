@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using SharpCraft.Level.Tiles;
 
 namespace SharpCraft.Level;
 
@@ -116,7 +117,7 @@ public class Level
     public bool IsTile(int x, int y, int z)
     {
         if (!IsInRange(x, y, z)) return false;
-        return _data[GetDataIndex(x, y, z)] == 1;
+        return _data[GetDataIndex(x, y, z)] > 0;
     }
 
     public bool IsTile(TilePosition position) => IsTile(position.X, position.Y, position.Z);
@@ -178,6 +179,8 @@ public class Level
     }
 
     public void SetTile(TilePosition position, byte value) => SetTile(position.X, position.Y, position.Z, value);
+
+    public byte GetTile(int x, int y, int z) => !IsInRange(x, y, z) ? (byte)0 : _data[GetDataIndex(x, y, z)];
 
     public RayCollision DoRayCast(Ray ray, float maxDistance)
     {
