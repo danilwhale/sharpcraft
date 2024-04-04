@@ -53,11 +53,11 @@ public class Player : Entity
 
         if (IsOnGround && (IsKeyDown(KeyboardKey.Space) || IsKeyDown(KeyboardKey.LeftSuper)))
         {
-            Direction.Y = 0.12f;
+            Direction.Y = 0.16f;
         }
 
-        MoveRelative(x, z, IsOnGround ? 0.02f : 0.005f);
-        Direction.Y -= 0.005f;
+        MoveRelative(x, z, IsOnGround ? 0.023f : 0.007f);
+        Direction.Y -= 0.008f;
         Move(Direction);
         
         Direction *= new Vector3(0.91f, 0.98f, 0.91f);
