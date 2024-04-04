@@ -20,7 +20,9 @@ public class GameScene : IScene
 
     private byte _currentTile = 1;
 
-    private GameOverlayScreen _screen;
+    private GameOverlayScreen _gameScreen;
+    private PauseScreen _pauseScreen;
+    private bool _paused;
 
     public GameScene()
     {
@@ -31,15 +33,40 @@ public class GameScene : IScene
         _levelRenderer = new LevelRenderer(_level);
         _player = new Player(_level);
 
-        _screen = new GameOverlayScreen();
-        Program.Screen = _screen;
+        _gameScreen = new GameOverlayScreen();
+        _pauseScreen = new PauseScreen();
     }
 
     public void Update()
     {
+        if (IsKeyPressed(KeyboardKey.Escape))
+        {
+            _paused = !_paused;
+            
+            if (_paused)
+            {
+                EnableCursor();
+                SetTargetFPS(15);
+                _timer.TimeScale = 0.0f;
+            }
+            else
+            {
+                DisableCursor();
+                SetTargetFPS(0);
+                _timer.TimeScale = 1.0f;
+            }
+        }
+        
+        if (!_paused)
+        {
+            FrameRateUpdate();
+        }
+        
         _timer.Advance();
         for (var i = 0; i < _timer.Ticks; i++) TickedUpdate();
-        FrameRateUpdate();
+        
+        if (_paused) _pauseScreen.Update();
+        else _gameScreen.Update();
     }
 
     private void FrameRateUpdate()
@@ -74,7 +101,7 @@ public class GameScene : IScene
 
         if (mouseScroll < 0) _currentTile = (byte)(_currentTile - 1 < 1 ? MaxTileId : _currentTile - 1);
         else if (mouseScroll > 0) _currentTile = (byte)(_currentTile + 1 > MaxTileId ? 1 : _currentTile + 1);
-        _screen.BlockSelection.CurrentTile = _currentTile;
+        _gameScreen.BlockSelection.CurrentTile = _currentTile;
 
         if (IsKeyPressed(KeyboardKey.Enter)) _level.Save();
 
@@ -101,6 +128,9 @@ public class GameScene : IScene
         _levelRenderer.DrawHit(_rayCast);
 
         EndMode3D();
+        
+        _gameScreen.Draw();
+        if (_paused) _pauseScreen.Draw();
     }
 
     public void Dispose()

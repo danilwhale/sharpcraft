@@ -7,7 +7,7 @@ public class Timer(float ticksPerSecond)
     private const long NanosecondsPerSecond = TimeSpan.TicksPerSecond * TimeSpan.NanosecondsPerTick;
     private const int MaxTicks = 100;
     
-    private const float TimeScale = 1.0f;
+    public float TimeScale = 1.0f;
     
     public int Ticks { get; private set; }
     public float PassedTime { get; private set; }

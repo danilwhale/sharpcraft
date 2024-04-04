@@ -16,11 +16,11 @@ namespace SharpCraft;
 internal static class Program
 {
     public static IScene Scene = null!;
-    public static Screen? Screen;
 
     private static void Main()
     {
         InitWindow(1024, 768, "SharpCraft");
+        SetExitKey(KeyboardKey.Null);
         
         Resources.Load();
         
@@ -29,12 +29,10 @@ internal static class Program
         while (!WindowShouldClose())
         {
             Scene.Update();
-            Screen?.Update();
             
             BeginDrawing();
             
             Scene.Draw();
-            Screen?.Draw();
             
             EndDrawing();
         }
