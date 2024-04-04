@@ -2,6 +2,8 @@
 global using Raylib_cs;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using SharpCraft.Gui;
+using SharpCraft.Gui.Screens;
 using SharpCraft.Level;
 using SharpCraft.Scenes;
 using SharpCraft.Utilities;
@@ -14,6 +16,7 @@ namespace SharpCraft;
 internal static class Program
 {
     public static IScene Scene = null!;
+    public static Screen? Screen;
 
     private static void Main()
     {
@@ -26,10 +29,12 @@ internal static class Program
         while (!WindowShouldClose())
         {
             Scene.Update();
+            Screen?.Update();
             
             BeginDrawing();
             
             Scene.Draw();
+            Screen?.Draw();
             
             EndDrawing();
         }
