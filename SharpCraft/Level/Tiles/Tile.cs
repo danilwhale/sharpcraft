@@ -21,11 +21,6 @@ public class Tile
     
     public void Build(MeshBuilder builder, Level level, int x, int y, int z)
     {
-        var u0 = TextureIndex % 16.0f / 16.0f;
-        var u1 = u0 + 1.0f / 16;
-        var v0 = MathF.Floor(TextureIndex / 16.0f) / 16.0f;
-        var v1 = v0 + 1.0f / 16;
-
         var x0 = x;
         var y0 = y;
         var z0 = z;
@@ -35,6 +30,13 @@ public class Tile
 
         if (!level.IsSolidTile(x - 1, y, z))
         {
+            var textureIndex = GetTextureIndexForFace(Face.Left);
+            
+            var u0 = textureIndex % 16.0f / 16.0f;
+            var u1 = u0 + 1.0f / 16;
+            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
+            var v1 = v0 + 1.0f / 16;
+            
             var b = level.GetBrightness(x - 1, y, z) * Darkest;
 
             builder.Color(b, b, b);
@@ -50,6 +52,13 @@ public class Tile
 
         if (!level.IsSolidTile(x + 1, y, z))
         {
+            var textureIndex = GetTextureIndexForFace(Face.Right);
+            
+            var u0 = textureIndex % 16.0f / 16.0f;
+            var u1 = u0 + 1.0f / 16;
+            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
+            var v1 = v0 + 1.0f / 16;
+            
             var b = level.GetBrightness(x + 1, y, z) * Darkest;
 
             builder.Color(b, b, b);
@@ -65,6 +74,13 @@ public class Tile
 
         if (!level.IsSolidTile(x, y + 1, z))
         {
+            var textureIndex = GetTextureIndexForFace(Face.Top);
+            
+            var u0 = textureIndex % 16.0f / 16.0f;
+            var u1 = u0 + 1.0f / 16;
+            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
+            var v1 = v0 + 1.0f / 16;
+            
             var b = level.GetBrightness(x, y + 1, z) * Light;
             
             builder.Color(b, b, b);
@@ -80,6 +96,13 @@ public class Tile
 
         if (!level.IsSolidTile(x, y - 1, z))
         {
+            var textureIndex = GetTextureIndexForFace(Face.Bottom);
+            
+            var u0 = textureIndex % 16.0f / 16.0f;
+            var u1 = u0 + 1.0f / 16;
+            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
+            var v1 = v0 + 1.0f / 16;
+            
             var b = level.GetBrightness(x, y - 1, z) * Light;
 
             builder.Color(b, b, b);
@@ -95,6 +118,13 @@ public class Tile
 
         if (!level.IsSolidTile(x, y, z + 1))
         {
+            var textureIndex = GetTextureIndexForFace(Face.Front);
+            
+            var u0 = textureIndex % 16.0f / 16.0f;
+            var u1 = u0 + 1.0f / 16;
+            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
+            var v1 = v0 + 1.0f / 16;
+            
             var b = level.GetBrightness(x, y, z + 1) * Darker;
 
             builder.Color(b, b, b);
@@ -110,6 +140,13 @@ public class Tile
 
         if (!level.IsSolidTile(x, y, z - 1))
         {
+            var textureIndex = GetTextureIndexForFace(Face.Back);
+            
+            var u0 = textureIndex % 16.0f / 16.0f;
+            var u1 = u0 + 1.0f / 16;
+            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
+            var v1 = v0 + 1.0f / 16;
+            
             var b = level.GetBrightness(x, y, z - 1) * Darker;
 
             builder.Color(b, b, b);
@@ -202,5 +239,10 @@ public class Tile
                 Rlgl.Vertex3f(x1, y0, z0);
                 break;
         }
+    }
+
+    protected virtual int GetTextureIndexForFace(Face face)
+    {
+        return TextureIndex;
     }
 }

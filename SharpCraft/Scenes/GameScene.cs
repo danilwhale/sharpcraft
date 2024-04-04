@@ -10,7 +10,7 @@ namespace SharpCraft.Scenes;
 
 public class GameScene : IScene
 {
-    private const byte MaxTileId = 2;
+    private static readonly int MaxTileId = TileRegistry.GetNonNullTileCount();
 
     private Timer _timer;
     private Level.Level _level;
