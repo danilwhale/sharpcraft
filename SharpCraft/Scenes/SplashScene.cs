@@ -24,23 +24,24 @@ public class SplashScene : IScene
 
         var random = new Random(_seed);
         
-        var halfHeight = GetScreenHeight() / 128 / 2;
+        var halfHeight = GetScreenHeight() / 64 / 2;
 
-        for (var x = 0; x < GetScreenWidth() / 128; x++)
+        for (var x = 0; x < GetScreenWidth() / 64; x++)
         {
             var level = halfHeight + random.Next(1, 3);
             
-            for (var y = 0; y < GetScreenHeight() / 128; y++)
+            for (var y = 0; y < GetScreenHeight() / 64; y++)
             {
                 Rectangle source;
-                if (y == halfHeight || y == level) source = new Rectangle(0, 0, 16, 16);
+                if (y == halfHeight) source = new Rectangle(48, 0, 16, 16);
+                else if (y <= level && y > halfHeight) source = new Rectangle(32, 0, 16, 16);
                 else if (y < halfHeight) continue;
                 else source = new Rectangle(16, 0, 16, 16);
 
                 DrawTexturePro(
                     terrain,
                     source,
-                    new Rectangle(x * 128, y * 128, 128, 128),
+                    new Rectangle(x * 64, y * 64, 64, 64),
                     Vector2.Zero,
                     0.0f,
                     new Color(87, 87, 87, 255)
