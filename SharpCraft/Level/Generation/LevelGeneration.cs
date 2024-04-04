@@ -12,17 +12,21 @@ public static class LevelGeneration
 
         for (var x = 0; x < level.Width; x++)
         {
-            for (var y = 0; y < level.Height; y++)
+            for (var z = 0; z < level.Length; z++)
             {
-                for (var z = 0; z < level.Length; z++)
-                {
-                    var yLevel = level.Height * 2 / 3 - random.Next(1, 3);
+                var yLevel = level.Height * 2 / 3 - random.Next(2, 5);
 
-                    if (y == groundLevel || y == yLevel)
+                for (var y = 0; y < level.Height; y++)
+                {
+                    if (y == groundLevel)
                     {
                         level.SetTileUnchecked(x, y, z, TileRegistry.Grass.Id, false);
                     }
-                    else if (y < groundLevel)
+                    else if (y >= yLevel && y < groundLevel)
+                    {
+                        level.SetTileUnchecked(x, y, z, TileRegistry.Dirt.Id, false);
+                    }
+                    else if (y < yLevel)
                     {
                         level.SetTileUnchecked(x, y, z, TileRegistry.Rock.Id, false);
                     }
