@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using SharpCraft.Level.Generation;
 using SharpCraft.Level.Tiles;
 
 namespace SharpCraft.Level;
@@ -39,16 +40,7 @@ public class Level
 
         if (!TryLoad())
         {
-            for (var x = 0; x < width; x++)
-            {
-                for (var y = 0; y < height; y++)
-                {
-                    for (var z = 0; z < length; z++)
-                    {
-                        _data[GetDataIndex(x, y, z)] = (byte)(y > height * 2 / 3 ? 0 : 1);
-                    }
-                }
-            }
+            LevelGeneration.Generate(this, Random.Shared.Next());
         }
         
         UpdateLightLevels(0, 0, width, length);
@@ -168,28 +160,29 @@ public class Level
 
     public float GetBrightness(TilePosition position) => GetBrightness(position.X, position.Y, position.Z);
 
-    public void SetTile(int x, int y, int z, byte value)
+    public void SetTile(int x, int y, int z, byte value, bool updateLighting = true)
     {
         if (!IsInRange(x, y, z)) return;
 
-        SetTileUnchecked(x, y, z, value);
+        SetTileUnchecked(x, y, z, value, updateLighting);
     }
 
-    public void SetTile(TilePosition position, byte value) => SetTile(position.X, position.Y, position.Z, value);
+    public void SetTile(TilePosition position, byte value, bool updateLighting = true) => 
+        SetTile(position.X, position.Y, position.Z, value, updateLighting);
 
     public byte GetTile(int x, int y, int z) => !IsInRange(x, y, z) ? (byte)0 : GetTileUnchecked(x, y, z);
     public byte GetTile(TilePosition position) => GetTile(position.X, position.Y, position.Z);
 
-    public void SetTileUnchecked(int x, int y, int z, byte value)
+    public void SetTileUnchecked(int x, int y, int z, byte value, bool updateLighting)
     {
         _data[GetDataIndex(x, y, z)] = value;
         
-        UpdateLightLevels(x, z, 1, 1);
+        if (updateLighting) UpdateLightLevels(x, z, 1, 1);
         OnTileChanged?.Invoke(x, y, z);
     }
 
-    public void SetTileUnchecked(TilePosition position, byte value) =>
-        SetTileUnchecked(position.X, position.Y, position.Z, value);
+    public void SetTileUnchecked(TilePosition position, byte value, bool updateLighting) =>
+        SetTileUnchecked(position.X, position.Y, position.Z, value, updateLighting);
 
     public byte GetTileUnchecked(int x, int y, int z) => _data[GetDataIndex(x, y, z)];
     public byte GetTileUnchecked(TilePosition position) => GetTileUnchecked(position.X, position.Y, position.Z);
