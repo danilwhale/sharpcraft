@@ -98,21 +98,26 @@ public class LevelRenderer : IDisposable
 
     public void DrawHit(RayCollision hit)
     {
-        var alpha = MathF.Sin((float)GetTime() * 1000.0f / 100.0f) * 0.2f + 0.4f;
+        if (!hit.Hit) return;
+        
+        var alpha = MathF.Sin((float)GetTime() * 1000.0f / 100.0f) * 0.05f + 0.3f;
+        var position = (TilePosition)(hit.Point - hit.Normal / 2.0f);
+        
+        Rlgl.DisableDepthTest();
         
         Rlgl.Begin(DrawMode.Quads);
         Rlgl.Color4f(1.0f, 1.0f, 1.0f, alpha);
-
-        var position = (TilePosition)(hit.Point - hit.Normal / 2.0f);
         
-        if (hit.Normal == new Vector3(1.0f, 0.0f, 0.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Right);
-        else if (hit.Normal == new Vector3(-1.0f, 0.0f, 0.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Left);
-        else if (hit.Normal == new Vector3(0.0f, 1.0f, 0.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Top);
-        else if (hit.Normal == new Vector3(0.0f, -1.0f, 0.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Bottom);
-        else if (hit.Normal == new Vector3(0.0f, 0.0f, 1.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Front);
-        else if (hit.Normal == new Vector3(0.0f, 0.0f, -1.0f)) TileRegistry.Rock.DrawRlGlFace(position, Face.Back);
+        foreach (var face in Enum.GetValues<Face>())
+        {
+            TileRegistry.Rock.DrawRlGlFace(position, face);
+        }
         
         Rlgl.End();
+        
+        DrawCubeWiresV((Vector3)position + Vector3.One / 2, Vector3.One, Color.Black);
+        
+        Rlgl.EnableDepthTest();
     }
 
     public void Dispose()
