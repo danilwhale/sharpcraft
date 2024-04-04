@@ -41,7 +41,7 @@ public class Player : Entity
     {
         base.Tick();
         
-        if (IsKeyDown(KeyboardKey.R)) MoveToRandom();
+        if (IsKeyPressed(KeyboardKey.R)) MoveToRandom();
 
         var x = IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left) ? 1
             : IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right) ? -1
