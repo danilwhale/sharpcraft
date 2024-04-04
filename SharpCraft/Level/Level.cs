@@ -116,8 +116,7 @@ public class Level
 
     public bool IsTile(int x, int y, int z)
     {
-        if (!IsInRange(x, y, z)) return false;
-        return _data[GetDataIndex(x, y, z)] > 0;
+        return GetTile(x, y, z) > 0;
     }
 
     public bool IsTile(TilePosition position) => IsTile(position.X, position.Y, position.Z);
@@ -172,16 +171,29 @@ public class Level
     public void SetTile(int x, int y, int z, byte value)
     {
         if (!IsInRange(x, y, z)) return;
-        
-        _data[GetDataIndex(x, y, z)] = value;
-        UpdateLightLevels(x, z, 1, 1);
-        OnTileChanged?.Invoke(x, y, z);
+
+        SetTileUnchecked(x, y, z, value);
     }
 
     public void SetTile(TilePosition position, byte value) => SetTile(position.X, position.Y, position.Z, value);
 
-    public byte GetTile(int x, int y, int z) => !IsInRange(x, y, z) ? (byte)0 : _data[GetDataIndex(x, y, z)];
+    public byte GetTile(int x, int y, int z) => !IsInRange(x, y, z) ? (byte)0 : GetTileUnchecked(x, y, z);
+    public byte GetTile(TilePosition position) => GetTile(position.X, position.Y, position.Z);
 
+    public void SetTileUnchecked(int x, int y, int z, byte value)
+    {
+        _data[GetDataIndex(x, y, z)] = value;
+        
+        UpdateLightLevels(x, z, 1, 1);
+        OnTileChanged?.Invoke(x, y, z);
+    }
+
+    public void SetTileUnchecked(TilePosition position, byte value) =>
+        SetTileUnchecked(position.X, position.Y, position.Z, value);
+
+    public byte GetTileUnchecked(int x, int y, int z) => _data[GetDataIndex(x, y, z)];
+    public byte GetTileUnchecked(TilePosition position) => GetTileUnchecked(position.X, position.Y, position.Z);
+    
     public RayCollision DoRayCast(Ray ray, float maxDistance)
     {
         var col = new RayCollision();
@@ -285,7 +297,7 @@ public class Level
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Length;
-    
+
     // use original indexing to have compatibility with original levels
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private int GetDataIndex(int x, int y, int z) => (y * Length + z) * Width + x;
