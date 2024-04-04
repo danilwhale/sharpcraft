@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using SharpCraft.Entities;
 using SharpCraft.Level;
+using SharpCraft.Level.Tiles;
 using SharpCraft.Utilities;
 using Timer = SharpCraft.Utilities.Timer;
 
@@ -8,6 +9,8 @@ namespace SharpCraft.Scenes;
 
 public class GameScene : IScene
 {
+    private const byte MaxTileId = 2;
+
     private Timer _timer;
     private Level.Level _level;
     private LevelRenderer _levelRenderer;
@@ -17,7 +20,9 @@ public class GameScene : IScene
     private int _fps;
     private int _frames;
     private double _lastSecondTime;
-    
+
+    private byte _currentTile = 1;
+
     public GameScene()
     {
         DisableCursor();
@@ -27,7 +32,7 @@ public class GameScene : IScene
         _levelRenderer = new LevelRenderer(_level);
         _player = new Player(_level);
     }
-    
+
     public void Update()
     {
         _timer.Advance();
@@ -49,7 +54,7 @@ public class GameScene : IScene
 
             _lastSecondTime = time;
         }
-        
+
         HandleInput();
     }
 
@@ -57,16 +62,16 @@ public class GameScene : IScene
     {
         var mouseDelta = GetMouseDelta();
         _player.Rotate(mouseDelta.Y, mouseDelta.X);
-        
+
         _rayCast = _level.DoRayCast(
             GetMouseRay(new Vector2(GetScreenWidth(), GetScreenHeight()) / 2, _player.Camera),
             4.0f);
-        
+
         if (IsMouseButtonPressed(MouseButton.Left) && _rayCast.Hit)
         {
             var hitPoint = _rayCast.Point + _rayCast.Normal / 2;
 
-            _level.SetTile(hitPoint, 1);
+            _level.SetTile(hitPoint, _currentTile);
         }
 
         if (IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
@@ -75,6 +80,11 @@ public class GameScene : IScene
 
             _level.SetTile(hitPoint, 0);
         }
+
+        var mouseScroll = GetMouseWheelMove();
+
+        if (mouseScroll < 0) _currentTile = (byte)(_currentTile - 1 < 1 ? MaxTileId : _currentTile - 1);
+        else if (mouseScroll > 0) _currentTile = (byte)(_currentTile + 1 > MaxTileId ? 1 : _currentTile + 1);
 
         if (IsKeyPressed(KeyboardKey.Enter)) _level.Save();
 
@@ -94,7 +104,7 @@ public class GameScene : IScene
         _player.MoveCamera(_timer.LastPassedTime);
 
         ClearBackground(ColorFromNormalized(new Vector4(0.5f, 0.8f, 1.0f, 1.0f)));
-        
+
         BeginMode3D(_player.Camera);
 
         _levelRenderer.Draw();
@@ -102,9 +112,58 @@ public class GameScene : IScene
 
         EndMode3D();
 
-        DrawText($"{_fps} FPS, {Chunk.Updates} chunk updates", 0, 0, 24, Color.White);
+        DrawGui();
     }
-    
+
+    private void DrawGui()
+    {
+        DrawText($"{_fps} FPS, {Chunk.Updates} chunk updates", 0, 0, 24, Color.White);
+
+        DrawRectangle(16 - 4, GetScreenHeight() - 96 - 16 - 4, 96 + 8, 96 + 8, Color.White);
+
+        var textureIndex = TileRegistry.Tiles[_currentTile].TextureIndex;
+        DrawTexturePro(
+            ResourceManager.GetTexture("terrain.png"),
+            new Rectangle(textureIndex % 16 * 16, textureIndex / 16 * 16, 16, 16),
+            new Rectangle(16, GetScreenHeight() - 96 - 16, 96, 96),
+            Vector2.Zero,
+            0.0f,
+            Color.White);
+
+        DrawCrosshair(24, 24, 2);
+    }
+
+    private void DrawCrosshair(int crosshairWidth, int crosshairHeight, int crosshairThickness)
+    {
+        Rlgl.SetBlendMode(BlendMode.SubtractColors);
+
+        // x0 -> x1
+        DrawRectangle(
+            GetScreenWidth() / 2 - crosshairWidth / 2,
+            GetScreenHeight() / 2 - crosshairThickness / 2,
+            crosshairWidth,
+            crosshairThickness,
+            Color.White);
+
+        // y0 -> y0.4
+        DrawRectangle(
+            GetScreenWidth() / 2 - crosshairThickness / 2,
+            GetScreenHeight() / 2 - crosshairHeight / 2,
+            crosshairThickness,
+            crosshairHeight / 2 - crosshairThickness / 2,
+            Color.White);
+
+        // y0.6 -> y1
+        DrawRectangle(
+            GetScreenWidth() / 2 - crosshairThickness / 2,
+            GetScreenHeight() / 2 + crosshairThickness / 2,
+            crosshairThickness,
+            crosshairHeight / 2 - crosshairThickness / 2,
+            Color.White);
+
+        Rlgl.SetBlendMode(BlendMode.Alpha);
+    }
+
     public void Dispose()
     {
         _level.Save();

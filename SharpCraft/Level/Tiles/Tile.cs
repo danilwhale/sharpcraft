@@ -9,22 +9,21 @@ public class Tile
     private const float Light = 1.0f;
     
     public readonly byte Id;
-    
-    private readonly int _textureIndex;
+    public readonly int TextureIndex;
 
     public Tile(byte id, int textureIndex)
     {
         Id = id;
         TileRegistry.Tiles[id] = this;
         
-        _textureIndex = textureIndex;
+        TextureIndex = textureIndex;
     }
     
     public void Build(MeshBuilder builder, Level level, int x, int y, int z)
     {
-        var u0 = _textureIndex % 16.0f / 16.0f;
+        var u0 = TextureIndex % 16.0f / 16.0f;
         var u1 = u0 + 1.0f / 16;
-        var v0 = MathF.Floor(_textureIndex / 16.0f) / 16.0f;
+        var v0 = MathF.Floor(TextureIndex / 16.0f) / 16.0f;
         var v1 = v0 + 1.0f / 16;
 
         var x0 = x;
