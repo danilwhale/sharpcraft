@@ -11,7 +11,7 @@ public class Tile
 
     public readonly byte Id;
     public readonly int TextureIndex;
-    public readonly BoundingBox Bounds = new(new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
+    protected BoundingBox Bounds = new(new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
 
     public Tile(byte id, int textureIndex)
     {
@@ -30,14 +30,15 @@ public class Tile
         var y1 = y + Bounds.Max.Y;
         var z1 = z + Bounds.Max.Z;
 
-        if (!level.IsSolidTile(x - 1, y, z))
+        if (ShouldKeepFace(level, x - 1, y, z, Face.Left))
         {
             var textureIndex = GetTextureIndexForFace(Face.Left);
-
-            var u0 = textureIndex % 16.0f / 16.0f;
-            var u1 = u0 + 1.0f / 16;
-            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
-            var v1 = v0 + 1.0f / 16;
+            var coords = GetTextureCoordinates(Face.Left, textureIndex);
+            
+            var u0 = coords.X;
+            var u1 = coords.X + coords.Width;
+            var v0 = coords.Y;
+            var v1 = coords.Y + coords.Height;
 
             var b = level.GetBrightness(x - 1, y, z) * Darkest;
 
@@ -52,14 +53,15 @@ public class Tile
             builder.VertexWithTex(x0, y1, z0, u0, v0);
         }
 
-        if (!level.IsSolidTile(x + 1, y, z))
+        if (ShouldKeepFace(level, x + 1, y, z, Face.Right))
         {
             var textureIndex = GetTextureIndexForFace(Face.Right);
-
-            var u0 = textureIndex % 16.0f / 16.0f;
-            var u1 = u0 + 1.0f / 16;
-            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
-            var v1 = v0 + 1.0f / 16;
+            var coords = GetTextureCoordinates(Face.Right, textureIndex);
+            
+            var u0 = coords.X;
+            var u1 = coords.X + coords.Width;
+            var v0 = coords.Y;
+            var v1 = coords.Y + coords.Height;
 
             var b = level.GetBrightness(x + 1, y, z) * Darkest;
 
@@ -74,14 +76,15 @@ public class Tile
             builder.VertexWithTex(x1, y0, z1, u0, v1);
         }
 
-        if (!level.IsSolidTile(x, y + 1, z))
+        if (ShouldKeepFace(level, x, y + 1, z, Face.Top))
         {
             var textureIndex = GetTextureIndexForFace(Face.Top);
-
-            var u0 = textureIndex % 16.0f / 16.0f;
-            var u1 = u0 + 1.0f / 16;
-            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
-            var v1 = v0 + 1.0f / 16;
+            var coords = GetTextureCoordinates(Face.Top, textureIndex);
+            
+            var u0 = coords.X;
+            var u1 = coords.X + coords.Width;
+            var v0 = coords.Y;
+            var v1 = coords.Y + coords.Height;
 
             var b = level.GetBrightness(x, y + 1, z) * Light;
 
@@ -96,14 +99,15 @@ public class Tile
             builder.VertexWithTex(x1, y1, z0, u1, v0);
         }
 
-        if (!level.IsSolidTile(x, y - 1, z))
+        if (ShouldKeepFace(level, x, y - 1, z, Face.Bottom))
         {
             var textureIndex = GetTextureIndexForFace(Face.Bottom);
-
-            var u0 = textureIndex % 16.0f / 16.0f;
-            var u1 = u0 + 1.0f / 16;
-            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
-            var v1 = v0 + 1.0f / 16;
+            var coords = GetTextureCoordinates(Face.Bottom, textureIndex);
+            
+            var u0 = coords.X;
+            var u1 = coords.X + coords.Width;
+            var v0 = coords.Y;
+            var v1 = coords.Y + coords.Height;
 
             var b = level.GetBrightness(x, y - 1, z) * Light;
 
@@ -118,15 +122,16 @@ public class Tile
             builder.VertexWithTex(x0, y0, z1, u1, v1);
         }
 
-        if (!level.IsSolidTile(x, y, z + 1))
+        if (ShouldKeepFace(level, x, y, z + 1, Face.Front))
         {
             var textureIndex = GetTextureIndexForFace(Face.Front);
-
-            var u0 = textureIndex % 16.0f / 16.0f;
-            var u1 = u0 + 1.0f / 16;
-            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
-            var v1 = v0 + 1.0f / 16;
-
+            var coords = GetTextureCoordinates(Face.Front, textureIndex);
+            
+            var u0 = coords.X;
+            var u1 = coords.X + coords.Width;
+            var v0 = coords.Y;
+            var v1 = coords.Y + coords.Height;
+            
             var b = level.GetBrightness(x, y, z + 1) * Darker;
 
             builder.Color(b, b, b);
@@ -140,14 +145,15 @@ public class Tile
             builder.VertexWithTex(x0, y1, z1, u0, v0);
         }
 
-        if (!level.IsSolidTile(x, y, z - 1))
+        if (ShouldKeepFace(level, x, y, z - 1, Face.Back))
         {
             var textureIndex = GetTextureIndexForFace(Face.Back);
-
-            var u0 = textureIndex % 16.0f / 16.0f;
-            var u1 = u0 + 1.0f / 16;
-            var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
-            var v1 = v0 + 1.0f / 16;
+            var coords = GetTextureCoordinates(Face.Back, textureIndex);
+            
+            var u0 = coords.X;
+            var u1 = coords.X + coords.Width;
+            var v0 = coords.Y;
+            var v1 = coords.Y + coords.Height;
 
             var b = level.GetBrightness(x, y, z - 1) * Darker;
 
@@ -168,22 +174,22 @@ public class Tile
         var count = 0;
 
         // check right side
-        if (!level.IsSolidTile(x + 1, y, z)) count++;
+        if (ShouldKeepFace(level, x + 1, y, z, Face.Right)) count++;
 
         // check left side
-        if (!level.IsSolidTile(x - 1, y, z)) count++;
+        if (ShouldKeepFace(level, x - 1, y, z, Face.Left)) count++;
 
         // check top side
-        if (!level.IsSolidTile(x, y + 1, z)) count++;
+        if (ShouldKeepFace(level, x, y + 1, z, Face.Top)) count++;
 
         // check bottom side
-        if (!level.IsSolidTile(x, y - 1, z)) count++;
+        if (ShouldKeepFace(level, x, y - 1, z, Face.Bottom)) count++;
 
         // check front side
-        if (!level.IsSolidTile(x, y, z + 1)) count++;
+        if (ShouldKeepFace(level, x, y, z + 1, Face.Front)) count++;
 
         // check back side
-        if (!level.IsSolidTile(x, y, z - 1)) count++;
+        if (ShouldKeepFace(level, x, y, z - 1, Face.Back)) count++;
 
         return count;
     }
@@ -246,6 +252,21 @@ public class Tile
     protected virtual int GetTextureIndexForFace(Face face)
     {
         return TextureIndex;
+    }
+
+    protected virtual bool ShouldKeepFace(Level level, int x, int y, int z, Face face)
+    {
+        return !level.IsSolidTile(x, y, z);
+    }
+
+    protected virtual Rectangle GetTextureCoordinates(Face face, int textureIndex)
+    {
+        return new Rectangle(
+                textureIndex % 16.0f / 16.0f,
+                MathF.Floor(textureIndex / 16.0f) / 16.0f,
+                1.0f / 16,
+                1.0f / 16
+        );
     }
 
     public BoundingBox GetCollision(int x, int y, int z) =>

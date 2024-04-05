@@ -119,8 +119,9 @@ public class LevelRenderer : IDisposable
         }
         
         Rlgl.End();
-        
-        DrawCubeWiresV((Vector3)position + Vector3.One / 2, Vector3.One, Color.Black);
+
+        var collision = tile.GetCollision(position.X, position.Y, position.Z);
+        DrawCubeWiresV(collision.Min + (collision.Max - collision.Min) / 2, collision.Max - collision.Min, Color.Black);
         
         Rlgl.EnableDepthTest();
     }

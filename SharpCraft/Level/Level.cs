@@ -156,7 +156,7 @@ public class Level
                 {
                     var id = GetTile(x, y, z);
                     var tile = TileRegistry.Tiles[id];
-                    if (tile == null || !tile.IsSolid()) continue;
+                    if (tile == null) continue;
 
                     boxes.Add(tile.GetCollision(x, y, z));
                 }
@@ -231,7 +231,7 @@ public class Level
 
         while (t <= maxDistance)
         {
-            if (IsSolidTile(ix, iy, iz))
+            if (IsTile(ix, iy, iz))
             {
                 col.Point = ray.Position + t * ray.Direction;
 
@@ -303,7 +303,7 @@ public class Level
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Length;
+    public bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Length;
 
     // use original indexing to have compatibility with original levels
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
