@@ -41,8 +41,6 @@ public class Player : Entity
     {
         base.Tick();
         
-        if (IsKeyPressed(KeyboardKey.R)) MoveToRandom();
-
         var x = IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left) ? 1
             : IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right) ? -1
             : 0;
@@ -63,5 +61,10 @@ public class Player : Entity
         Direction *= new Vector3(0.91f, 0.98f, 0.91f);
 
         if (IsOnGround) Direction *= new Vector3(0.8f, 1.0f, 0.8f);
+    }
+
+    public void Update()
+    {
+        if (IsKeyPressed(KeyboardKey.R)) MoveToRandom();
     }
 }

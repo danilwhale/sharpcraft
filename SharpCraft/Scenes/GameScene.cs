@@ -72,6 +72,7 @@ public class GameScene : IScene
     private void FrameRateUpdate()
     {
         HandleInput();
+        _player.Update();
     }
 
     private void HandleInput()
