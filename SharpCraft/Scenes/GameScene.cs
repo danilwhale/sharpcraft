@@ -100,8 +100,8 @@ public class GameScene : IScene
 
         var mouseScroll = GetMouseWheelMove();
 
-        if (mouseScroll < 0) _currentTile = (byte)(_currentTile - 1 < 1 ? MaxTileId : _currentTile - 1);
-        else if (mouseScroll > 0) _currentTile = (byte)(_currentTile + 1 > MaxTileId ? 1 : _currentTile + 1);
+        if (mouseScroll > 0) _currentTile = (byte)(_currentTile - 1 < 1 ? MaxTileId : _currentTile - 1);
+        else if (mouseScroll < 0) _currentTile = (byte)(_currentTile + 1 > MaxTileId ? 1 : _currentTile + 1);
         _gameScreen.BlockSelection.CurrentTile = _currentTile;
 
         if (IsKeyPressed(KeyboardKey.Enter)) _level.Save();
