@@ -100,8 +100,13 @@ public class LevelRenderer : IDisposable
     {
         if (!hit.Hit) return;
         
-        var alpha = MathF.Sin((float)GetTime() * 1000.0f / 100.0f) * 0.05f + 0.3f;
         var position = (TilePosition)(hit.Point - hit.Normal / 2.0f);
+
+        var id = Level.GetTile(position);
+        var tile = TileRegistry.Tiles[id];
+        if (tile == null) return;
+        
+        var alpha = MathF.Sin((float)GetTime() * 1000.0f / 100.0f) * 0.05f + 0.3f;
         
         Rlgl.DisableDepthTest();
         
@@ -110,7 +115,7 @@ public class LevelRenderer : IDisposable
         
         foreach (var face in Enum.GetValues<Face>())
         {
-            TileRegistry.Rock.DrawRlGlFace(position, face);
+            tile.DrawRlGlFace(position, face);
         }
         
         Rlgl.End();

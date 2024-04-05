@@ -42,7 +42,7 @@ public class Level
         {
             LevelGeneration.Generate(this, Random.Shared.Next());
         }
-        
+
         UpdateLightLevels(0, 0, width, length);
     }
 
@@ -55,7 +55,7 @@ public class Level
             using var fileStream = File.OpenRead(path);
             using var stream = new GZipStream(fileStream, CompressionMode.Decompress);
             stream.ReadExactly(_data);
-            
+
             OnEverythingChanged?.Invoke();
 
             return true;
@@ -113,11 +113,23 @@ public class Level
 
     public bool IsTile(TilePosition position) => IsTile(position.X, position.Y, position.Z);
 
-    public bool IsSolidTile(int x, int y, int z) => IsTile(x, y, z);
+    public bool IsSolidTile(int x, int y, int z)
+    {
+        var id = GetTile(x, y, z);
+        var tile = TileRegistry.Tiles[id];
+
+        return tile?.IsSolid() ?? false;
+    }
 
     public bool IsSolidTile(TilePosition position) => IsSolidTile(position.X, position.Y, position.Z);
 
-    public bool IsLightBlocker(int x, int y, int z) => IsSolidTile(x, y, z);
+    public bool IsLightBlocker(int x, int y, int z)
+    {
+        var id = GetTile(x, y, z);
+        var tile = TileRegistry.Tiles[id];
+
+        return tile?.IsLightBlocker() ?? false;
+    }
 
     public bool IsLightBlocker(TilePosition position) => IsLightBlocker(position.X, position.Y, position.Z);
 
@@ -142,9 +154,11 @@ public class Level
             {
                 for (var z = minZ; z <= maxZ; z++)
                 {
-                    if (!IsSolidTile(x, y, z)) continue;
+                    var id = GetTile(x, y, z);
+                    var tile = TileRegistry.Tiles[id];
+                    if (tile == null || !tile.IsSolid()) continue;
 
-                    boxes.Add(new BoundingBox(new Vector3(x, y, z), new Vector3(x + 1, y + 1, z + 1)));
+                    boxes.Add(tile.GetCollision(x, y, z));
                 }
             }
         }
@@ -167,7 +181,7 @@ public class Level
         SetTileUnchecked(x, y, z, value, updateLighting);
     }
 
-    public void SetTile(TilePosition position, byte value, bool updateLighting = true) => 
+    public void SetTile(TilePosition position, byte value, bool updateLighting = true) =>
         SetTile(position.X, position.Y, position.Z, value, updateLighting);
 
     public byte GetTile(int x, int y, int z) => !IsInRange(x, y, z) ? (byte)0 : GetTileUnchecked(x, y, z);
@@ -176,7 +190,7 @@ public class Level
     public void SetTileUnchecked(int x, int y, int z, byte value, bool updateLighting)
     {
         _data[GetDataIndex(x, y, z)] = value;
-        
+
         if (updateLighting) UpdateLightLevels(x, z, 1, 1);
         OnTileChanged?.Invoke(x, y, z);
     }
@@ -186,7 +200,7 @@ public class Level
 
     public byte GetTileUnchecked(int x, int y, int z) => _data[GetDataIndex(x, y, z)];
     public byte GetTileUnchecked(TilePosition position) => GetTileUnchecked(position.X, position.Y, position.Z);
-    
+
     public RayCollision DoRayCast(Ray ray, float maxDistance)
     {
         var col = new RayCollision();
