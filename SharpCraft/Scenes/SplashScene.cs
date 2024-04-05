@@ -10,6 +10,11 @@ public class SplashScene : IScene
 
     public void Update()
     {
+        if (IsKeyPressed(KeyboardKey.F11))
+        {
+            ToggleBorderlessWindowed();
+        }
+        
         if (GetTime() - _startTime >= 2.0)
         {
             Program.Scene = new GameScene();
