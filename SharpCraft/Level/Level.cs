@@ -82,7 +82,7 @@ public class Level
         }
     }
 
-    private void UpdateLightLevels(int x, int z, int width, int length)
+    public void UpdateLightLevels(int x, int z, int width, int length)
     {
         for (var i = x; i < x + width; i++)
         {
