@@ -105,23 +105,12 @@ public class LevelRenderer : IDisposable
         var id = Level.GetTile(position);
         var tile = TileRegistry.Tiles[id];
         if (tile == null) return;
-        
-        var alpha = MathF.Sin((float)GetTime() * 1000.0f / 100.0f) * 0.05f + 0.3f;
-        
+
         Rlgl.DisableDepthTest();
-        
-        Rlgl.Begin(DrawMode.Quads);
-        Rlgl.Color4f(1.0f, 1.0f, 1.0f, alpha);
-        
-        foreach (var face in Enum.GetValues<Face>())
-        {
-            tile.DrawRlGlFace(position, face);
-        }
-        
-        Rlgl.End();
 
         var collision = tile.GetCollision(position.X, position.Y, position.Z);
-        DrawCubeWiresV(collision.Min + (collision.Max - collision.Min) / 2, collision.Max - collision.Min, Color.Black);
+        var size = collision.Max - collision.Min;
+        DrawCubeWiresV(collision.Min + size / 2, size, Color.Black);
         
         Rlgl.EnableDepthTest();
     }
