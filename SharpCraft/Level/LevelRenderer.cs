@@ -17,6 +17,8 @@ public class LevelRenderer : IDisposable
 
     public readonly Level Level;
 
+    private Queue<Chunk> _rebuildQueue = new();
+
     public LevelRenderer(Level level)
     {
         Level = level;
@@ -53,11 +55,39 @@ public class LevelRenderer : IDisposable
                 }
             }
         }
+
+        var rebuildThread = new Thread(RebuildLoop);
+        rebuildThread.Start();
+    }
+
+    private void RebuildLoop()
+    {
+        while (!WindowShouldClose())
+        {
+            for (var x = 0; x < ChunksX; x++)
+            {
+                for (var y = 0; y < ChunksY; y++)
+                {
+                    for (var z = 0; z < ChunksZ; z++)
+                    {
+                        var chunk = _chunks[x][y][z];
+                        if (chunk.TryBeginRebuild())
+                        {
+                            _rebuildQueue.Enqueue(chunk);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public void Draw()
     {
-        Chunk.Rebuilds = 0;
+        while (_rebuildQueue.TryDequeue(out var chunk))
+        {
+            chunk.EndRebuild();
+        }
+        
         var frustum = Frustum.Instance;
 
         for (var x = 0; x < ChunksX; x++)

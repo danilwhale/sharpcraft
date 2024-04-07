@@ -10,7 +10,6 @@ public class Chunk : IDisposable
     public const int Size = 16;
 
     public static int Updates;
-    public static int Rebuilds;
 
     public readonly int X;
     public readonly int Y;
@@ -26,6 +25,8 @@ public class Chunk : IDisposable
     private readonly Level _level;
     private readonly MeshBuilder _builder = new();
 
+    private bool _hasBeganRebuild;
+
     public Chunk(Level level, int x, int y, int z)
     {
         _level = level;
@@ -38,13 +39,15 @@ public class Chunk : IDisposable
         BBox = new BoundingBox(new Vector3(X, Y, Z), new Vector3(MaxX, MaxY, MaxZ));
     }
 
-    private void Rebuild()
+    public bool TryBeginRebuild()
     {
-        if (Rebuilds >= 2) return;
+        if (!IsDirty) return false;
+        if (_hasBeganRebuild) return false;
+        
+        _hasBeganRebuild = true;
         
         Updates++;
-        Rebuilds++;
-        
+
         _builder.Begin(GetFaceCount() * 2);
         
         for (var x = X; x < MaxX; x++)
@@ -55,23 +58,26 @@ public class Chunk : IDisposable
                 {
                     if (!_level.IsTile(x, y, z)) continue;
                     
-                    TileRegistry.Tiles[_level.GetTile(x, y, z)].Build(_builder, _level, x, y, z);
+                    TileRegistry.Tiles[_level.GetTile(x, y, z)]!.Build(_builder, _level, x, y, z);
                 }
             }
         }
+
+        return true;
+    }
+
+    public void EndRebuild()
+    {
+        if (!_hasBeganRebuild) return;
+        
+        _hasBeganRebuild = false;
+        IsDirty = false;
         
         _builder.End();
-        
-        IsDirty = false;
     }
 
     public void Draw()
     {
-        if (IsDirty)
-        {
-            Rebuild();
-        }
-        
         _builder.Draw(Resources.DefaultTerrainMaterial);
     }
 
@@ -87,7 +93,7 @@ public class Chunk : IDisposable
                 {
                     if (!_level.IsTile(x, y, z)) continue;
 
-                    count += TileRegistry.Tiles[_level.GetTile(x, y, z)].GetFaceCount(_level, x, y, z);
+                    count += TileRegistry.Tiles[_level.GetTile(x, y, z)]!.GetFaceCount(_level, x, y, z);
                 }
             }
         }
