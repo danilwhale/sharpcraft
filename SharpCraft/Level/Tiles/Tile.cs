@@ -256,7 +256,7 @@ public class Tile
 
     protected virtual bool ShouldKeepFace(Level level, int x, int y, int z, Face face)
     {
-        return !level.IsSolidTile(x, y, z);
+        return !level.IsTile(x, y, z);
     }
 
     protected virtual Rectangle GetTextureCoordinates(Face face, int textureIndex)
