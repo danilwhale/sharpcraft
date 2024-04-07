@@ -189,7 +189,10 @@ public class Level
 
     public void SetTileUnchecked(int x, int y, int z, byte value, bool updateLighting)
     {
-        _data[GetDataIndex(x, y, z)] = value;
+        var index = GetDataIndex(x, y, z);
+        if (_data[index] == value) return;
+        
+        _data[value] = value;
 
         if (updateLighting) UpdateLightLevels(x, z, 1, 1);
         OnTileChanged?.Invoke(x, y, z);
