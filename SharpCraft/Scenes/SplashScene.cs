@@ -14,7 +14,7 @@ public class SplashScene : IScene
         {
             ToggleBorderlessWindowed();
         }
-        
+
         if (GetTime() - _startTime >= 2.0)
         {
             Program.Scene = new GameScene();
@@ -28,46 +28,37 @@ public class SplashScene : IScene
         var terrain = ResourceManager.GetTexture("terrain.png");
 
         var random = new Random(_seed);
-        
-        var halfHeight = GetScreenHeight() / 64 / 2;
 
         for (var x = 0; x < GetScreenWidth() / 64; x++)
         {
-            var level = halfHeight + random.Next(1, 3);
-            
             for (var y = 0; y < GetScreenHeight() / 64; y++)
             {
-                Rectangle source;
-                if (y == halfHeight) source = new Rectangle(48, 0, 16, 16);
-                else if (y <= level && y > halfHeight) source = new Rectangle(32, 0, 16, 16);
-                else if (y < halfHeight) continue;
-                else source = new Rectangle(16, 0, 16, 16);
-
                 DrawTexturePro(
                     terrain,
-                    source,
+                    random.NextDouble() < 0.1
+                        ? new Rectangle(16, 0, 16, 16)
+                        : new Rectangle(96, 0, 16, 16),
                     new Rectangle(x * 64, y * 64, 64, 64),
                     Vector2.Zero,
                     0.0f,
                     new Color(87, 87, 87, 255)
-                    );
+                );
             }
         }
-        
+
         DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(), Color.Blank, Color.Black);
-        
+
         DrawTextCentered("sharpcraft", 48, 0, Color.White);
-        DrawTextCentered("comically long splash screen for fun", 16, GetScreenHeight() / 2 - 48, Color.White);
     }
 
     private void DrawTextCentered(string text, int fontSize, int yOffset, Color color)
     {
         var width = MeasureText(text, fontSize);
-        DrawText(text, GetScreenWidth() / 2 - width / 2, GetScreenHeight() / 2 - fontSize / 2 + yOffset, fontSize, color);
+        DrawText(text, GetScreenWidth() / 2 - width / 2, GetScreenHeight() / 2 - fontSize / 2 + yOffset, fontSize,
+            color);
     }
-    
+
     public void Dispose()
     {
-        
     }
 }
