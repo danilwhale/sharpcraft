@@ -9,16 +9,22 @@ public class Tile
     private const float Darker = 0.8f;
     private const float Light = 1.0f;
 
+    public readonly bool IsSolid;
+    public readonly bool IsLightBlocker;
+
     public readonly byte Id;
     public readonly int TextureIndex;
     protected BoundingBox Bounds = new(new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
 
-    public Tile(byte id, int textureIndex)
+    public Tile(byte id, int textureIndex, bool isSolid = true, bool isLightBlocker = true)
     {
         Id = id;
         TileRegistry.Tiles[id] = this;
 
         TextureIndex = textureIndex;
+
+        IsSolid = isSolid;
+        IsLightBlocker = isLightBlocker;
     }
 
     public void Build(MeshBuilder builder, Level level, int x, int y, int z)
@@ -271,7 +277,4 @@ public class Tile
 
     public BoundingBox GetCollision(int x, int y, int z) =>
         new(Bounds.Min + new Vector3(x, y, z), Bounds.Max + new Vector3(x, y, z));
-
-    public virtual bool IsSolid() => true;
-    public virtual bool IsLightBlocker() => true;
 }

@@ -118,7 +118,7 @@ public class Level
         var id = GetTile(x, y, z);
         var tile = TileRegistry.Tiles[id];
 
-        return tile?.IsSolid() ?? false;
+        return tile?.IsSolid ?? false;
     }
 
     public bool IsSolidTile(TilePosition position) => IsSolidTile(position.X, position.Y, position.Z);
@@ -128,7 +128,7 @@ public class Level
         var id = GetTile(x, y, z);
         var tile = TileRegistry.Tiles[id];
 
-        return tile?.IsLightBlocker() ?? false;
+        return tile?.IsLightBlocker ?? false;
     }
 
     public bool IsLightBlocker(TilePosition position) => IsLightBlocker(position.X, position.Y, position.Z);

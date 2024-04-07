@@ -56,9 +56,7 @@ public class Chunk : IDisposable
             {
                 for (var z = Z; z < MaxZ; z++)
                 {
-                    if (!_level.IsTile(x, y, z)) continue;
-                    
-                    TileRegistry.Tiles[_level.GetTile(x, y, z)]!.Build(_builder, _level, x, y, z);
+                    TileRegistry.Tiles[_level.GetTile(x, y, z)]?.Build(_builder, _level, x, y, z);
                 }
             }
         }
@@ -91,9 +89,7 @@ public class Chunk : IDisposable
             {
                 for (var z = Z; z < MaxZ; z++)
                 {
-                    if (!_level.IsTile(x, y, z)) continue;
-
-                    count += TileRegistry.Tiles[_level.GetTile(x, y, z)]!.GetFaceCount(_level, x, y, z);
+                    count += TileRegistry.Tiles[_level.GetTile(x, y, z)]?.GetFaceCount(_level, x, y, z) ?? 0;
                 }
             }
         }
