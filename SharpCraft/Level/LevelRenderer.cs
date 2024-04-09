@@ -17,7 +17,8 @@ public class LevelRenderer : IDisposable
 
     public readonly Level Level;
 
-    private Queue<Chunk> _rebuildQueue = new();
+    private Stack<Chunk> _rebuildStack = new();
+    private Mutex _rebuildStackMutex = new();
 
     public LevelRenderer(Level level)
     {
@@ -71,10 +72,13 @@ public class LevelRenderer : IDisposable
                     for (var z = 0; z < ChunksZ; z++)
                     {
                         var chunk = _chunks[x][y][z];
-                        if (chunk.TryBeginRebuild())
-                        {
-                            _rebuildQueue.Enqueue(chunk);
-                        }
+                        if (!chunk.TryBeginRebuild()) continue;
+                        
+                        _rebuildStackMutex.WaitOne();
+                        
+                        _rebuildStack.Push(chunk);
+                        
+                        _rebuildStackMutex.ReleaseMutex();
                     }
                 }
             }
@@ -83,10 +87,14 @@ public class LevelRenderer : IDisposable
 
     public void Draw()
     {
-        while (_rebuildQueue.TryDequeue(out var chunk))
+        _rebuildStackMutex.WaitOne();
+
+        while (_rebuildStack.TryPop(out var chunk))
         {
             chunk.EndRebuild();
         }
+        
+        _rebuildStackMutex.ReleaseMutex();
         
         var frustum = Frustum.Instance;
 
