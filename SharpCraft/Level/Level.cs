@@ -192,7 +192,7 @@ public class Level
         var index = GetDataIndex(x, y, z);
         if (_data[index] == value) return;
         
-        _data[value] = value;
+        _data[index] = value;
 
         if (updateLighting) UpdateLightLevels(x, z, 1, 1);
         OnTileChanged?.Invoke(x, y, z);
