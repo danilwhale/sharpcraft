@@ -134,25 +134,6 @@ public class LevelRenderer : IDisposable
         }
     }
 
-    public void DrawHit(RayCollision hit)
-    {
-        if (!hit.Hit) return;
-        
-        var position = (TilePosition)(hit.Point - hit.Normal / 2.0f);
-
-        var id = Level.GetTile(position);
-        var tile = TileRegistry.Tiles[id];
-        if (tile == null) return;
-
-        Rlgl.DisableDepthTest();
-
-        var collision = tile.GetCollision(position.X, position.Y, position.Z);
-        var size = collision.Max - collision.Min;
-        DrawCubeWiresV(collision.Min + size / 2, size, Color.Black);
-        
-        Rlgl.EnableDepthTest();
-    }
-
     public void Dispose()
     {
         for (var x = 0; x < ChunksX; x++)

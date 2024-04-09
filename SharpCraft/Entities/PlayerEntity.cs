@@ -2,7 +2,7 @@
 
 namespace SharpCraft.Entities;
 
-public class Player : Entity
+public class PlayerEntity : Entity
 {
     private const float MouseSensitivity = 0.075f;
     private const float HalfWidth = 0.3f;
@@ -10,7 +10,7 @@ public class Player : Entity
     
     public Camera3D Camera;
 
-    public Player(Level.Level level) : base(level, HalfWidth, HalfHeight)
+    public PlayerEntity(Level.Level level) : base(level, HalfWidth, HalfHeight)
     {
         Camera = new Camera3D(Vector3.Zero, Vector3.Zero, Vector3.UnitY, 70.0f, CameraProjection.Perspective);
         MoveToRandom();
