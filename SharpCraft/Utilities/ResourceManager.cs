@@ -18,7 +18,7 @@ public static class ResourceManager
 
     public static string GetText(string path)
     {
-        if (!File.Exists(path))
+        if (!File.Exists(Path.Join("Assets", path)))
         {
             throw new Exception("explod no such resource explod explod!!");
         }
