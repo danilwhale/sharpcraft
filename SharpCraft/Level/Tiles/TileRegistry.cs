@@ -16,7 +16,10 @@ public static class TileRegistry
     public static readonly Tile Leaves = new LeavesTile(8, 9);
     public static readonly Tile WoodenPole = new PoleTile(9, 10, 4);
     public static readonly Tile StonePole = new PoleTile(10, 11, 1);
-    
+
+    public static readonly Tile Glass = new(11, 12,
+        TileConfig.Default with { Layer = TileLayer.Translucent, IsLightBlocker = false });
+
     public static int GetNonNullTileCount()
     {
         return Tiles.Count(t => t != null);
