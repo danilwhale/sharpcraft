@@ -48,38 +48,38 @@ public class Level
 
     private bool TryLoad(string path = "level.dat")
     {
-        // if (!File.Exists(path)) return false;
-        //
-        // try
-        // {
-        //     using var fileStream = File.OpenRead(path);
-        //     using var stream = new GZipStream(fileStream, CompressionMode.Decompress);
-        //     stream.ReadExactly(_data);
-        //
-        //     OnEverythingChanged?.Invoke();
-        //
-        //     return true;
-        // }
-        // catch (Exception e)
-        // {
-        //     TraceLog(TraceLogLevel.Warning, e.ToString());
-        // }
+        if (!File.Exists(path)) return false;
+        
+        try
+        {
+            using var fileStream = File.OpenRead(path);
+            using var stream = new GZipStream(fileStream, CompressionMode.Decompress);
+            stream.ReadExactly(_data);
+        
+            OnEverythingChanged?.Invoke();
+        
+            return true;
+        }
+        catch (Exception e)
+        {
+            TraceLog(TraceLogLevel.Warning, e.ToString());
+        }
 
         return false;
     }
 
     public void Save(string path = "level.dat")
     {
-        // try
-        // {
-        //     using var fileStream = File.OpenWrite(path);
-        //     using var stream = new GZipStream(fileStream, CompressionMode.Compress);
-        //     stream.Write(_data);
-        // }
-        // catch (Exception e)
-        // {
-        //     TraceLog(TraceLogLevel.Warning, e.ToString());
-        // }
+        try
+        {
+            using var fileStream = File.OpenWrite(path);
+            using var stream = new GZipStream(fileStream, CompressionMode.Compress);
+            stream.Write(_data);
+        }
+        catch (Exception e)
+        {
+            TraceLog(TraceLogLevel.Warning, e.ToString());
+        }
     }
 
     public void UpdateLightLevels(int x, int z, int width, int length)
