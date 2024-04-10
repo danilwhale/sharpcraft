@@ -48,38 +48,38 @@ public class Level
 
     private bool TryLoad(string path = "level.dat")
     {
-        if (!File.Exists(path)) return false;
-
-        try
-        {
-            using var fileStream = File.OpenRead(path);
-            using var stream = new GZipStream(fileStream, CompressionMode.Decompress);
-            stream.ReadExactly(_data);
-
-            OnEverythingChanged?.Invoke();
-
-            return true;
-        }
-        catch (Exception e)
-        {
-            TraceLog(TraceLogLevel.Warning, e.ToString());
-        }
+        // if (!File.Exists(path)) return false;
+        //
+        // try
+        // {
+        //     using var fileStream = File.OpenRead(path);
+        //     using var stream = new GZipStream(fileStream, CompressionMode.Decompress);
+        //     stream.ReadExactly(_data);
+        //
+        //     OnEverythingChanged?.Invoke();
+        //
+        //     return true;
+        // }
+        // catch (Exception e)
+        // {
+        //     TraceLog(TraceLogLevel.Warning, e.ToString());
+        // }
 
         return false;
     }
 
     public void Save(string path = "level.dat")
     {
-        try
-        {
-            using var fileStream = File.OpenWrite(path);
-            using var stream = new GZipStream(fileStream, CompressionMode.Compress);
-            stream.Write(_data);
-        }
-        catch (Exception e)
-        {
-            TraceLog(TraceLogLevel.Warning, e.ToString());
-        }
+        // try
+        // {
+        //     using var fileStream = File.OpenWrite(path);
+        //     using var stream = new GZipStream(fileStream, CompressionMode.Compress);
+        //     stream.Write(_data);
+        // }
+        // catch (Exception e)
+        // {
+        //     TraceLog(TraceLogLevel.Warning, e.ToString());
+        // }
     }
 
     public void UpdateLightLevels(int x, int z, int width, int length)
@@ -118,7 +118,7 @@ public class Level
         var id = GetTile(x, y, z);
         var tile = TileRegistry.Tiles[id];
 
-        return tile?.IsSolid ?? false;
+        return tile?.Config.IsSolid ?? false;
     }
 
     public bool IsSolidTile(TilePosition position) => IsSolidTile(position.X, position.Y, position.Z);
@@ -128,7 +128,7 @@ public class Level
         var id = GetTile(x, y, z);
         var tile = TileRegistry.Tiles[id];
 
-        return tile?.IsLightBlocker ?? false;
+        return tile?.Config.IsLightBlocker ?? false;
     }
 
     public bool IsLightBlocker(TilePosition position) => IsLightBlocker(position.X, position.Y, position.Z);
@@ -305,10 +305,8 @@ public class Level
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Length;
 
     // use original indexing to have compatibility with original levels
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private int GetDataIndex(int x, int y, int z) => (y * Length + z) * Width + x;
 }

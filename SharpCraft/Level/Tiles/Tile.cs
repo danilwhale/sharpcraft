@@ -9,26 +9,30 @@ public class Tile
     private const float Darker = 0.8f;
     private const float Light = 1.0f;
 
-    public readonly bool IsSolid;
-    public readonly bool IsLightBlocker;
+    public readonly TileConfig Config;
 
     public readonly byte Id;
     public readonly int TextureIndex;
     protected BoundingBox Bounds = new(new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
 
-    public Tile(byte id, int textureIndex, bool isSolid = true, bool isLightBlocker = true)
+    public Tile(byte id, int textureIndex)
+        : this(id, textureIndex, TileConfig.Default)
+    { }
+    
+    public Tile(byte id, int textureIndex, TileConfig config)
     {
         Id = id;
         TileRegistry.Tiles[id] = this;
 
         TextureIndex = textureIndex;
 
-        IsSolid = isSolid;
-        IsLightBlocker = isLightBlocker;
+        Config = config;
     }
 
-    public void Build(MeshBuilder builder, Level level, int x, int y, int z)
+    public void Build(MeshBuilder builder, Level level, int x, int y, int z, TileLayer layer)
     {
+        if (layer != Config.Layer) return;
+        
         var x0 = x + Bounds.Min.X;
         var y0 = y + Bounds.Min.Y;
         var z0 = z + Bounds.Min.Z;
@@ -175,8 +179,10 @@ public class Tile
         }
     }
 
-    public int GetFaceCount(Level level, int x, int y, int z)
+    public int GetFaceCount(Level level, int x, int y, int z, TileLayer layer)
     {
+        if (layer != Config.Layer) return 0;
+        
         var count = 0;
 
         // check right side
@@ -262,7 +268,10 @@ public class Tile
 
     protected virtual bool ShouldKeepFace(Level level, int x, int y, int z, Face face)
     {
-        return !level.IsSolidTile(x, y, z);
+        var id = level.GetTile(x, y, z);
+        var tile = TileRegistry.Tiles[id];
+
+        return (!tile?.Config.IsSolid ?? true) || tile.Config.Layer != Config.Layer;
     }
 
     protected virtual Rectangle GetTextureCoordinates(Face face, int textureIndex)

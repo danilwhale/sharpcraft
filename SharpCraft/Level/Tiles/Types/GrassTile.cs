@@ -1,6 +1,6 @@
 ﻿namespace SharpCraft.Level.Tiles.Types;
 
-public class GrassTile(byte id) : Tile(id, 3)
+public class GrassTile(byte id) : Tile(id, 3, TileConfig.Default)
 {
     protected override int GetTextureIndexForFace(Face face)
     {

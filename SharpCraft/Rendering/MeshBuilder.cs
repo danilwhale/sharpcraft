@@ -42,11 +42,19 @@ public partial class MeshBuilder : IDisposable
         _color = ColorFromNormalized(new Vector4(r, g, b, 1.0f));
     }
 
-    public void Vertex(float x, float y, float z)
+    public unsafe void Vertex(float x, float y, float z)
     {
-        _mesh.VerticesAs<Vector3>()[_index] = new Vector3(x, y, z);
-        _mesh.TexCoordsAs<Vector2>()[_index] = _texCoords;
-        _mesh.ColorsAs<Color>()[_index] = _color;
+        _mesh.Vertices[_index * 3] = x;
+        _mesh.Vertices[_index * 3 + 1] = y;
+        _mesh.Vertices[_index * 3 + 2] = z;
+
+        _mesh.TexCoords[_index * 2] = _texCoords.X;
+        _mesh.TexCoords[_index * 2 + 1] = _texCoords.Y;
+
+        _mesh.Colors[_index * 4] = _color.R;
+        _mesh.Colors[_index * 4 + 1] = _color.G;
+        _mesh.Colors[_index * 4 + 2] = _color.B;
+        _mesh.Colors[_index * 4 + 3] = _color.A;
         
         _index++;
     }

@@ -8,6 +8,9 @@ public static class Resources
     {
         DefaultTerrainMaterial = LoadMaterialDefault();
         SetMaterialTexture(ref DefaultTerrainMaterial, MaterialMapIndex.Albedo, ResourceManager.GetTexture("terrain.png"));
+
+        var shader = LoadShaderFromMemory(null, ResourceManager.GetText("DiscardShader.frag"));
+        DefaultTerrainMaterial.Shader = shader;
     }
 
     public static void Unload()

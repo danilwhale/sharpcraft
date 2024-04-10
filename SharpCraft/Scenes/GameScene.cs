@@ -94,7 +94,8 @@ public class GameScene : IScene
 
         BeginMode3D(_player.Entity.Camera);
 
-        _levelRenderer.Draw();
+        _levelRenderer.Draw(TileLayer.Solid);
+        _levelRenderer.Draw(TileLayer.Translucent);
         _player.Draw();
 
         EndMode3D();

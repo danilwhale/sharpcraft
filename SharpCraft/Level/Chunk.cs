@@ -11,6 +11,8 @@ public class Chunk : IDisposable
 
     public static int Updates;
 
+    private static readonly int LayerCount = Enum.GetValues<TileLayer>().Length;
+
     public readonly int X;
     public readonly int Y;
     public readonly int Z;
@@ -23,7 +25,7 @@ public class Chunk : IDisposable
     public bool IsDirty = true;
 
     private readonly Level _level;
-    private readonly MeshBuilder _builder = new();
+    private readonly MeshBuilder[] _layers = new MeshBuilder[LayerCount];
 
     private bool _hasBeganRebuild;
 
@@ -37,6 +39,11 @@ public class Chunk : IDisposable
         MaxY = (y + 1) * Size;
         MaxZ = (z + 1) * Size;
         BBox = new BoundingBox(new Vector3(X, Y, Z), new Vector3(MaxX, MaxY, MaxZ));
+
+        for (var i = 0; i < LayerCount; i++)
+        {
+            _layers[i] = new MeshBuilder();
+        }
     }
 
     public bool TryBeginRebuild()
@@ -48,7 +55,19 @@ public class Chunk : IDisposable
         
         Updates++;
 
-        _builder.Begin(GetFaceCount() * 2);
+        for (var i = 0; i < LayerCount; i++)
+        {
+            BeginLayerRebuild((TileLayer)i);
+        }
+
+        return true;
+    }
+
+    private void BeginLayerRebuild(TileLayer layer)
+    {
+        var builder = _layers[(int)layer];
+            
+        builder.Begin(GetFaceCount(layer) * 2);
         
         for (var x = X; x < MaxX; x++)
         {
@@ -56,30 +75,36 @@ public class Chunk : IDisposable
             {
                 for (var z = Z; z < MaxZ; z++)
                 {
-                    TileRegistry.Tiles[_level.GetTile(x, y, z)]?.Build(_builder, _level, x, y, z);
+                    TileRegistry.Tiles[_level.GetTile(x, y, z)]?.Build(builder, _level, x, y, z, layer);
                 }
             }
         }
-
-        return true;
     }
 
     public void EndRebuild()
     {
         if (!_hasBeganRebuild) return;
         
+        for (var i = 0; i < LayerCount; i++)
+        {
+            EndLayerRebuild((TileLayer)i);
+        }
+    }
+
+    private void EndLayerRebuild(TileLayer layer)
+    {
         _hasBeganRebuild = false;
         IsDirty = false;
         
-        _builder.End();
+        _layers[(int)layer].End();
     }
 
-    public void Draw()
+    public void Draw(TileLayer layer)
     {
-        _builder.Draw(Resources.DefaultTerrainMaterial);
+        _layers[(int)layer].Draw(Resources.DefaultTerrainMaterial);
     }
 
-    private int GetFaceCount()
+    private int GetFaceCount(TileLayer layer)
     {
         var count = 0;
 
@@ -89,7 +114,7 @@ public class Chunk : IDisposable
             {
                 for (var z = Z; z < MaxZ; z++)
                 {
-                    count += TileRegistry.Tiles[_level.GetTile(x, y, z)]?.GetFaceCount(_level, x, y, z) ?? 0;
+                    count += TileRegistry.Tiles[_level.GetTile(x, y, z)]?.GetFaceCount(_level, x, y, z, layer) ?? 0;
                 }
             }
         }
@@ -99,6 +124,9 @@ public class Chunk : IDisposable
 
     public void Dispose()
     {
-        _builder.Dispose();
+        foreach (var layer in _layers)
+        {
+            layer.Dispose();
+        }
     }
 }

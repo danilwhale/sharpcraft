@@ -85,7 +85,7 @@ public class LevelRenderer : IDisposable
         }
     }
 
-    public void Draw()
+    public void Draw(TileLayer layer)
     {
         _rebuildStackMutex.WaitOne();
 
@@ -106,7 +106,7 @@ public class LevelRenderer : IDisposable
                 {
                     var chunk = _chunks[x][y][z];
                     if (!frustum.IsCubeVisible(chunk.BBox)) continue;
-                    chunk.Draw();
+                    chunk.Draw(layer);
                 }
             }
         }

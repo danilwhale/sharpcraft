@@ -6,7 +6,7 @@ public class PoleTile : Tile
 {
     private readonly int _textureIndex;
     
-    public PoleTile(byte id, int viewTextureIndex, int textureIndex) : base(id, viewTextureIndex, false, false)
+    public PoleTile(byte id, int viewTextureIndex, int textureIndex) : base(id, viewTextureIndex, new TileConfig(false, false))
     {
         Bounds = new BoundingBox(new Vector3(0.3f, 0.0f, 0.3f), new Vector3(0.7f, 1.0f, 0.7f));
         _textureIndex = textureIndex;
