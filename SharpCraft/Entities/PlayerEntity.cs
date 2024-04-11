@@ -10,6 +10,8 @@ public class PlayerEntity : Entity
     
     public Camera3D Camera;
 
+    private bool _enableGravity = true;
+
     public PlayerEntity(Level.Level level) : base(level, HalfWidth, HalfHeight)
     {
         Camera = new Camera3D(Vector3.Zero, Vector3.Zero, Vector3.UnitY, 70.0f, CameraProjection.Perspective);
@@ -50,12 +52,25 @@ public class PlayerEntity : Entity
             : 0;
 
         if (IsOnGround && (IsKeyDown(KeyboardKey.Space) || IsKeyDown(KeyboardKey.LeftSuper)))
-        {
+        { 
             Direction.Y = 0.16f;
         }
+        else if (!_enableGravity && (IsKeyDown(KeyboardKey.Space) || IsKeyDown(KeyboardKey.LeftSuper)))
+        {
+            Direction.Y = 0.13f;
+        }
+        else if (!_enableGravity)
+        {
+            Direction.Y = 0.0f;
+        }
 
-        MoveRelative(x, z, IsOnGround ? 0.023f : 0.007f);
-        Direction.Y -= 0.008f;
+        if (!_enableGravity && IsKeyDown(KeyboardKey.LeftControl))
+        {
+            Direction.Y = -0.1f;
+        }
+
+        MoveRelative(x, z, !_enableGravity || IsOnGround ? 0.023f : 0.007f);
+        if (_enableGravity) Direction.Y -= 0.008f;
         Move(Direction);
         
         Direction *= new Vector3(0.91f, 0.98f, 0.91f);
@@ -66,5 +81,10 @@ public class PlayerEntity : Entity
     public void Update()
     {
         if (IsKeyPressed(KeyboardKey.R)) MoveToRandom();
+        
+        if (IsKeyPressed(KeyboardKey.F))
+        {
+            _enableGravity = !_enableGravity;
+        }
     }
 }
