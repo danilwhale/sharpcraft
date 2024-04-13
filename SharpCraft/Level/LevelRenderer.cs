@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using SharpCraft.Level.Tiles;
+using SharpCraft.Level.Blocks;
 using SharpCraft.Rendering;
 
 namespace SharpCraft.Level;
@@ -10,8 +10,8 @@ public class LevelRenderer : IDisposable
     public readonly int ChunksY;
     public readonly int ChunksZ;
 
-    private readonly TilePosition _min;
-    private readonly TilePosition _max;
+    private readonly BlockPosition _min;
+    private readonly BlockPosition _max;
     
     private readonly Chunk[][][] _chunks;
 
@@ -31,7 +31,7 @@ public class LevelRenderer : IDisposable
         {
             SetDirtyArea(x - 1, minY, z - 1, x + 1, maxY, z + 1);
         };
-        level.OnTileChanged += (x, y, z) =>
+        level.OnBlockChanged += (x, y, z) =>
         {
             SetDirtyArea(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
         };
@@ -40,8 +40,8 @@ public class LevelRenderer : IDisposable
         ChunksY = level.Height / Chunk.Size;
         ChunksZ = level.Length / Chunk.Size;
 
-        _min = new TilePosition(0, 0, 0);
-        _max = new TilePosition(level.Width, level.Height, level.Length);
+        _min = new BlockPosition(0, 0, 0);
+        _max = new BlockPosition(level.Width, level.Height, level.Length);
 
         _chunks = new Chunk[ChunksX][][];
         for (var x = 0; x < ChunksX; x++)
@@ -85,7 +85,7 @@ public class LevelRenderer : IDisposable
         }
     }
 
-    public void Draw(TileLayer layer)
+    public void Draw(BlockLayer layer)
     {
         _rebuildStackMutex.WaitOne();
 

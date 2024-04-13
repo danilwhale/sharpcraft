@@ -1,4 +1,4 @@
-﻿using SharpCraft.Level.Tiles;
+﻿using SharpCraft.Level.Blocks;
 
 namespace SharpCraft.Level.Generation.Structures;
 
@@ -6,9 +6,9 @@ public class TreeStructure : Structure
 {
     public TreeStructure() : base(5, 7, 5)
     {
-        byte a = 0, w = TileRegistry.Wood.Id, l = TileRegistry.Leaves.Id;
+        byte a = 0, w = BlockRegistry.Wood.Id, l = BlockRegistry.Leaves.Id;
 
-        WriteTiles(
+        WriteBlocks(
             // y=0
             new byte[][]
             {

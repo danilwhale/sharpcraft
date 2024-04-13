@@ -1,6 +1,4 @@
-﻿using SharpCraft.Level.Tiles;
-
-namespace SharpCraft.Level.Generation.Structures;
+﻿namespace SharpCraft.Level.Generation.Structures;
 
 public class Structure
 {
@@ -8,25 +6,25 @@ public class Structure
     public readonly int Height;
     public readonly int Length;
 
-    protected readonly byte[] Tiles;
+    protected readonly byte[] Blocks;
 
     protected Structure(int width, int height, int length)
     {
-        Tiles = new byte[width * height * length];
+        Blocks = new byte[width * height * length];
         Width = width;
         Height = height;
         Length = length;
     }
 
-    protected void WriteTiles(params byte[][][] tiles)
+    protected void WriteBlocks(params byte[][][] blocks)
     {
-        for (var y = 0; y < tiles.Length; y++)
+        for (var y = 0; y < blocks.Length; y++)
         {
-            for (var x = 0; x < tiles[y].Length; x++)
+            for (var x = 0; x < blocks[y].Length; x++)
             {
-                for (var z = 0; z < tiles[y][x].Length; z++)
+                for (var z = 0; z < blocks[y][x].Length; z++)
                 {
-                    Tiles[(y * Length + z) * Width + x] = tiles[y][x][z];
+                    Blocks[(y * Length + z) * Width + x] = blocks[y][x][z];
                 }
             }
         }
@@ -40,10 +38,10 @@ public class Structure
             {
                 for (var k = 0; k < Length; k++)
                 {
-                    var id = Tiles[(j * Length + k) * Width + i];
+                    var id = Blocks[(j * Length + k) * Width + i];
                     if (id == 0) continue;
 
-                    level.SetTile(x + i, y + j, z + k, id, false);
+                    level.SetBlock(x + i, y + j, z + k, id, false);
                 }
             }
         }

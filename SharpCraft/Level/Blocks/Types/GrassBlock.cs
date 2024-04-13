@@ -1,6 +1,6 @@
-﻿namespace SharpCraft.Level.Tiles.Types;
+﻿namespace SharpCraft.Level.Blocks.Types;
 
-public class GrassTile(byte id) : Tile(id, 3, TileConfig.Default)
+public class GrassBlock(byte id) : Block(id, 3, BlockConfig.Default)
 {
     protected override int GetTextureIndexForFace(Face face)
     {

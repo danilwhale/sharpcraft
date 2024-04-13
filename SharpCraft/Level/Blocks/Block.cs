@@ -1,35 +1,35 @@
 ﻿using System.Numerics;
 using SharpCraft.Rendering;
 
-namespace SharpCraft.Level.Tiles;
+namespace SharpCraft.Level.Blocks;
 
-public class Tile
+public class Block
 {
     private const float Darkest = 0.6f;
     private const float Darker = 0.8f;
     private const float Light = 1.0f;
 
-    public readonly TileConfig Config;
+    public readonly BlockConfig Config;
 
     public readonly byte Id;
     public readonly int TextureIndex;
     protected BoundingBox Bounds = new(new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
 
-    public Tile(byte id, int textureIndex)
-        : this(id, textureIndex, TileConfig.Default)
+    public Block(byte id, int textureIndex)
+        : this(id, textureIndex, BlockConfig.Default)
     { }
     
-    public Tile(byte id, int textureIndex, TileConfig config)
+    public Block(byte id, int textureIndex, BlockConfig config)
     {
         Id = id;
-        TileRegistry.Tiles[id] = this;
+        BlockRegistry.Blocks[id] = this;
 
         TextureIndex = textureIndex;
 
         Config = config;
     }
 
-    public void Build(MeshBuilder builder, Level level, int x, int y, int z, TileLayer layer)
+    public void Build(MeshBuilder builder, Level level, int x, int y, int z, BlockLayer layer)
     {
         if (layer != Config.Layer) return;
         
@@ -179,7 +179,7 @@ public class Tile
         }
     }
 
-    public int GetFaceCount(Level level, int x, int y, int z, TileLayer layer)
+    public int GetFaceCount(Level level, int x, int y, int z, BlockLayer layer)
     {
         if (layer != Config.Layer) return 0;
         
@@ -206,7 +206,7 @@ public class Tile
         return count;
     }
 
-    public void DrawRlGlFace(TilePosition position, Face face)
+    public void DrawRlGlFace(BlockPosition position, Face face)
     {
         var x0 = position.X + Bounds.Min.X;
         var y0 = position.Y + Bounds.Min.Y;
@@ -268,10 +268,10 @@ public class Tile
 
     protected virtual bool ShouldKeepFace(Level level, int x, int y, int z, Face face)
     {
-        var id = level.GetTile(x, y, z);
-        var tile = TileRegistry.Tiles[id];
+        var id = level.GetBlock(x, y, z);
+        var block = BlockRegistry.Blocks[id];
 
-        return (!tile?.Config.IsSolid ?? true) || tile.Config.Layer != Config.Layer;
+        return (!block?.Config.IsSolid ?? true) || block.Config.Layer != Config.Layer;
     }
 
     protected virtual Rectangle GetTextureCoordinates(Face face, int textureIndex)

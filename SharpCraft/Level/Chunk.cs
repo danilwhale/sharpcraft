@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using SharpCraft.Level.Tiles;
+using SharpCraft.Level.Blocks;
 using SharpCraft.Rendering;
 using SharpCraft.Utilities;
 
@@ -11,7 +11,7 @@ public class Chunk : IDisposable
 
     public static int Updates;
 
-    private static readonly int LayerCount = Enum.GetValues<TileLayer>().Length;
+    private static readonly int LayerCount = Enum.GetValues<BlockLayer>().Length;
 
     public readonly int X;
     public readonly int Y;
@@ -57,13 +57,13 @@ public class Chunk : IDisposable
 
         for (var i = 0; i < LayerCount; i++)
         {
-            BeginLayerRebuild((TileLayer)i);
+            BeginLayerRebuild((BlockLayer)i);
         }
 
         return true;
     }
 
-    private void BeginLayerRebuild(TileLayer layer)
+    private void BeginLayerRebuild(BlockLayer layer)
     {
         var builder = _layers[(int)layer];
             
@@ -75,7 +75,7 @@ public class Chunk : IDisposable
             {
                 for (var z = Z; z < MaxZ; z++)
                 {
-                    TileRegistry.Tiles[_level.GetTile(x, y, z)]?.Build(builder, _level, x, y, z, layer);
+                    BlockRegistry.Blocks[_level.GetBlock(x, y, z)]?.Build(builder, _level, x, y, z, layer);
                 }
             }
         }
@@ -87,11 +87,11 @@ public class Chunk : IDisposable
         
         for (var i = 0; i < LayerCount; i++)
         {
-            EndLayerRebuild((TileLayer)i);
+            EndLayerRebuild((BlockLayer)i);
         }
     }
 
-    private void EndLayerRebuild(TileLayer layer)
+    private void EndLayerRebuild(BlockLayer layer)
     {
         _hasBeganRebuild = false;
         IsDirty = false;
@@ -99,12 +99,12 @@ public class Chunk : IDisposable
         _layers[(int)layer].End();
     }
 
-    public void Draw(TileLayer layer)
+    public void Draw(BlockLayer layer)
     {
         _layers[(int)layer].Draw(Resources.DefaultTerrainMaterial);
     }
 
-    private int GetFaceCount(TileLayer layer)
+    private int GetFaceCount(BlockLayer layer)
     {
         var count = 0;
 
@@ -114,7 +114,7 @@ public class Chunk : IDisposable
             {
                 for (var z = Z; z < MaxZ; z++)
                 {
-                    count += TileRegistry.Tiles[_level.GetTile(x, y, z)]?.GetFaceCount(_level, x, y, z, layer) ?? 0;
+                    count += BlockRegistry.Blocks[_level.GetBlock(x, y, z)]?.GetFaceCount(_level, x, y, z, layer) ?? 0;
                 }
             }
         }

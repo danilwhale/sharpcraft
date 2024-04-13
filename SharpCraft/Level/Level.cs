@@ -1,14 +1,14 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using SharpCraft.Level.Blocks;
 using SharpCraft.Level.Generation;
-using SharpCraft.Level.Tiles;
 
 namespace SharpCraft.Level;
 
 public class Level
 {
-    public delegate void OnTileChangedEvent(int x, int y, int z);
+    public delegate void OnBlockChangedEvent(int x, int y, int z);
 
     public delegate void OnLightLevelChangedEvent(int x, int z, int minY, int maxY);
 
@@ -25,7 +25,7 @@ public class Level
     public readonly int Height;
     public readonly int Length;
 
-    public event OnTileChangedEvent? OnTileChanged;
+    public event OnBlockChangedEvent? OnBlockChanged;
     public event OnLightLevelChangedEvent? OnLightLevelChanged;
     public event OnEverythingChangedEvent? OnEverythingChanged;
 
@@ -106,32 +106,32 @@ public class Level
         }
     }
 
-    public bool IsTile(int x, int y, int z)
+    public bool IsBlock(int x, int y, int z)
     {
-        return GetTile(x, y, z) > 0;
+        return GetBlock(x, y, z) > 0;
     }
 
-    public bool IsTile(TilePosition position) => IsTile(position.X, position.Y, position.Z);
+    public bool IsBlock(BlockPosition position) => IsBlock(position.X, position.Y, position.Z);
 
-    public bool IsSolidTile(int x, int y, int z)
+    public bool IsSolidBlock(int x, int y, int z)
     {
-        var id = GetTile(x, y, z);
-        var tile = TileRegistry.Tiles[id];
+        var id = GetBlock(x, y, z);
+        var block = BlockRegistry.Blocks[id];
 
-        return tile?.Config.IsSolid ?? false;
+        return block?.Config.IsSolid ?? false;
     }
 
-    public bool IsSolidTile(TilePosition position) => IsSolidTile(position.X, position.Y, position.Z);
+    public bool IsSolidBlock(BlockPosition position) => IsSolidBlock(position.X, position.Y, position.Z);
 
     public bool IsLightBlocker(int x, int y, int z)
     {
-        var id = GetTile(x, y, z);
-        var tile = TileRegistry.Tiles[id];
+        var id = GetBlock(x, y, z);
+        var block = BlockRegistry.Blocks[id];
 
-        return tile?.Config.IsLightBlocker ?? false;
+        return block?.Config.IsLightBlocker ?? false;
     }
 
-    public bool IsLightBlocker(TilePosition position) => IsLightBlocker(position.X, position.Y, position.Z);
+    public bool IsLightBlocker(BlockPosition position) => IsLightBlocker(position.X, position.Y, position.Z);
 
     public List<BoundingBox> GetBoxes(BoundingBox area)
     {
@@ -154,11 +154,11 @@ public class Level
             {
                 for (var z = minZ; z <= maxZ; z++)
                 {
-                    var id = GetTile(x, y, z);
-                    var tile = TileRegistry.Tiles[id];
-                    if (tile == null) continue;
+                    var id = GetBlock(x, y, z);
+                    var block = BlockRegistry.Blocks[id];
+                    if (block == null) continue;
 
-                    boxes.Add(tile.GetCollision(x, y, z));
+                    boxes.Add(block.GetCollision(x, y, z));
                 }
             }
         }
@@ -172,22 +172,22 @@ public class Level
         return _lightLevels[x + Width * z] >= y ? DarkValue : LightValue;
     }
 
-    public float GetBrightness(TilePosition position) => GetBrightness(position.X, position.Y, position.Z);
+    public float GetBrightness(BlockPosition position) => GetBrightness(position.X, position.Y, position.Z);
 
-    public void SetTile(int x, int y, int z, byte value, bool updateLighting = true)
+    public void SetBlock(int x, int y, int z, byte value, bool updateLighting = true)
     {
         if (!IsInRange(x, y, z)) return;
 
-        SetTileUnchecked(x, y, z, value, updateLighting);
+        SetBlockUnchecked(x, y, z, value, updateLighting);
     }
 
-    public void SetTile(TilePosition position, byte value, bool updateLighting = true) =>
-        SetTile(position.X, position.Y, position.Z, value, updateLighting);
+    public void SetBlock(BlockPosition position, byte value, bool updateLighting = true) =>
+        SetBlock(position.X, position.Y, position.Z, value, updateLighting);
 
-    public byte GetTile(int x, int y, int z) => !IsInRange(x, y, z) ? (byte)0 : GetTileUnchecked(x, y, z);
-    public byte GetTile(TilePosition position) => GetTile(position.X, position.Y, position.Z);
+    public byte GetBlock(int x, int y, int z) => !IsInRange(x, y, z) ? (byte)0 : GetBlockUnchecked(x, y, z);
+    public byte GetBlock(BlockPosition position) => GetBlock(position.X, position.Y, position.Z);
 
-    public void SetTileUnchecked(int x, int y, int z, byte value, bool updateLighting)
+    public void SetBlockUnchecked(int x, int y, int z, byte value, bool updateLighting)
     {
         var index = GetDataIndex(x, y, z);
         if (_data[index] == value) return;
@@ -195,14 +195,14 @@ public class Level
         _data[index] = value;
 
         if (updateLighting) UpdateLightLevels(x, z, 1, 1);
-        OnTileChanged?.Invoke(x, y, z);
+        OnBlockChanged?.Invoke(x, y, z);
     }
 
-    public void SetTileUnchecked(TilePosition position, byte value, bool updateLighting) =>
-        SetTileUnchecked(position.X, position.Y, position.Z, value, updateLighting);
+    public void SetBlockUnchecked(BlockPosition position, byte value, bool updateLighting) =>
+        SetBlockUnchecked(position.X, position.Y, position.Z, value, updateLighting);
 
-    public byte GetTileUnchecked(int x, int y, int z) => _data[GetDataIndex(x, y, z)];
-    public byte GetTileUnchecked(TilePosition position) => GetTileUnchecked(position.X, position.Y, position.Z);
+    public byte GetBlockUnchecked(int x, int y, int z) => _data[GetDataIndex(x, y, z)];
+    public byte GetBlockUnchecked(BlockPosition position) => GetBlockUnchecked(position.X, position.Y, position.Z);
 
     public RayCollision DoRayCast(Ray ray, float maxDistance)
     {
@@ -234,7 +234,7 @@ public class Level
 
         while (t <= maxDistance)
         {
-            if (IsTile(ix, iy, iz))
+            if (IsBlock(ix, iy, iz))
             {
                 col.Point = ray.Position + t * ray.Direction;
 

@@ -1,12 +1,12 @@
 ﻿using System.Numerics;
 
-namespace SharpCraft.Level.Tiles.Types;
+namespace SharpCraft.Level.Blocks.Types;
 
-public class PoleTile : Tile
+public class PoleBlock : Block
 {
     private readonly int _textureIndex;
     
-    public PoleTile(byte id, int viewTextureIndex, int textureIndex) : base(id, viewTextureIndex, new TileConfig(false, false))
+    public PoleBlock(byte id, int viewTextureIndex, int textureIndex) : base(id, viewTextureIndex, new BlockConfig(false, false))
     {
         Bounds = new BoundingBox(new Vector3(0.3f, 0.0f, 0.3f), new Vector3(0.7f, 1.0f, 0.7f));
         _textureIndex = textureIndex;
@@ -22,12 +22,12 @@ public class PoleTile : Tile
         if (face is not (Face.Top or Face.Bottom)) return true;
         if (!level.IsInRange(x, y, z)) return true;
 
-        var id = level.GetTileUnchecked(x, y, z);
-        var tile = TileRegistry.Tiles[id];
+        var id = level.GetBlockUnchecked(x, y, z);
+        var block = BlockRegistry.Blocks[id];
         
-        if (tile == null) return true;
+        if (block == null) return true;
 
-        return tile is not PoleTile;
+        return block is not PoleBlock;
     }
 
     protected override Rectangle GetTextureCoordinates(Face face, int textureIndex)

@@ -2,7 +2,7 @@
 using SharpCraft.Entities;
 using SharpCraft.Gui.Screens;
 using SharpCraft.Level;
-using SharpCraft.Level.Tiles;
+using SharpCraft.Level.Blocks;
 using SharpCraft.Utilities;
 using Timer = SharpCraft.Utilities.Timer;
 
@@ -94,8 +94,8 @@ public class GameScene : IScene
 
         BeginMode3D(_player.Entity.Camera);
 
-        _levelRenderer.Draw(TileLayer.Solid);
-        _levelRenderer.Draw(TileLayer.Translucent);
+        _levelRenderer.Draw(BlockLayer.Solid);
+        _levelRenderer.Draw(BlockLayer.Translucent);
         _player.Draw();
 
         EndMode3D();

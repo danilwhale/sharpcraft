@@ -1,6 +1,6 @@
-﻿namespace SharpCraft.Level.Tiles.Types;
+﻿namespace SharpCraft.Level.Blocks.Types;
 
-public class WoodTile(byte id) : Tile(id, 7, TileConfig.Default)
+public class WoodBlock(byte id) : Block(id, 7, BlockConfig.Default)
 {
     protected override int GetTextureIndexForFace(Face face)
     {

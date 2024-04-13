@@ -1,5 +1,4 @@
 ﻿using SharpCraft.Entities;
-using SharpCraft.Level.Tiles;
 
 namespace SharpCraft;
 

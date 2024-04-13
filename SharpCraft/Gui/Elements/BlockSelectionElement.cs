@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using SharpCraft.Level.Tiles;
+using SharpCraft.Level.Blocks;
 using SharpCraft.Utilities;
 
 namespace SharpCraft.Gui.Elements;
@@ -8,8 +8,8 @@ public class BlockSelectionElement : Element
 {
     private const int Size = 48;
     
-    public byte CurrentTile = 1;
-    public Range PreviewRange = 1..TileRegistry.GetNonNullTileCount();
+    public byte CurrentBlock = 1;
+    public Range PreviewRange = 1..BlockRegistry.GetExistingBlockCount();
     
     public override void Update()
     {
@@ -18,27 +18,27 @@ public class BlockSelectionElement : Element
 
     public override void Draw()
     {
-        var textureIndex = TileRegistry.Tiles[CurrentTile]?.TextureIndex ?? 1;
+        var textureIndex = BlockRegistry.Blocks[CurrentBlock]?.TextureIndex ?? 1;
         
-        DrawTile(16, GetScreenHeight() - 112, 96, 4, textureIndex);
+        DrawBlockFace(16, GetScreenHeight() - 112, 96, 4, textureIndex);
 
         for (var i = PreviewRange.Start.Value; i <= PreviewRange.End.Value; i++)
         {
-            var tile = TileRegistry.Tiles[i]!;
+            var block = BlockRegistry.Blocks[i]!;
 
             var x = 64 + i * (Size + 8);
             var y = GetScreenHeight() - 64;
             
-            DrawTile(x, y, Size, 4, tile.TextureIndex);
+            DrawBlockFace(x, y, Size, 4, block.TextureIndex);
 
-            if (CurrentTile == tile.Id)
+            if (CurrentBlock == block.Id)
             {
                 DrawRectangle(x, y + Size - 4, Size, 4, Color.SkyBlue);
             }
         }
     }
 
-    private void DrawTile(int x, int y, int size, int padding, int textureIndex)
+    private void DrawBlockFace(int x, int y, int size, int padding, int textureIndex)
     {
         DrawRectangle(x, y, size, size, Color.White);
         DrawTexturePro(

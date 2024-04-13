@@ -1,5 +1,5 @@
-﻿using SharpCraft.Level.Generation.Structures;
-using SharpCraft.Level.Tiles;
+﻿using SharpCraft.Level.Blocks;
+using SharpCraft.Level.Generation.Structures;
 
 namespace SharpCraft.Level.Generation;
 
@@ -23,28 +23,28 @@ public static class LevelGeneration
                     
                     if (y == groundLevel)
                     {
-                        id = TileRegistry.Grass.Id;
+                        id = BlockRegistry.Grass.Id;
                     }
                     else if (y == groundLevel + 1 && random.NextDouble() < 0.01)
                     {
-                        id = TileRegistry.Rock.Id;
+                        id = BlockRegistry.Rock.Id;
                     }
                     else if (y >= yLevel && y < groundLevel)
                     {
-                        id = TileRegistry.Dirt.Id;
+                        id = BlockRegistry.Dirt.Id;
                     }
                     else if (y < yLevel && random.NextDouble() > y / (float)level.Height)
                     {
-                        id = TileRegistry.Rock.Id;
+                        id = BlockRegistry.Rock.Id;
                     }
                     else if (y < yLevel)
                     {
-                        id = TileRegistry.Stone.Id;
+                        id = BlockRegistry.Stone.Id;
                     }
                     
                     if (id == 0) continue;
                     
-                    level.SetTileUnchecked(x, y, z, id, false);
+                    level.SetBlockUnchecked(x, y, z, id, false);
                 }
             }
         }

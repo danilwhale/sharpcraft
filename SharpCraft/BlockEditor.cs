@@ -1,16 +1,16 @@
 ﻿using System.Numerics;
 using SharpCraft.Entities;
 using SharpCraft.Gui.Elements;
-using SharpCraft.Level.Tiles;
+using SharpCraft.Level.Blocks;
 
 namespace SharpCraft;
 
 public class BlockEditor(Level.Level level, float maxHitDistance)
 {
-    private static readonly int MaxTileId = TileRegistry.GetNonNullTileCount();
+    private static readonly int LastBlockId = BlockRegistry.GetExistingBlockCount();
 
     public BlockSelectionElement SelectionElement;
-    public byte CurrentTile = 1;
+    public byte CurrentBlock = 1;
     
     private RayCollision _rayCast;
 
@@ -20,14 +20,14 @@ public class BlockEditor(Level.Level level, float maxHitDistance)
 
         if (mouseScroll > 0)
         {
-            CurrentTile = (byte)(CurrentTile - 1 < 1 ? MaxTileId : CurrentTile - 1);
+            CurrentBlock = (byte)(CurrentBlock - 1 < 1 ? LastBlockId : CurrentBlock - 1);
         }
         else if (mouseScroll < 0)
         {
-            CurrentTile = (byte)(CurrentTile + 1 > MaxTileId ? 1 : CurrentTile + 1);
+            CurrentBlock = (byte)(CurrentBlock + 1 > LastBlockId ? 1 : CurrentBlock + 1);
         }
         
-        SelectionElement.CurrentTile = CurrentTile;
+        SelectionElement.CurrentBlock = CurrentBlock;
         
         _rayCast = level.DoRayCast(
             GetMouseRay(new Vector2(GetScreenWidth(), GetScreenHeight()) / 2, playerEntity.Camera),
@@ -42,14 +42,14 @@ public class BlockEditor(Level.Level level, float maxHitDistance)
         {
             var hitPoint = _rayCast.Point + _rayCast.Normal / 2;
 
-            level.SetTile(hitPoint, CurrentTile);
+            level.SetBlock(hitPoint, CurrentBlock);
         }
 
         if (IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
         {
             var hitPoint = _rayCast.Point - _rayCast.Normal / 2;
 
-            level.SetTile(hitPoint, 0);
+            level.SetBlock(hitPoint, 0);
         }
     }
 
@@ -57,15 +57,15 @@ public class BlockEditor(Level.Level level, float maxHitDistance)
     {
         if (!_rayCast.Hit) return;
         
-        var position = (TilePosition)(_rayCast.Point - _rayCast.Normal / 2.0f);
+        var position = (BlockPosition)(_rayCast.Point - _rayCast.Normal / 2.0f);
 
-        var id = level.GetTile(position);
-        var tile = TileRegistry.Tiles[id];
-        if (tile == null) return;
+        var id = level.GetBlock(position);
+        var block = BlockRegistry.Blocks[id];
+        if (block == null) return;
 
         Rlgl.DisableDepthTest();
 
-        var collision = tile.GetCollision(position.X, position.Y, position.Z);
+        var collision = block.GetCollision(position.X, position.Y, position.Z);
         var size = collision.Max - collision.Min;
         DrawCubeWiresV(collision.Min + size / 2, size, Color.Black);
         
