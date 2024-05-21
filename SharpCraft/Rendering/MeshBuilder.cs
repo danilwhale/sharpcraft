@@ -67,6 +67,8 @@ public partial class MeshBuilder : IDisposable
 
     public void End()
     {
+        if (_mesh.VertexCount == 0) return;
+        
         UploadMesh(ref _mesh, false);
 
         if (_oldMesh.VaoId == 0) return;

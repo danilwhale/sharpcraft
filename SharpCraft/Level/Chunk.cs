@@ -66,8 +66,11 @@ public class Chunk : IDisposable
     private void BeginLayerRebuild(BlockLayer layer)
     {
         var builder = _layers[(int)layer];
+
+        var faceCount = GetFaceCount(layer);
+        if (faceCount == 0) return;
             
-        builder.Begin(GetFaceCount(layer) * 2);
+        builder.Begin(faceCount * 2);
         
         for (var x = X; x < MaxX; x++)
         {
