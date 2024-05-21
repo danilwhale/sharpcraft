@@ -6,7 +6,7 @@ namespace SharpCraft.Gui.Screens;
 
 public class GameOverlayScreen : Screen
 {
-    private TextElement _fpsText = new()
+    private TextElement _debugText = new()
     {
         Size = 24.0f,
         Position = new Vector2(8.0f)
@@ -21,7 +21,7 @@ public class GameOverlayScreen : Screen
     
     public GameOverlayScreen()
     {
-        Elements.Add(_fpsText);
+        Elements.Add(_debugText);
         Elements.Add(_crosshair);
         Elements.Add(BlockSelection);
     }
@@ -43,7 +43,7 @@ public class GameOverlayScreen : Screen
             _lastSecondTime = time;
         }
 
-        _fpsText.Text = $"{_fps} FPS, {Chunk.Updates} chunk updates";
+        _debugText.Text = $"{_fps} FPS\n{Chunk.Updates} chunk updates";
     }
 
     public override void Draw()

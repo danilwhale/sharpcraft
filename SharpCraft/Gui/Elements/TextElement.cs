@@ -17,7 +17,12 @@ public class TextElement : Element
 
     public override void Draw()
     {
-        DrawTextEx(Font, Text, Position, Size, GetSpacing(), Tint);
+        var split = Text.Split('\n');
+        for (var i = 0; i < split.Length; i++)
+        {
+            var line = split[i];
+            DrawTextEx(Font, line, Position + new Vector2(0.0f, i * Size), Size, GetSpacing(), Tint);
+        }
     }
 
     private float GetSpacing() => Spacing < 0 ? MathF.Max(Size, Font.BaseSize) / Font.BaseSize : Spacing;
