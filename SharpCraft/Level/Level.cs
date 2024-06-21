@@ -16,14 +16,19 @@ public class Level
 
     private const float LightValue = 1.0f;
     private const float DarkValue = 0.4f;
-
-    // I use 1d array only because it's easier to load/save level
-    private readonly byte[] _data;
-    private readonly int[] _lightLevels;
+    
+    private const int Format = 1;
 
     public readonly int Width;
     public readonly int Height;
     public readonly int Length;
+
+    public readonly int ChunksX;
+    public readonly int ChunksY;
+    public readonly int ChunksZ;
+
+    public readonly Chunk[] Chunks;
+    public readonly LightRegion[] LightRegions;
 
     public event OnBlockChangedEvent? OnBlockChanged;
     public event OnLightLevelChangedEvent? OnLightLevelChanged;
@@ -35,8 +40,31 @@ public class Level
         Height = height;
         Length = length;
 
-        _data = new byte[width * height * length];
-        _lightLevels = new int[width * length];
+        ChunksX = width >> 4;
+        ChunksY = height >> 4;
+        ChunksZ = length >> 4;
+
+        Chunks = new Chunk[ChunksX * ChunksY * ChunksZ];
+        LightRegions = new LightRegion[ChunksX * ChunksZ];
+
+        for (var x = 0; x < ChunksX; x++)
+        {
+            for (var y = 0; y < ChunksY; y++)
+            {
+                for (var z = 0; z < ChunksZ; z++)
+                {
+                    Chunks[y * Chunk.SizeSq + z * Chunk.Size + x] = new Chunk(this, x, y, z);
+                }
+            }
+        }
+
+        for (var x = 0; x < ChunksX; x++)
+        {
+            for (var z = 0; z < ChunksZ; z++)
+            {
+                LightRegions[x + ChunksX * z] = new LightRegion();
+            }
+        }
 
         if (!TryLoad())
         {
@@ -54,7 +82,17 @@ public class Level
         {
             using var fileStream = File.OpenRead(path);
             using var stream = new GZipStream(fileStream, CompressionMode.Decompress);
-            stream.ReadExactly(_data);
+
+            if (stream.ReadByte() != Format)
+            {
+                TraceLog(TraceLogLevel.Warning, "Unknown level format detected! Big chance that this is old level format, generating new level");
+                return false;
+            }
+
+            foreach (var chunk in Chunks)
+            {
+                chunk.Read(stream);
+            }
         
             OnEverythingChanged?.Invoke();
         
@@ -74,7 +112,13 @@ public class Level
         {
             using var fileStream = File.OpenWrite(path);
             using var stream = new GZipStream(fileStream, CompressionMode.Compress);
-            stream.Write(_data);
+            
+            stream.WriteByte(Format);
+            
+            foreach (var chunk in Chunks)
+            {
+                chunk.Write(stream);
+            }
         }
         catch (Exception e)
         {
@@ -88,20 +132,19 @@ public class Level
         {
             for (var j = z; j < z + length; j++)
             {
-                var oldY = _lightLevels[i + Width * j];
-
+                var region = LightRegions[(i >> 4) + ChunksX * (j >> 4)];
                 var y = Height;
+
                 for (; y > 0 && !IsLightBlocker(i, y, j); y--)
                 {
                 }
 
-                if (y == oldY) continue;
-
-                var minY = Math.Min(y, oldY);
-                var maxY = Math.Max(y, oldY);
-
+                var originalY = region[i % Chunk.Size, j % Chunk.Size];
+                var minY = Math.Min(y, originalY);
+                var maxY = Math.Max(y, originalY);
+                
                 OnLightLevelChanged?.Invoke(i, j, minY, maxY);
-                _lightLevels[i + Width * j] = y;
+                region[i % Chunk.Size, j % Chunk.Size] = (ushort)y;
             }
         }
     }
@@ -169,7 +212,10 @@ public class Level
     public float GetBrightness(int x, int y, int z)
     {
         if (!IsInRange(x, y, z)) return LightValue;
-        return _lightLevels[x + Width * z] >= y ? DarkValue : LightValue;
+
+        var cx = x >> 4;
+        var cz = z >> 4;
+        return LightRegions[cx + ChunksX * cz][x % Chunk.Size, z % Chunk.Size] >= y ? DarkValue : LightValue;
     }
 
     public float GetBrightness(BlockPosition position) => GetBrightness(position.X, position.Y, position.Z);
@@ -189,10 +235,13 @@ public class Level
 
     public void SetBlockUnchecked(int x, int y, int z, byte value, bool updateLighting)
     {
-        var index = GetDataIndex(x, y, z);
-        if (_data[index] == value) return;
+        var cx = x >> 4;
+        var cy = y >> 4;
+        var cz = z >> 4;
         
-        _data[index] = value;
+        var chunk = Chunks[cy * Chunk.SizeSq + cz * Chunk.Size + cx];
+
+        chunk[x % Chunk.Size, y % Chunk.Size, z % Chunk.Size] = value;
 
         if (updateLighting) UpdateLightLevels(x, z, 1, 1);
         OnBlockChanged?.Invoke(x, y, z);
@@ -201,7 +250,16 @@ public class Level
     public void SetBlockUnchecked(BlockPosition position, byte value, bool updateLighting) =>
         SetBlockUnchecked(position.X, position.Y, position.Z, value, updateLighting);
 
-    public byte GetBlockUnchecked(int x, int y, int z) => _data[GetDataIndex(x, y, z)];
+    public byte GetBlockUnchecked(int x, int y, int z)
+    {
+        var cx = x >> 4;
+        var cy = y >> 4;
+        var cz = z >> 4;
+        
+        var chunk = Chunks[cy * Chunk.SizeSq + cz * Chunk.Size + cx];
+
+        return chunk[x % Chunk.Size, y % Chunk.Size, z % Chunk.Size];
+    }
     public byte GetBlockUnchecked(BlockPosition position) => GetBlockUnchecked(position.X, position.Y, position.Z);
 
     public RayCollision DoRayCast(Ray ray, float maxDistance)
@@ -306,7 +364,4 @@ public class Level
     }
 
     public bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Length;
-
-    // use original indexing to have compatibility with original levels
-    private int GetDataIndex(int x, int y, int z) => (y * Length + z) * Width + x;
 }

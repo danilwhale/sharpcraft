@@ -22,7 +22,7 @@ public readonly struct BlockPosition(int x, int y, int z)
 
     public static BlockPosition ToChunkPosition(BlockPosition worldPosition)
     {
-        return new BlockPosition(worldPosition.X / Chunk.Size, worldPosition.Y / Chunk.Size, worldPosition.Z / Chunk.Size);
+        return new BlockPosition(worldPosition.X >> 4, worldPosition.Y >> 4, worldPosition.Z >> 4);
     }
 
     public static BlockPosition Clamp(BlockPosition value, BlockPosition min, BlockPosition max)

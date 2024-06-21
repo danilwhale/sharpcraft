@@ -5,12 +5,12 @@ using SharpCraft.Utilities;
 
 namespace SharpCraft.Level;
 
-public class Chunk : IDisposable
+public class Chunk : IDisposable, ILevelSerializable
 {
     public const int Size = 16;
-
+    public const int SizeSq = Size * Size;
+    
     public static int Updates;
-
     private static readonly int LayerCount = Enum.GetValues<BlockLayer>().Length;
 
     public readonly int X;
@@ -26,6 +26,8 @@ public class Chunk : IDisposable
 
     private readonly Level _level;
     private readonly MeshBuilder[] _layers = new MeshBuilder[LayerCount];
+
+    private readonly byte[] _blocks = new byte[Size * Size * Size];
 
     private bool _hasBeganRebuild;
 
@@ -44,6 +46,12 @@ public class Chunk : IDisposable
         {
             _layers[i] = new MeshBuilder();
         }
+    }
+
+    public byte this[int x, int y, int z]
+    {
+        get => _blocks[x + Size * (y + Size * z)];
+        set => _blocks[x + Size * (y + Size * z)] = value;
     }
 
     public bool TryBeginRebuild()
@@ -131,5 +139,15 @@ public class Chunk : IDisposable
         {
             layer.Dispose();
         }
+    }
+
+    public void Read(Stream stream)
+    {
+        stream.ReadExactly(_blocks);
+    }
+
+    public void Write(Stream stream)
+    {
+        stream.Write(_blocks);
     }
 }
