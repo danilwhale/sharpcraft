@@ -5,15 +5,11 @@ namespace SharpCraft.Level.Blocks;
 
 public class Block
 {
-    private const float Darkest = 0.6f;
-    private const float Darker = 0.8f;
-    private const float Light = 1.0f;
-
     public readonly BlockConfig Config;
 
     public readonly byte Id;
     public readonly int TextureIndex;
-    protected BoundingBox Bounds = new(new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
+    public BoundingBox Bounds = new(new Vector3(0.0f, 0.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
 
     public Block(byte id, int textureIndex)
         : this(id, textureIndex, BlockConfig.Default)
@@ -29,154 +25,49 @@ public class Block
         Config = config;
     }
 
-    public void Build(MeshBuilder builder, Level level, int x, int y, int z, BlockLayer layer)
+    public void Build(IVertexBuilder builder, Level level, int x, int y, int z, BlockLayer layer)
     {
         if (layer != Config.Layer) return;
-        
-        var x0 = x + Bounds.Min.X;
-        var y0 = y + Bounds.Min.Y;
-        var z0 = z + Bounds.Min.Z;
-        var x1 = x + Bounds.Max.X;
-        var y1 = y + Bounds.Max.Y;
-        var z1 = z + Bounds.Max.Z;
 
         if (ShouldKeepFace(level, x - 1, y, z, Face.Left))
         {
-            var textureIndex = GetTextureIndexForFace(Face.Left);
-            var coords = GetTextureCoordinates(Face.Left, textureIndex);
-            
-            var u0 = coords.X;
-            var u1 = coords.X + coords.Width;
-            var v0 = coords.Y;
-            var v1 = coords.Y + coords.Height;
-
-            var b = level.GetBrightness(x - 1, y, z) * Darkest;
-
-            builder.Color(b, b, b);
-
-            builder.VertexWithTex(x0, y0, z0, u0, v1);
-            builder.VertexWithTex(x0, y0, z1, u1, v1);
-            builder.VertexWithTex(x0, y1, z1, u1, v0);
-
-            builder.VertexWithTex(x0, y0, z0, u0, v1);
-            builder.VertexWithTex(x0, y1, z1, u1, v0);
-            builder.VertexWithTex(x0, y1, z0, u0, v0);
+            BlockRender.BuildLeftFace(builder, level, this, x, y, z);
         }
 
         if (ShouldKeepFace(level, x + 1, y, z, Face.Right))
         {
-            var textureIndex = GetTextureIndexForFace(Face.Right);
-            var coords = GetTextureCoordinates(Face.Right, textureIndex);
-            
-            var u0 = coords.X;
-            var u1 = coords.X + coords.Width;
-            var v0 = coords.Y;
-            var v1 = coords.Y + coords.Height;
-
-            var b = level.GetBrightness(x + 1, y, z) * Darkest;
-
-            builder.Color(b, b, b);
-
-            builder.VertexWithTex(x1, y0, z0, u1, v1);
-            builder.VertexWithTex(x1, y1, z0, u1, v0);
-            builder.VertexWithTex(x1, y1, z1, u0, v0);
-
-            builder.VertexWithTex(x1, y0, z0, u1, v1);
-            builder.VertexWithTex(x1, y1, z1, u0, v0);
-            builder.VertexWithTex(x1, y0, z1, u0, v1);
+            BlockRender.BuildRightFace(builder, level, this, x, y, z);
         }
 
         if (ShouldKeepFace(level, x, y + 1, z, Face.Top))
         {
-            var textureIndex = GetTextureIndexForFace(Face.Top);
-            var coords = GetTextureCoordinates(Face.Top, textureIndex);
-            
-            var u0 = coords.X;
-            var u1 = coords.X + coords.Width;
-            var v0 = coords.Y;
-            var v1 = coords.Y + coords.Height;
-
-            var b = level.GetBrightness(x, y + 1, z) * Light;
-
-            builder.Color(b, b, b);
-
-            builder.VertexWithTex(x0, y1, z0, u0, v0);
-            builder.VertexWithTex(x0, y1, z1, u0, v1);
-            builder.VertexWithTex(x1, y1, z1, u1, v1);
-
-            builder.VertexWithTex(x0, y1, z0, u0, v0);
-            builder.VertexWithTex(x1, y1, z1, u1, v1);
-            builder.VertexWithTex(x1, y1, z0, u1, v0);
+            BlockRender.BuildTopFace(builder, level, this, x, y, z);
         }
 
         if (ShouldKeepFace(level, x, y - 1, z, Face.Bottom))
         {
-            var textureIndex = GetTextureIndexForFace(Face.Bottom);
-            var coords = GetTextureCoordinates(Face.Bottom, textureIndex);
-            
-            var u0 = coords.X;
-            var u1 = coords.X + coords.Width;
-            var v0 = coords.Y;
-            var v1 = coords.Y + coords.Height;
-
-            var b = level.GetBrightness(x, y - 1, z) * Light;
-
-            builder.Color(b, b, b);
-
-            builder.VertexWithTex(x0, y0, z0, u1, v0);
-            builder.VertexWithTex(x1, y0, z0, u0, v0);
-            builder.VertexWithTex(x1, y0, z1, u0, v1);
-
-            builder.VertexWithTex(x0, y0, z0, u1, v0);
-            builder.VertexWithTex(x1, y0, z1, u0, v1);
-            builder.VertexWithTex(x0, y0, z1, u1, v1);
+            BlockRender.BuildBottomFace(builder, level, this, x, y, z);
         }
 
         if (ShouldKeepFace(level, x, y, z + 1, Face.Front))
         {
-            var textureIndex = GetTextureIndexForFace(Face.Front);
-            var coords = GetTextureCoordinates(Face.Front, textureIndex);
-            
-            var u0 = coords.X;
-            var u1 = coords.X + coords.Width;
-            var v0 = coords.Y;
-            var v1 = coords.Y + coords.Height;
-            
-            var b = level.GetBrightness(x, y, z + 1) * Darker;
-
-            builder.Color(b, b, b);
-
-            builder.VertexWithTex(x0, y0, z1, u0, v1);
-            builder.VertexWithTex(x1, y0, z1, u1, v1);
-            builder.VertexWithTex(x1, y1, z1, u1, v0);
-
-            builder.VertexWithTex(x0, y0, z1, u0, v1);
-            builder.VertexWithTex(x1, y1, z1, u1, v0);
-            builder.VertexWithTex(x0, y1, z1, u0, v0);
+            BlockRender.BuildFrontFace(builder, level, this, x, y, z);
         }
 
         if (ShouldKeepFace(level, x, y, z - 1, Face.Back))
         {
-            var textureIndex = GetTextureIndexForFace(Face.Back);
-            var coords = GetTextureCoordinates(Face.Back, textureIndex);
-            
-            var u0 = coords.X;
-            var u1 = coords.X + coords.Width;
-            var v0 = coords.Y;
-            var v1 = coords.Y + coords.Height;
-
-            var b = level.GetBrightness(x, y, z - 1) * Darker;
-
-            builder.Color(b, b, b);
-
-            builder.VertexWithTex(x0, y0, z0, u1, v1);
-            builder.VertexWithTex(x0, y1, z0, u1, v0);
-            builder.VertexWithTex(x1, y1, z0, u0, v0);
-
-            builder.VertexWithTex(x0, y0, z0, u1, v1);
-            builder.VertexWithTex(x1, y1, z0, u0, v0);
-            builder.VertexWithTex(x1, y0, z0, u0, v1);
+            BlockRender.BuildBackFace(builder, level, this, x, y, z);
         }
+    }
+
+    public void Build(IVertexBuilder builder, int x, int y, int z)
+    {
+        BlockRender.BuildLeftFace(builder, 1.0f, this, x, y, z);
+        BlockRender.BuildRightFace(builder, 1.0f, this, x, y, z);
+        BlockRender.BuildTopFace(builder, 1.0f, this, x, y, z);
+        BlockRender.BuildBottomFace(builder, 1.0f, this, x, y, z);
+        BlockRender.BuildFrontFace(builder, 1.0f, this, x, y, z);
+        BlockRender.BuildBackFace(builder, 1.0f, this, x, y, z);
     }
 
     public int GetFaceCount(Level level, int x, int y, int z, BlockLayer layer)
@@ -206,67 +97,12 @@ public class Block
         return count;
     }
 
-    public void DrawRlGlFace(BlockPosition position, Face face)
-    {
-        var x0 = position.X + Bounds.Min.X;
-        var y0 = position.Y + Bounds.Min.Y;
-        var z0 = position.Z + Bounds.Min.Z;
-        var x1 = position.X + Bounds.Max.X;
-        var y1 = position.Y + Bounds.Max.Y;
-        var z1 = position.Z + Bounds.Max.Z;
-
-        switch (face)
-        {
-            case Face.Left:
-                Rlgl.Vertex3f(x0, y0, z0);
-                Rlgl.Vertex3f(x0, y0, z1);
-                Rlgl.Vertex3f(x0, y1, z1);
-                Rlgl.Vertex3f(x0, y1, z0);
-                break;
-
-            case Face.Right:
-                Rlgl.Vertex3f(x1, y0, z0);
-                Rlgl.Vertex3f(x1, y1, z0);
-                Rlgl.Vertex3f(x1, y1, z1);
-                Rlgl.Vertex3f(x1, y0, z1);
-                break;
-
-            case Face.Top:
-                Rlgl.Vertex3f(x0, y1, z0);
-                Rlgl.Vertex3f(x0, y1, z1);
-                Rlgl.Vertex3f(x1, y1, z1);
-                Rlgl.Vertex3f(x1, y1, z0);
-                break;
-
-            case Face.Bottom:
-                Rlgl.Vertex3f(x0, y0, z0);
-                Rlgl.Vertex3f(x1, y0, z0);
-                Rlgl.Vertex3f(x1, y0, z1);
-                Rlgl.Vertex3f(x0, y0, z1);
-                break;
-
-            case Face.Front:
-                Rlgl.Vertex3f(x0, y0, z1);
-                Rlgl.Vertex3f(x1, y0, z1);
-                Rlgl.Vertex3f(x1, y1, z1);
-                Rlgl.Vertex3f(x0, y1, z1);
-                break;
-
-            case Face.Back:
-                Rlgl.Vertex3f(x0, y0, z0);
-                Rlgl.Vertex3f(x0, y1, z0);
-                Rlgl.Vertex3f(x1, y1, z0);
-                Rlgl.Vertex3f(x1, y0, z0);
-                break;
-        }
-    }
-
-    protected virtual int GetTextureIndexForFace(Face face)
+    public virtual int GetTextureIndexForFace(Face face)
     {
         return TextureIndex;
     }
 
-    protected virtual bool ShouldKeepFace(Level level, int x, int y, int z, Face face)
+    public virtual bool ShouldKeepFace(Level level, int x, int y, int z, Face face)
     {
         var id = level.GetBlock(x, y, z);
         var block = BlockRegistry.Blocks[id];
@@ -274,7 +110,7 @@ public class Block
         return (!block?.Config.IsSolid ?? true) || block.Config.Layer != Config.Layer;
     }
 
-    protected virtual Rectangle GetTextureCoordinates(Face face, int textureIndex)
+    public virtual Rectangle GetTextureCoordinates(Face face, int textureIndex)
     {
         return new Rectangle(
                 textureIndex % 16.0f / 16.0f,

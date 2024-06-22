@@ -2,7 +2,7 @@
 
 public class WoodBlock(byte id) : Block(id, 7, BlockConfig.Default)
 {
-    protected override int GetTextureIndexForFace(Face face)
+    public override int GetTextureIndexForFace(Face face)
     {
         return face switch
         {

@@ -2,7 +2,7 @@
 
 public class GrassBlock(byte id) : Block(id, 3, BlockConfig.Default)
 {
-    protected override int GetTextureIndexForFace(Face face)
+    public override int GetTextureIndexForFace(Face face)
     {
         return face switch
         {

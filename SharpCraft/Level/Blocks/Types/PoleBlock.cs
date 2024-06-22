@@ -12,12 +12,12 @@ public class PoleBlock : Block
         _textureIndex = textureIndex;
     }
 
-    protected override int GetTextureIndexForFace(Face face)
+    public override int GetTextureIndexForFace(Face face)
     {
         return _textureIndex;
     }
 
-    protected override bool ShouldKeepFace(Level level, int x, int y, int z, Face face)
+    public override bool ShouldKeepFace(Level level, int x, int y, int z, Face face)
     {
         if (face is not (Face.Top or Face.Bottom)) return true;
         if (!level.IsInRange(x, y, z)) return true;
@@ -30,7 +30,7 @@ public class PoleBlock : Block
         return block is not PoleBlock;
     }
 
-    protected override Rectangle GetTextureCoordinates(Face face, int textureIndex)
+    public override Rectangle GetTextureCoordinates(Face face, int textureIndex)
     {
         var x = textureIndex % 16.0f / 16.0f;
         var y = MathF.Floor(textureIndex / 16.0f) / 16.0f;
