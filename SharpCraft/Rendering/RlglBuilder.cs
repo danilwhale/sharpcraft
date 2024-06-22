@@ -3,8 +3,10 @@
 public class RlglBuilder : IVertexBuilder
 {
     public static readonly RlglBuilder Instance = new();
-    
-    public void Begin(int triangles)
+
+    public bool SupportsIndices => false;
+
+    public void Begin(int vertices, int triangles)
     {
         Rlgl.Begin(DrawMode.Triangles);
     }
@@ -28,6 +30,16 @@ public class RlglBuilder : IVertexBuilder
     {
         TexCoords(u, v);
         Vertex(x, y, z);
+    }
+
+    public void Index(ushort index, bool relative)
+    {
+        throw new NotImplementedException();
+    }
+
+    public void Indices(ushort[] indices, bool relative)
+    {
+        throw new NotImplementedException();
     }
 
     public void End()

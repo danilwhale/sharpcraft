@@ -9,27 +9,30 @@ public class Chunk : IDisposable, ILevelSerializable
 {
     public const int Size = 16;
     public const int SizeSq = Size * Size;
-    
+
     public static int Updates;
     private static readonly int LayerCount = Enum.GetValues<BlockLayer>().Length;
 
     public readonly int X;
     public readonly int Y;
     public readonly int Z;
-    
+
     public readonly int MaxX;
     public readonly int MaxY;
     public readonly int MaxZ;
 
     public readonly BoundingBox BBox;
     public bool IsDirty = true;
+    public bool IsEmpty => _blockCount == 0;
 
     private readonly Level _level;
+    
     private readonly MeshBuilder[] _layers = new MeshBuilder[LayerCount];
-
     private readonly byte[] _blocks = new byte[Size * Size * Size];
 
     private bool _hasBeganRebuild;
+
+    private int _blockCount;
 
     public Chunk(Level level, int x, int y, int z)
     {
@@ -44,23 +47,38 @@ public class Chunk : IDisposable, ILevelSerializable
 
         for (var i = 0; i < LayerCount; i++)
         {
-            _layers[i] = new MeshBuilder();
+            _layers.GetUnsafeRef(i) = new MeshBuilder();
         }
     }
 
     public byte this[int x, int y, int z]
     {
-        get => _blocks[x + Size * (y + Size * z)];
-        set => _blocks[x + Size * (y + Size * z)] = value;
+        get => _blocks.GetUnsafeRef(y * SizeSq + z * Size + x);
+        set
+        {
+            ref var valueRef = ref _blocks.GetUnsafeRef(y * SizeSq + z * Size + x);
+            
+            if (valueRef != 0 && value == 0)
+            {
+                _blockCount--;
+            }
+
+            if (valueRef == 0 && value != 0)
+            {
+                _blockCount++;
+            }
+
+            valueRef = value;
+        }
     }
 
     public bool TryBeginRebuild()
     {
         if (!IsDirty) return false;
         if (_hasBeganRebuild) return false;
-        
+
         _hasBeganRebuild = true;
-        
+
         Updates++;
 
         for (var i = 0; i < LayerCount; i++)
@@ -73,20 +91,26 @@ public class Chunk : IDisposable, ILevelSerializable
 
     private void BeginLayerRebuild(BlockLayer layer)
     {
-        var builder = _layers[(int)layer];
+        var builder = _layers.GetUnsafeRef((int)layer);
 
         var faceCount = GetFaceCount(layer);
-        if (faceCount == 0) return;
-            
-        builder.Begin(faceCount * 2);
+
+        if (faceCount <= 0)
+        {
+            builder.SwapMeshes();
+            builder.Mesh = new Mesh();
+            return;
+        }
         
+        builder.Begin(faceCount * 6, faceCount * 2);
+
         for (var x = X; x < MaxX; x++)
         {
             for (var y = Y; y < MaxY; y++)
             {
                 for (var z = Z; z < MaxZ; z++)
                 {
-                    BlockRegistry.Blocks[_level.GetBlock(x, y, z)]?.Build(builder, _level, x, y, z, layer);
+                    BlockRegistry.Blocks.GetUnsafeRef(_level.GetBlock(x, y, z))?.Build(builder, _level, x, y, z, layer);
                 }
             }
         }
@@ -95,24 +119,24 @@ public class Chunk : IDisposable, ILevelSerializable
     public void EndRebuild()
     {
         if (!_hasBeganRebuild) return;
-        
+
         for (var i = 0; i < LayerCount; i++)
         {
             EndLayerRebuild((BlockLayer)i);
         }
+        
+        _hasBeganRebuild = false;
+        IsDirty = false;
     }
 
     private void EndLayerRebuild(BlockLayer layer)
     {
-        _hasBeganRebuild = false;
-        IsDirty = false;
-        
-        _layers[(int)layer].End();
+        _layers.GetUnsafeRef((int)layer).End();
     }
 
     public void Draw(BlockLayer layer)
     {
-        _layers[(int)layer].Draw(Resources.DefaultTerrainMaterial);
+        _layers.GetUnsafeRef((int)layer).Draw(Resources.DefaultTerrainMaterial);
     }
 
     private int GetFaceCount(BlockLayer layer)
@@ -125,7 +149,9 @@ public class Chunk : IDisposable, ILevelSerializable
             {
                 for (var z = Z; z < MaxZ; z++)
                 {
-                    count += BlockRegistry.Blocks[_level.GetBlock(x, y, z)]?.GetFaceCount(_level, x, y, z, layer) ?? 0;
+                    count += BlockRegistry.Blocks
+                        .GetUnsafeRef(_level.GetBlock(x, y, z))?
+                        .GetFaceCount(_level, x, y, z, layer) ?? 0;
                 }
             }
         }

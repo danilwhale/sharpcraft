@@ -2,6 +2,7 @@
 using SharpCraft.Entities;
 using SharpCraft.Gui.Elements;
 using SharpCraft.Level.Blocks;
+using SharpCraft.Utilities;
 
 namespace SharpCraft;
 
@@ -60,7 +61,7 @@ public class BlockEditor(Level.Level level, float maxHitDistance)
         var position = (BlockPosition)(_rayCast.Point - _rayCast.Normal / 2.0f);
 
         var id = level.GetBlock(position);
-        var block = BlockRegistry.Blocks[id];
+        var block = BlockRegistry.Blocks.GetUnsafeRef(id);
         if (block == null) return;
 
         Rlgl.DisableDepthTest();

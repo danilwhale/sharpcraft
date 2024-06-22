@@ -35,22 +35,11 @@ public class GameScene : IScene
 
     public void Update()
     {
+        if (!IsWindowFocused()) SetPause(true);
+        
         if (IsKeyPressed(KeyboardKey.Escape))
         {
-            _paused = !_paused;
-            
-            if (_paused)
-            {
-                EnableCursor();
-                SetTargetFPS(15);
-                _timer.TimeScale = 0.0f;
-            }
-            else
-            {
-                DisableCursor();
-                SetTargetFPS(0);
-                _timer.TimeScale = 1.0f;
-            }
+            SetPause(!_paused);
         }
         
         if (!_paused)
@@ -63,6 +52,24 @@ public class GameScene : IScene
         
         if (_paused) _pauseScreen.Update();
         else _gameScreen.Update();
+    }
+
+    private void SetPause(bool pause)
+    {
+        _paused = pause;
+        
+        if (_paused)
+        {
+            EnableCursor();
+            SetTargetFPS(15);
+            _timer.TimeScale = 0.0f;
+        }
+        else
+        {
+            DisableCursor();
+            SetTargetFPS(0);
+            _timer.TimeScale = 1.0f;
+        }
     }
 
     private void FrameRateUpdate()

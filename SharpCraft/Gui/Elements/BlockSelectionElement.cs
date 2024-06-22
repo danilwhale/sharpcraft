@@ -18,13 +18,13 @@ public class BlockSelectionElement : Element
 
     public override void Draw()
     {
-        var currentBlock = BlockRegistry.Blocks[CurrentBlock];
+        var currentBlock = BlockRegistry.Blocks.GetUnsafeRef(CurrentBlock);
 
         DrawBlock(16, GetScreenHeight() - 112, 96, currentBlock!);
 
         for (var i = PreviewRange.Start.Value; i <= PreviewRange.End.Value; i++)
         {
-            var block = BlockRegistry.Blocks[i]!;
+            var block = BlockRegistry.Blocks.GetUnsafeRef(i)!;
 
             var x = 64 + i * (Size + 8);
             var y = GetScreenHeight() - 64;
@@ -58,7 +58,7 @@ public class BlockSelectionElement : Element
         
         Rlgl.Scalef(-1.0f, -1.0f, 1.0f);
         
-        Rlgl.Begin(DrawMode.Triangles);
+        Rlgl.Begin(DrawMode.Quads);
         Rlgl.SetTexture(ResourceManager.GetTexture("terrain.png").Id);
         
         block.Build(RlglBuilder.Instance, 0, 0, 0);

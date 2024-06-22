@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using SharpCraft.Rendering;
+using SharpCraft.Utilities;
 
 namespace SharpCraft.Level.Blocks;
 
@@ -18,7 +19,7 @@ public class Block
     public Block(byte id, int textureIndex, BlockConfig config)
     {
         Id = id;
-        BlockRegistry.Blocks[id] = this;
+        BlockRegistry.Blocks.GetUnsafeRef(id) = this;
 
         TextureIndex = textureIndex;
 
@@ -105,7 +106,7 @@ public class Block
     public virtual bool ShouldKeepFace(Level level, int x, int y, int z, Face face)
     {
         var id = level.GetBlock(x, y, z);
-        var block = BlockRegistry.Blocks[id];
+        var block = BlockRegistry.Blocks.GetUnsafeRef(id);
 
         return (!block?.Config.IsSolid ?? true) || block.Config.Layer != Config.Layer;
     }

@@ -26,13 +26,15 @@ public static class BlockRender
 
         var b = brightness * Darkest;
 
+        if (builder.SupportsIndices)
+        {
+            builder.Indices([ 0, 1, 2, 0, 2, 3 ], true);
+        }
+        
         builder.Color(b, b, b);
 
         builder.VertexWithTex(x0, y0, z0, u0, v1);
         builder.VertexWithTex(x0, y0, z1, u1, v1);
-        builder.VertexWithTex(x0, y1, z1, u1, v0);
-
-        builder.VertexWithTex(x0, y0, z0, u0, v1);
         builder.VertexWithTex(x0, y1, z1, u1, v0);
         builder.VertexWithTex(x0, y1, z0, u0, v0);
     }
@@ -60,13 +62,15 @@ public static class BlockRender
 
         var b = brightness * Darkest;
 
+        if (builder.SupportsIndices)
+        {
+            builder.Indices([ 0, 1, 2, 0, 2, 3 ], true);
+        }
+        
         builder.Color(b, b, b);
 
         builder.VertexWithTex(x1, y0, z0, u1, v1);
         builder.VertexWithTex(x1, y1, z0, u1, v0);
-        builder.VertexWithTex(x1, y1, z1, u0, v0);
-
-        builder.VertexWithTex(x1, y0, z0, u1, v1);
         builder.VertexWithTex(x1, y1, z1, u0, v0);
         builder.VertexWithTex(x1, y0, z1, u0, v1);
     }
@@ -93,14 +97,16 @@ public static class BlockRender
         var v1 = coords.Y + coords.Height;
 
         var b = brightness * Light;
+        
+        if (builder.SupportsIndices)
+        {
+            builder.Indices([ 0, 1, 2, 0, 2, 3 ], true);
+        }
 
         builder.Color(b, b, b);
 
         builder.VertexWithTex(x0, y1, z0, u0, v0);
         builder.VertexWithTex(x0, y1, z1, u0, v1);
-        builder.VertexWithTex(x1, y1, z1, u1, v1);
-
-        builder.VertexWithTex(x0, y1, z0, u0, v0);
         builder.VertexWithTex(x1, y1, z1, u1, v1);
         builder.VertexWithTex(x1, y1, z0, u1, v0);
     }
@@ -127,14 +133,16 @@ public static class BlockRender
         var v1 = coords.Y + coords.Height;
 
         var b = brightness * Light;
+        
+        if (builder.SupportsIndices)
+        {
+            builder.Indices([ 0, 1, 2, 0, 2, 3 ], true);
+        }
 
         builder.Color(b, b, b);
 
         builder.VertexWithTex(x0, y0, z0, u1, v0);
         builder.VertexWithTex(x1, y0, z0, u0, v0);
-        builder.VertexWithTex(x1, y0, z1, u0, v1);
-
-        builder.VertexWithTex(x0, y0, z0, u1, v0);
         builder.VertexWithTex(x1, y0, z1, u0, v1);
         builder.VertexWithTex(x0, y0, z1, u1, v1);
     }
@@ -161,14 +169,16 @@ public static class BlockRender
         var v1 = coords.Y + coords.Height;
             
         var b = brightness * Darker;
+        
+        if (builder.SupportsIndices)
+        {
+            builder.Indices([ 0, 1, 2, 0, 2, 3 ], true);
+        }
 
         builder.Color(b, b, b);
 
         builder.VertexWithTex(x0, y0, z1, u0, v1);
         builder.VertexWithTex(x1, y0, z1, u1, v1);
-        builder.VertexWithTex(x1, y1, z1, u1, v0);
-
-        builder.VertexWithTex(x0, y0, z1, u0, v1);
         builder.VertexWithTex(x1, y1, z1, u1, v0);
         builder.VertexWithTex(x0, y1, z1, u0, v0);
     }
@@ -195,14 +205,16 @@ public static class BlockRender
         var v1 = coords.Y + coords.Height;
 
         var b = brightness * Darker;
+        
+        if (builder.SupportsIndices)
+        {
+            builder.Indices([ 0, 1, 2, 0, 2, 3 ], true);
+        }
 
         builder.Color(b, b, b);
 
         builder.VertexWithTex(x0, y0, z0, u1, v1);
         builder.VertexWithTex(x0, y1, z0, u1, v0);
-        builder.VertexWithTex(x1, y1, z0, u0, v0);
-
-        builder.VertexWithTex(x0, y0, z0, u1, v1);
         builder.VertexWithTex(x1, y1, z0, u0, v0);
         builder.VertexWithTex(x1, y0, z0, u0, v1);
     }

@@ -1,16 +1,15 @@
 ﻿using System.Runtime.CompilerServices;
+using SharpCraft.Utilities;
 
 namespace SharpCraft.Level;
 
 public class LightRegion
 {
-    public const int Size = Chunk.Size;
-
-    private readonly ushort[] _levels = new ushort[Size * Size];
+    private readonly ushort[] _levels = new ushort[Chunk.SizeSq];
 
     public ushort this[int x, int z]
     {
-        get => _levels[x + Size * z];
-        set => _levels[x + Size * z] = value;
+        get => _levels.GetUnsafeRef(x + Chunk.Size * z);
+        set => _levels.GetUnsafeRef(x + Chunk.Size * z) = value;
     }
 }

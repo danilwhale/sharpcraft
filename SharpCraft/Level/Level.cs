@@ -3,21 +3,18 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using SharpCraft.Level.Blocks;
 using SharpCraft.Level.Generation;
+using SharpCraft.Utilities;
 
 namespace SharpCraft.Level;
 
 public class Level
 {
-    public delegate void OnBlockChangedEvent(int x, int y, int z);
-
-    public delegate void OnLightLevelChangedEvent(int x, int z, int minY, int maxY);
-
-    public delegate void OnEverythingChangedEvent();
+    public delegate void OnAreaUpdateEvent(BlockPosition min, BlockPosition max);
 
     private const float LightValue = 1.0f;
     private const float DarkValue = 0.4f;
     
-    private const int Format = 1;
+    private const int Format = 2;
 
     public readonly int Width;
     public readonly int Height;
@@ -30,9 +27,7 @@ public class Level
     public readonly Chunk[] Chunks;
     public readonly LightRegion[] LightRegions;
 
-    public event OnBlockChangedEvent? OnBlockChanged;
-    public event OnLightLevelChangedEvent? OnLightLevelChanged;
-    public event OnEverythingChangedEvent? OnEverythingChanged;
+    public event OnAreaUpdateEvent? OnAreaUpdate;
 
     public Level(int width, int height, int length)
     {
@@ -53,7 +48,7 @@ public class Level
             {
                 for (var z = 0; z < ChunksZ; z++)
                 {
-                    Chunks[y * Chunk.SizeSq + z * Chunk.Size + x] = new Chunk(this, x, y, z);
+                    Chunks.GetUnsafeRef(y * Chunk.SizeSq + z * Chunk.Size + x) = new Chunk(this, x, y, z);
                 }
             }
         }
@@ -62,7 +57,7 @@ public class Level
         {
             for (var z = 0; z < ChunksZ; z++)
             {
-                LightRegions[x + ChunksX * z] = new LightRegion();
+                LightRegions.GetUnsafeRef(x + ChunksX * z) = new LightRegion();
             }
         }
 
@@ -71,7 +66,7 @@ public class Level
             LevelGeneration.Generate(this, Random.Shared.Next());
         }
 
-        UpdateLightLevels(0, 0, width, length);
+        UpdateLightLevels(0, 0, width, length, false);
     }
 
     private bool TryLoad(string path = "level.dat")
@@ -94,7 +89,7 @@ public class Level
                 chunk.Read(stream);
             }
         
-            OnEverythingChanged?.Invoke();
+            OnAreaUpdate?.Invoke(new BlockPosition(0, 0, 0), new BlockPosition(Width, Height, Length));
         
             return true;
         }
@@ -126,13 +121,17 @@ public class Level
         }
     }
 
-    public void UpdateLightLevels(int x, int z, int width, int length)
+    public void UpdateLightLevels(int x, int z, int width, int length, bool markDirty = true)
     {
         for (var i = x; i < x + width; i++)
         {
+            if (i < 0 || i >= Width) continue;
+            
             for (var j = z; j < z + length; j++)
             {
-                var region = LightRegions[(i >> 4) + ChunksX * (j >> 4)];
+                if (j < 0 || j >= Length) continue;
+                
+                var region = LightRegions.GetUnsafeRef((i >> 4) + ChunksX * (j >> 4));
                 var y = Height;
 
                 for (; y > 0 && !IsLightBlocker(i, y, j); y--)
@@ -142,8 +141,12 @@ public class Level
                 var originalY = region[i % Chunk.Size, j % Chunk.Size];
                 var minY = Math.Min(y, originalY);
                 var maxY = Math.Max(y, originalY);
+
+                if (markDirty)
+                {
+                    OnAreaUpdate?.Invoke(new BlockPosition(i, minY, j), new BlockPosition(i + 1, maxY, j + 1));
+                }
                 
-                OnLightLevelChanged?.Invoke(i, j, minY, maxY);
                 region[i % Chunk.Size, j % Chunk.Size] = (ushort)y;
             }
         }
@@ -159,7 +162,7 @@ public class Level
     public bool IsSolidBlock(int x, int y, int z)
     {
         var id = GetBlock(x, y, z);
-        var block = BlockRegistry.Blocks[id];
+        var block = BlockRegistry.Blocks.GetUnsafeRef(id);
 
         return block?.Config.IsSolid ?? false;
     }
@@ -169,7 +172,7 @@ public class Level
     public bool IsLightBlocker(int x, int y, int z)
     {
         var id = GetBlock(x, y, z);
-        var block = BlockRegistry.Blocks[id];
+        var block = BlockRegistry.Blocks.GetUnsafeRef(id);
 
         return block?.Config.IsLightBlocker ?? false;
     }
@@ -198,7 +201,7 @@ public class Level
                 for (var z = minZ; z <= maxZ; z++)
                 {
                     var id = GetBlock(x, y, z);
-                    var block = BlockRegistry.Blocks[id];
+                    var block = BlockRegistry.Blocks.GetUnsafeRef(id);
                     if (block == null) continue;
 
                     boxes.Add(block.GetCollision(x, y, z));
@@ -215,7 +218,7 @@ public class Level
 
         var cx = x >> 4;
         var cz = z >> 4;
-        return LightRegions[cx + ChunksX * cz][x % Chunk.Size, z % Chunk.Size] >= y ? DarkValue : LightValue;
+        return LightRegions.GetUnsafeRef(cx + ChunksX * cz)[x - (cx << 4), z - (cz << 4)] >= y ? DarkValue : LightValue;
     }
 
     public float GetBrightness(BlockPosition position) => GetBrightness(position.X, position.Y, position.Z);
@@ -239,12 +242,12 @@ public class Level
         var cy = y >> 4;
         var cz = z >> 4;
         
-        var chunk = Chunks[cy * Chunk.SizeSq + cz * Chunk.Size + cx];
+        var chunk = Chunks.GetUnsafeRef(cy * Chunk.SizeSq + cz * Chunk.Size + cx);
 
-        chunk[x % Chunk.Size, y % Chunk.Size, z % Chunk.Size] = value;
+        chunk[x - (cx << 4), y - (cy << 4), z - (cz << 4)] = value;
 
         if (updateLighting) UpdateLightLevels(x, z, 1, 1);
-        OnBlockChanged?.Invoke(x, y, z);
+        OnAreaUpdate?.Invoke(new BlockPosition(x, y, z), new BlockPosition(x + 1, y + 1, z + 1));
     }
 
     public void SetBlockUnchecked(BlockPosition position, byte value, bool updateLighting) =>
@@ -256,9 +259,9 @@ public class Level
         var cy = y >> 4;
         var cz = z >> 4;
         
-        var chunk = Chunks[cy * Chunk.SizeSq + cz * Chunk.Size + cx];
+        var chunk = Chunks.GetUnsafeRef(cy * Chunk.SizeSq + cz * Chunk.Size + cx);
 
-        return chunk[x % Chunk.Size, y % Chunk.Size, z % Chunk.Size];
+        return chunk[x - (cx << 4), y - (cy << 4), z - (cz << 4)];
     }
     public byte GetBlockUnchecked(BlockPosition position) => GetBlockUnchecked(position.X, position.Y, position.Z);
 

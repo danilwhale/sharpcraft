@@ -1,37 +1,20 @@
-﻿using System.Numerics;
+﻿using System.Collections.Concurrent;
+using System.Numerics;
 using SharpCraft.Level.Blocks;
 using SharpCraft.Rendering;
+using SharpCraft.Utilities;
 
 namespace SharpCraft.Level;
 
 public class LevelRenderer : IDisposable
 {
-    private readonly BlockPosition _min;
-    private readonly BlockPosition _max;
-
     public readonly Level Level;
-
-    private Stack<Chunk> _rebuildStack = new();
-    private Mutex _rebuildStackMutex = new();
+    private readonly BlockingCollection<Chunk> _rebuildStack = new();
 
     public LevelRenderer(Level level)
     {
         Level = level;
-        level.OnEverythingChanged += () =>
-        {
-            SetDirtyArea(0, 0, 0, level.Width, level.Height, level.Length);
-        };
-        level.OnLightLevelChanged += (x, z, minY, maxY) =>
-        {
-            SetDirtyArea(x - 1, minY, z - 1, x + 1, maxY, z + 1);
-        };
-        level.OnBlockChanged += (x, y, z) =>
-        {
-            SetDirtyArea(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
-        };
-
-        _min = new BlockPosition(0, 0, 0);
-        _max = new BlockPosition(level.Width, level.Height, level.Length);
+        level.OnAreaUpdate += (min, max) => { SetDirtyArea(min.X, min.Y, min.Z, max.X, max.Y, max.Z); };
 
         var rebuildThread = new Thread(RebuildLoop);
         rebuildThread.Start();
@@ -41,50 +24,29 @@ public class LevelRenderer : IDisposable
     {
         while (!WindowShouldClose())
         {
-            for (var x = 0; x < Level.ChunksX; x++)
+            foreach (var chunk in Level.Chunks)
             {
-                for (var y = 0; y < Level.ChunksY; y++)
-                {
-                    for (var z = 0; z < Level.ChunksZ; z++)
-                    {
-                        var chunk = Level.Chunks[x + Level.ChunksX * (y + Level.ChunksY * z)];
-                        if (!chunk.TryBeginRebuild()) continue;
-                        
-                        _rebuildStackMutex.WaitOne();
-                        
-                        _rebuildStack.Push(chunk);
-                        
-                        _rebuildStackMutex.ReleaseMutex();
-                    }
-                }
+                if (!chunk.TryBeginRebuild()) continue;
+                _rebuildStack.Add(chunk);
             }
+            
+            WaitTime(GetFrameTime());
         }
     }
 
     public void Draw(BlockLayer layer)
     {
-        _rebuildStackMutex.WaitOne();
-
-        while (_rebuildStack.TryPop(out var chunk))
+        while (_rebuildStack.TryTake(out var chunk))
         {
             chunk.EndRebuild();
         }
-        
-        _rebuildStackMutex.ReleaseMutex();
-        
+
         var frustum = Frustum.Instance;
 
-        for (var x = 0; x < Level.ChunksX; x++)
+        foreach (var chunk in Level.Chunks)
         {
-            for (var y = 0; y < Level.ChunksY; y++)
-            {
-                for (var z = 0; z < Level.ChunksZ; z++)
-                {
-                    var chunk = Level.Chunks[y * Chunk.SizeSq + z * Chunk.Size + x];
-                    if (!frustum.IsCubeVisible(chunk.BBox)) continue;
-                    chunk.Draw(layer);
-                }
-            }
+            if (!frustum.IsCubeVisible(chunk.BBox)) continue;
+            chunk.Draw(layer);
         }
     }
 
@@ -97,14 +59,14 @@ public class LevelRenderer : IDisposable
         maxX = Math.Clamp(maxX >> 4, 0, Level.ChunksX - 1);
         maxY = Math.Clamp(maxY >> 4, 0, Level.ChunksY - 1);
         maxZ = Math.Clamp(maxZ >> 4, 0, Level.ChunksZ - 1);
-        
+
         for (var x = minX; x <= maxX; x++)
         {
             for (var y = minY; y <= maxY; y++)
             {
                 for (var z = minZ; z <= maxZ; z++)
                 {
-                    Level.Chunks[y * Chunk.SizeSq + z * Chunk.Size + x].IsDirty = true;
+                    Level.Chunks.GetUnsafeRef(y * Chunk.SizeSq + z * Chunk.Size + x).IsDirty = true;
                 }
             }
         }
@@ -112,15 +74,9 @@ public class LevelRenderer : IDisposable
 
     public void Dispose()
     {
-        for (var x = 0; x < Level.ChunksX; x++)
+        foreach (var chunk in Level.Chunks)
         {
-            for (var y = 0; y < Level.ChunksY; y++)
-            {
-                for (var z = 0; z < Level.ChunksZ; z++)
-                {
-                    Level.Chunks[y * Chunk.SizeSq + z * Chunk.Size + x].Dispose();
-                }
-            }
+            chunk.Dispose();
         }
     }
 }

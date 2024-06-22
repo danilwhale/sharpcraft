@@ -1,4 +1,6 @@
-﻿namespace SharpCraft.Level.Generation.Structures;
+﻿using SharpCraft.Utilities;
+
+namespace SharpCraft.Level.Generation.Structures;
 
 public class Structure
 {
@@ -16,7 +18,7 @@ public class Structure
         Length = length;
     }
 
-    protected void WriteBlocks(params byte[][][] blocks)
+    protected void WriteBlocks(byte[][][] blocks)
     {
         for (var y = 0; y < blocks.Length; y++)
         {
@@ -38,7 +40,7 @@ public class Structure
             {
                 for (var k = 0; k < Length; k++)
                 {
-                    var id = Blocks[(j * Length + k) * Width + i];
+                    var id = Blocks.GetUnsafeRef((j * Length + k) * Width + i);
                     if (id == 0) continue;
 
                     level.SetBlock(x + i, y + j, z + k, id, false);

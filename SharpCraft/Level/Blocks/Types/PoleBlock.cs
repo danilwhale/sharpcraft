@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using SharpCraft.Utilities;
 
 namespace SharpCraft.Level.Blocks.Types;
 
@@ -23,7 +24,7 @@ public class PoleBlock : Block
         if (!level.IsInRange(x, y, z)) return true;
 
         var id = level.GetBlockUnchecked(x, y, z);
-        var block = BlockRegistry.Blocks[id];
+        var block = BlockRegistry.Blocks.GetUnsafeRef(id);
         
         if (block == null) return true;
 
