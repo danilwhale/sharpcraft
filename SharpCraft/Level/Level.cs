@@ -25,7 +25,8 @@ public class Level
     public readonly int ChunksZ;
 
     public readonly Chunk[] Chunks;
-    public readonly LightRegion[] LightRegions;
+    public readonly LevelColumn<byte>[] LightRegions;
+    public readonly LevelColumn<byte>[] HeightMaps;
 
     public event OnAreaUpdateEvent? OnAreaUpdate;
 
@@ -40,7 +41,8 @@ public class Level
         ChunksZ = length >> 4;
 
         Chunks = new Chunk[ChunksX * ChunksY * ChunksZ];
-        LightRegions = new LightRegion[ChunksX * ChunksZ];
+        LightRegions = new LevelColumn<byte>[ChunksX * ChunksZ];
+        HeightMaps = new LevelColumn<byte>[ChunksX * ChunksZ];
 
         for (var x = 0; x < ChunksX; x++)
         {
@@ -48,7 +50,7 @@ public class Level
             {
                 for (var z = 0; z < ChunksZ; z++)
                 {
-                    Chunks.GetUnsafeRef(y * Chunk.SizeSq + z * Chunk.Size + x) = new Chunk(this, x, y, z);
+                    Chunks.Get3DUnsafeRef(x, y, z, Chunk.SizeSq, Chunk.Size) = new Chunk(this, x, y, z);
                 }
             }
         }
@@ -57,7 +59,8 @@ public class Level
         {
             for (var z = 0; z < ChunksZ; z++)
             {
-                LightRegions.GetUnsafeRef(x + ChunksX * z) = new LightRegion();
+                LightRegions.Get2DUnsafeRef(x, z, ChunksX) = new LevelColumn<byte>();
+                HeightMaps.Get2DUnsafeRef(x, z, ChunksX) = new LevelColumn<byte>();
             }
         }
 
@@ -131,7 +134,7 @@ public class Level
             {
                 if (j < 0 || j >= Length) continue;
                 
-                var region = LightRegions.GetUnsafeRef((i >> 4) + ChunksX * (j >> 4));
+                var region = LightRegions.Get2DUnsafeRef(i >> 4, j >> 4, ChunksX);
                 var y = Height;
 
                 for (; y > 0 && !IsLightBlocker(i, y, j); y--)
@@ -147,7 +150,7 @@ public class Level
                     OnAreaUpdate?.Invoke(new BlockPosition(i, minY, j), new BlockPosition(i + 1, maxY, j + 1));
                 }
                 
-                region[i % Chunk.Size, j % Chunk.Size] = (ushort)y;
+                region[i % Chunk.Size, j % Chunk.Size] = (byte)y;
             }
         }
     }
@@ -218,7 +221,7 @@ public class Level
 
         var cx = x >> 4;
         var cz = z >> 4;
-        return LightRegions.GetUnsafeRef(cx + ChunksX * cz)[x - (cx << 4), z - (cz << 4)] >= y ? DarkValue : LightValue;
+        return LightRegions.Get2DUnsafeRef(cx, cz, ChunksX)[x - (cx << 4), z - (cz << 4)] > y ? DarkValue : LightValue;
     }
 
     public float GetBrightness(BlockPosition position) => GetBrightness(position.X, position.Y, position.Z);
@@ -241,13 +244,13 @@ public class Level
         var cx = x >> 4;
         var cy = y >> 4;
         var cz = z >> 4;
-        
-        var chunk = Chunks.GetUnsafeRef(cy * Chunk.SizeSq + cz * Chunk.Size + cx);
+
+        var chunk = Chunks.Get3DUnsafeRef(cx, cy, cz, Chunk.SizeSq, Chunk.Size);
 
         chunk[x - (cx << 4), y - (cy << 4), z - (cz << 4)] = value;
 
         if (updateLighting) UpdateLightLevels(x, z, 1, 1);
-        OnAreaUpdate?.Invoke(new BlockPosition(x, y, z), new BlockPosition(x + 1, y + 1, z + 1));
+        OnAreaUpdate?.Invoke(new BlockPosition(x - 1, y - 1, z - 1), new BlockPosition(x + 1, y + 1, z + 1));
     }
 
     public void SetBlockUnchecked(BlockPosition position, byte value, bool updateLighting) =>
@@ -258,12 +261,18 @@ public class Level
         var cx = x >> 4;
         var cy = y >> 4;
         var cz = z >> 4;
-        
-        var chunk = Chunks.GetUnsafeRef(cy * Chunk.SizeSq + cz * Chunk.Size + cx);
+
+        var chunk = Chunks.Get3DUnsafeRef(cx, cy, cz, Chunk.SizeSq, Chunk.Size);
 
         return chunk[x - (cx << 4), y - (cy << 4), z - (cz << 4)];
     }
     public byte GetBlockUnchecked(BlockPosition position) => GetBlockUnchecked(position.X, position.Y, position.Z);
+
+    public byte GetHeightUnchecked(int x, int z)
+    {
+        var map = HeightMaps.Get2DUnsafeRef(x >> 4, z >> 4, ChunksX);
+        return map[x % Chunk.Size, z % Chunk.Size];
+    }
 
     public RayCollision DoRayCast(Ray ray, float maxDistance)
     {

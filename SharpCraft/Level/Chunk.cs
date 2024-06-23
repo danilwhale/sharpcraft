@@ -56,7 +56,7 @@ public class Chunk : IDisposable, ILevelSerializable
         get => _blocks.GetUnsafeRef(y * SizeSq + z * Size + x);
         set
         {
-            ref var valueRef = ref _blocks.GetUnsafeRef(y * SizeSq + z * Size + x);
+            ref var valueRef = ref _blocks.Get3DUnsafeRef(x, y, z, SizeSq, Size);
             
             if (valueRef != 0 && value == 0)
             {

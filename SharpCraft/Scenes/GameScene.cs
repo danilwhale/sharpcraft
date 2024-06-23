@@ -35,7 +35,7 @@ public class GameScene : IScene
 
     public void Update()
     {
-        if (!IsWindowFocused()) SetPause(true);
+        if (!IsWindowFocused() && !_paused) SetPause(true);
         
         if (IsKeyPressed(KeyboardKey.Escape))
         {

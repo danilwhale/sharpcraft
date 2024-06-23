@@ -43,7 +43,7 @@ public class Structure
                     var id = Blocks.GetUnsafeRef((j * Length + k) * Width + i);
                     if (id == 0) continue;
 
-                    level.SetBlock(x + i, y + j, z + k, id, false);
+                    level.SetBlock(x - Width / 2 + i, y + j, z - Length / 2 + k, id, false);
                 }
             }
         }
