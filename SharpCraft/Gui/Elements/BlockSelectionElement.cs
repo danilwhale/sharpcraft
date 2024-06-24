@@ -59,7 +59,7 @@ public class BlockSelectionElement : Element
         Rlgl.Scalef(-1.0f, -1.0f, 1.0f);
         
         Rlgl.Begin(DrawMode.Quads);
-        Rlgl.SetTexture(ResourceManager.GetTexture("terrain.png").Id);
+        Rlgl.SetTexture(ResourceManager.GetTexture("Terrain.png").Id);
         
         block.Build(RlglBuilder.Instance, 0, 0, 0);
         

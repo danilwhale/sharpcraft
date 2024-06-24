@@ -25,7 +25,7 @@ public class SplashScene : IScene
     {
         ClearBackground(ColorBrightness(Color.SkyBlue, -0.6f));
 
-        var terrain = ResourceManager.GetTexture("terrain.png");
+        var terrain = ResourceManager.GetTexture("Terrain.png");
 
         var random = new Random(_seed);
 
