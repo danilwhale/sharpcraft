@@ -31,7 +31,7 @@ public class BlockEditor(Level.Level level, float maxHitDistance)
         SelectionElement.CurrentBlock = CurrentBlock;
         
         _rayCast = level.DoRayCast(
-            GetMouseRay(new Vector2(GetScreenWidth(), GetScreenHeight()) / 2, playerEntity.Camera),
+            new Ray(playerEntity.Camera.Position, playerEntity.Camera.Target - playerEntity.Camera.Position),
             maxHitDistance);
         
         HandleInput();
