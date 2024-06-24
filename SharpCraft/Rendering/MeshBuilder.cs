@@ -99,7 +99,7 @@ public unsafe partial class MeshBuilder : IVertexBuilder, IDisposable
         UploadMesh(ref Mesh, false);
 
         if (OldMesh.VaoId == 0) return;
-        UnloadMesh(ref OldMesh);
+        UnloadMesh(OldMesh);
         OldMesh.VaoId = 0;
     }
 
@@ -121,9 +121,9 @@ public unsafe partial class MeshBuilder : IVertexBuilder, IDisposable
 
     public void Dispose()
     {
-        if (OldMesh.VaoId != 0) UnloadMesh(ref OldMesh);
+        if (OldMesh.VaoId != 0) UnloadMesh(OldMesh);
         if (Mesh.VaoId == 0) return;
 
-        UnloadMesh(ref Mesh);
+        UnloadMesh(Mesh);
     }
 }
