@@ -1,4 +1,5 @@
 ﻿using SharpCraft.Entities;
+using SharpCraft.Framework;
 
 namespace SharpCraft;
 
@@ -16,7 +17,7 @@ public class Player(Level.Level level)
     {
         Entity.Update();
         
-        var mouseDelta = GetMouseDelta();
+        var mouseDelta = Input.MouseDelta;
         Entity.Rotate(mouseDelta.Y, mouseDelta.X);
         
         Editor.Update(Entity);

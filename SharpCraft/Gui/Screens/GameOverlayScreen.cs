@@ -35,7 +35,7 @@ public class GameOverlayScreen : Screen
 
         _frames++;
 
-        var time = GetTime();
+        var time = Program.MainWindow.Time;
         if (time - _lastSecondTime >= 1.0)
         {
             _fps = _frames;

@@ -19,10 +19,10 @@ public static class BlockRender
         var y1 = y + block.Bounds.Max.Y;
         var z1 = z + block.Bounds.Max.Z;
             
-        var u0 = coords.X;
-        var u1 = coords.X + coords.Width;
-        var v0 = coords.Y;
-        var v1 = coords.Y + coords.Height;
+        var u0 = coords.Origin.X;
+        var u1 = coords.Origin.X + coords.Size.X;
+        var v0 = coords.Origin.Y;
+        var v1 = coords.Origin.Y + coords.Size.Y;
 
         var b = brightness * Darkest;
 
@@ -55,10 +55,10 @@ public static class BlockRender
         var y1 = y + block.Bounds.Max.Y;
         var z1 = z + block.Bounds.Max.Z;
             
-        var u0 = coords.X;
-        var u1 = coords.X + coords.Width;
-        var v0 = coords.Y;
-        var v1 = coords.Y + coords.Height;
+        var u0 = coords.Origin.X;
+        var u1 = coords.Origin.X + coords.Size.X;
+        var v0 = coords.Origin.Y;
+        var v1 = coords.Origin.Y + coords.Size.Y;
 
         var b = brightness * Darkest;
 
@@ -91,10 +91,10 @@ public static class BlockRender
         var y1 = y + block.Bounds.Max.Y;
         var z1 = z + block.Bounds.Max.Z;
             
-        var u0 = coords.X;
-        var u1 = coords.X + coords.Width;
-        var v0 = coords.Y;
-        var v1 = coords.Y + coords.Height;
+        var u0 = coords.Origin.X;
+        var u1 = coords.Origin.X + coords.Size.X;
+        var v0 = coords.Origin.Y;
+        var v1 = coords.Origin.Y + coords.Size.Y;
 
         var b = brightness * Light;
         
@@ -127,10 +127,10 @@ public static class BlockRender
         var x1 = x + block.Bounds.Max.X;
         var z1 = z + block.Bounds.Max.Z;
             
-        var u0 = coords.X;
-        var u1 = coords.X + coords.Width;
-        var v0 = coords.Y;
-        var v1 = coords.Y + coords.Height;
+        var u0 = coords.Origin.X;
+        var u1 = coords.Origin.X + coords.Size.X;
+        var v0 = coords.Origin.Y;
+        var v1 = coords.Origin.Y + coords.Size.Y;
 
         var b = brightness * Light;
         
@@ -163,10 +163,10 @@ public static class BlockRender
         var y1 = y + block.Bounds.Max.Y;
         var z1 = z + block.Bounds.Max.Z;
         
-        var u0 = coords.X;
-        var u1 = coords.X + coords.Width;
-        var v0 = coords.Y;
-        var v1 = coords.Y + coords.Height;
+        var u0 = coords.Origin.X;
+        var u1 = coords.Origin.X + coords.Size.X;
+        var v0 = coords.Origin.Y;
+        var v1 = coords.Origin.Y + coords.Size.Y;
             
         var b = brightness * Darker;
         
@@ -199,10 +199,10 @@ public static class BlockRender
         var x1 = x + block.Bounds.Max.X;
         var y1 = y + block.Bounds.Max.Y;
             
-        var u0 = coords.X;
-        var u1 = coords.X + coords.Width;
-        var v0 = coords.Y;
-        var v1 = coords.Y + coords.Height;
+        var u0 = coords.Origin.X;
+        var u1 = coords.Origin.X + coords.Size.X;
+        var v0 = coords.Origin.Y;
+        var v1 = coords.Origin.Y + coords.Size.Y;
 
         var b = brightness * Darker;
         

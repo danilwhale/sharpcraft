@@ -1,4 +1,5 @@
-﻿using SharpCraft.Gui.Elements;
+﻿using SharpCraft.Framework;
+using SharpCraft.Gui.Elements;
 
 namespace SharpCraft.Gui.Screens;
 
@@ -24,7 +25,7 @@ public class PauseScreen : Screen
 
     public override void Draw()
     {
-        DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(), Color.Blank, Color.Black);
+        // DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(), Color.Blank, Color.Black);
         DrawElements();
     }
 }

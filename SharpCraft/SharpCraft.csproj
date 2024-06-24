@@ -11,13 +11,18 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Raylib-cs" Version="6.0.0" />
-    </ItemGroup>
-
-    <ItemGroup>
       <Content Include="Assets\*.*">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Serilog" Version="4.0.0" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+      <PackageReference Include="Silk.NET.Input.Glfw" Version="2.21.0" />
+      <PackageReference Include="Silk.NET.OpenGL" Version="2.21.0" />
+      <PackageReference Include="Silk.NET.Windowing.Glfw" Version="2.21.0" />
+      <PackageReference Include="StbImageSharper" Version="1.0.1" />
     </ItemGroup>
 
 </Project>

@@ -1,6 +1,8 @@
 ﻿using System.Numerics;
+using SharpCraft.Physics;
 using SharpCraft.Rendering;
 using SharpCraft.Utilities;
+using Silk.NET.Maths;
 
 namespace SharpCraft.Level.Blocks;
 
@@ -111,9 +113,9 @@ public class Block
         return (!block?.Config.IsSolid ?? true) || block.Config.Layer != Config.Layer;
     }
 
-    public virtual Rectangle GetTextureCoordinates(Face face, int textureIndex)
+    public virtual Rectangle<float> GetTextureCoordinates(Face face, int textureIndex)
     {
-        return new Rectangle(
+        return new Rectangle<float>(
                 textureIndex % 16.0f / 16.0f,
                 MathF.Floor(textureIndex / 16.0f) / 16.0f,
                 1.0f / 16,

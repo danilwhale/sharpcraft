@@ -1,4 +1,10 @@
-﻿namespace SharpCraft.Rendering;
+﻿using System.Numerics;
+using SharpCraft.Framework;
+using Silk.NET.Maths;
+using Silk.NET.OpenGL;
+using Shader = SharpCraft.Framework.Shader;
+
+namespace SharpCraft.Rendering;
 
 public interface IVertexBuilder
 {
@@ -11,5 +17,6 @@ public interface IVertexBuilder
     void VertexWithTex(float x, float y, float z, float u, float v);
     void Index(ushort index, bool relative);
     void Indices(ushort[] indices, bool relative);
-    void End();
+    void End(Shader shader);
+    void Draw(MatrixStack matrices, Material material, PrimitiveType mode, Matrix4x4 transform);
 }

@@ -1,22 +1,24 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Security;
+using SharpCraft.Framework;
+using Silk.NET.Maths;
+using Silk.NET.OpenGL;
+using Shader = SharpCraft.Framework.Shader;
 
 namespace SharpCraft.Rendering;
 
 [SuppressUnmanagedCodeSecurity]
-public unsafe partial class MeshBuilder : IVertexBuilder, IDisposable
+public class MeshBuilder : IVertexBuilder, IDisposable
 {
-    [LibraryImport(NativeLibName)]
-    private static partial void UploadMesh(ref Mesh mesh, [MarshalAs(UnmanagedType.I1)] bool isDynamic);
-    
-    public Mesh Mesh;
-    public Mesh OldMesh;
+    public Mesh? Mesh;
+    public Mesh? OldMesh;
 
+    private List<Vertex> _vertices;
+    private List<ushort> _indices;
+    
     private Vector2 _texCoords;
     private Color _color;
-    private int _vertex;
-    private int _index;
 
     public bool SupportsIndices => true;
 
@@ -29,47 +31,27 @@ public unsafe partial class MeshBuilder : IVertexBuilder, IDisposable
     {
         Clear();
 
-        if (Mesh.VaoId > 0) SwapMeshes();
+        if (Mesh is { Vao: > 0 }) SwapMeshes();
 
-        Mesh = new Mesh(vertices, triangles);
-        Mesh.AllocVertices();
+        _vertices = new List<Vertex>(vertices);
+        _indices = new List<ushort>(triangles * 3);
+
+        Mesh = new Mesh(Program.Gl);
     }
 
     public void TexCoords(float u, float v)
     {
-        if (Mesh.TexCoords == null) Mesh.AllocTexCoords();
-        
         _texCoords = new Vector2(u, v);
     }
 
     public void Color(float r, float g, float b)
     {
-        if (Mesh.Colors == null) Mesh.AllocColors();
-        
-        _color = ColorFromNormalized(new Vector4(r, g, b, 1.0f));
+        _color = new Color(r, g, b, 1.0f);
     }
 
     public void Vertex(float x, float y, float z)
     {
-        Mesh.Vertices[_vertex * 3] = x;
-        Mesh.Vertices[_vertex * 3 + 1] = y;
-        Mesh.Vertices[_vertex * 3 + 2] = z;
-
-        if (Mesh.TexCoords != null)
-        {
-            Mesh.TexCoords[_vertex * 2] = _texCoords.X;
-            Mesh.TexCoords[_vertex * 2 + 1] = _texCoords.Y;
-        }
-
-        if (Mesh.Colors != null)
-        {
-            Mesh.Colors[_vertex * 4] = _color.R;
-            Mesh.Colors[_vertex * 4 + 1] = _color.G;
-            Mesh.Colors[_vertex * 4 + 2] = _color.B;
-            Mesh.Colors[_vertex * 4 + 3] = _color.A;
-        }
-        
-        _vertex++;
+        _vertices.Add(new Vertex(x, y, z, _texCoords.X, _texCoords.Y, _color.R, _color.G, _color.B, _color.A));
     }
 
     public void VertexWithTex(float x, float y, float z, float u, float v)
@@ -80,9 +62,7 @@ public unsafe partial class MeshBuilder : IVertexBuilder, IDisposable
 
     public void Index(ushort index, bool relative)
     {
-        if (Mesh.Indices == null) Mesh.AllocIndices();
-
-        Mesh.Indices[_index++] = (ushort)(relative ? _vertex + index : index);
+        _indices.Add((ushort)(relative ? _vertices.Count + index : index));
     }
 
     public void Indices(ushort[] indices, bool relative)
@@ -93,37 +73,35 @@ public unsafe partial class MeshBuilder : IVertexBuilder, IDisposable
         }
     }
 
-    public void End()
+    public void End(Shader shader)
     {
-        if (Mesh.Vertices == null) return;
-        UploadMesh(ref Mesh, false);
+        Mesh?.Upload(shader, CollectionsMarshal.AsSpan(_vertices), CollectionsMarshal.AsSpan(_indices));
 
-        if (OldMesh.VaoId == 0) return;
-        UnloadMesh(ref OldMesh);
-        OldMesh.VaoId = 0;
+        if (OldMesh?.Vao == 0) return;
+        OldMesh?.Dispose();
     }
 
     private void Clear()
     {
-        _vertex = 0;
-        _index = 0;
-        _color = Raylib_cs.Color.White;
+        _color = Framework.Color.White;
         _texCoords = Vector2.Zero;
     }
 
-    public void Draw(Material mat)
+    public void Draw(MatrixStack matrices, Material material, PrimitiveType mode, Matrix4x4 transform)
     {
-        if (OldMesh.VaoId != 0 && Mesh.VertexCount > 0) DrawMesh(OldMesh, mat, Matrix4x4.Transpose(Matrix4x4.Identity));
-        if (Mesh.VaoId == 0) return;
+        if ((OldMesh != null && OldMesh.Vao != 0) && 
+            (Mesh == null || Mesh.Vao == 0)) 
+            OldMesh?.Draw(matrices, mode, material, transform);
+        if (Mesh == null || Mesh.Vao == 0) return;
 
-        DrawMesh(Mesh, mat, Matrix4x4.Transpose(Matrix4x4.Identity));
+        Mesh.Draw(matrices, mode, material, transform);
     }
 
     public void Dispose()
     {
-        if (OldMesh.VaoId != 0) UnloadMesh(ref OldMesh);
-        if (Mesh.VaoId == 0) return;
+        if (OldMesh?.Vao != 0) OldMesh?.Dispose();
+        if (Mesh?.Vao == 0) return;
 
-        UnloadMesh(ref Mesh);
+        Mesh?.Dispose();
     }
 }

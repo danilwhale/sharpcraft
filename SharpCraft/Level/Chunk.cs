@@ -1,7 +1,11 @@
 ﻿using System.Numerics;
+using SharpCraft.Framework;
 using SharpCraft.Level.Blocks;
+using SharpCraft.Physics;
 using SharpCraft.Rendering;
 using SharpCraft.Utilities;
+using Silk.NET.Maths;
+using Silk.NET.OpenGL;
 
 namespace SharpCraft.Level;
 
@@ -97,8 +101,6 @@ public class Chunk : IDisposable, ILevelSerializable
 
         if (faceCount <= 0)
         {
-            builder.SwapMeshes();
-            builder.Mesh = new Mesh();
             return;
         }
         
@@ -131,12 +133,12 @@ public class Chunk : IDisposable, ILevelSerializable
 
     private void EndLayerRebuild(BlockLayer layer)
     {
-        _layers.GetUnsafeRef((int)layer).End();
+        _layers.GetUnsafeRef((int)layer).End(Resources.DefaultTerrainMaterial.Shader);
     }
 
-    public void Draw(BlockLayer layer)
+    public void Draw(MatrixStack matrices, BlockLayer layer)
     {
-        _layers.GetUnsafeRef((int)layer).Draw(Resources.DefaultTerrainMaterial);
+        _layers.GetUnsafeRef((int)layer).Draw(matrices, Resources.DefaultTerrainMaterial, PrimitiveType.Triangles, Matrix4x4.Identity);
     }
 
     private int GetFaceCount(BlockLayer layer)

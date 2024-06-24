@@ -1,9 +1,13 @@
 ﻿using System.Numerics;
 using SharpCraft.Entities;
+using SharpCraft.Framework;
 using SharpCraft.Gui.Screens;
 using SharpCraft.Level;
 using SharpCraft.Level.Blocks;
 using SharpCraft.Utilities;
+using Silk.NET.Input;
+using Silk.NET.Maths;
+using Silk.NET.OpenGL;
 using Timer = SharpCraft.Utilities.Timer;
 
 namespace SharpCraft.Scenes;
@@ -18,10 +22,11 @@ public class GameScene : IScene
     private GameOverlayScreen _gameScreen;
     private PauseScreen _pauseScreen;
     private bool _paused;
+    private Mesh _mesh;
 
     public GameScene()
     {
-        DisableCursor();
+        Input.SetCursorMode(CursorMode.Disabled);
 
         _timer = new Timer(60.0f);
         _level = new Level.Level(256, 64, 256);
@@ -31,13 +36,24 @@ public class GameScene : IScene
         _gameScreen = new GameOverlayScreen();
         _pauseScreen = new PauseScreen();
         _player.Editor.SelectionElement = _gameScreen.BlockSelection;
+
+        _mesh = new Mesh(Program.Gl);
+        _mesh.Upload(Resources.DefaultTerrainMaterial.Shader, new[]
+        {
+            new Vertex(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f),
+            new Vertex(1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f),
+            new Vertex(1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f)
+        }, new ushort[]
+        {
+            0, 1, 2
+        });
+        
+        Program.Gl.ClearColor(0.5f, 0.8f, 1.0f, 1.0f);
     }
 
-    public void Update()
+    public void Update(double deltaTime)
     {
-        if (!IsWindowFocused() && !_paused) SetPause(true);
-        
-        if (IsKeyPressed(KeyboardKey.Escape))
+        if (Input.IsKeyPressed(Key.Escape))
         {
             SetPause(!_paused);
         }
@@ -52,6 +68,8 @@ public class GameScene : IScene
         
         if (_paused) _pauseScreen.Update();
         else _gameScreen.Update();
+
+        Program.MainWindow.Title = $"SharpCraft - {Program.Fps} FPS";
     }
 
     private void SetPause(bool pause)
@@ -60,14 +78,14 @@ public class GameScene : IScene
         
         if (_paused)
         {
-            EnableCursor();
-            SetTargetFPS(15);
+            Input.SetCursorMode(CursorMode.Normal);
+            Program.MainWindow.FramesPerSecond = 15.0;
             _timer.TimeScale = 0.0f;
         }
         else
         {
-            DisableCursor();
-            SetTargetFPS(0);
+            Input.SetCursorMode(CursorMode.Disabled);
+            Program.MainWindow.FramesPerSecond = 0.0;
             _timer.TimeScale = 1.0f;
         }
     }
@@ -76,16 +94,12 @@ public class GameScene : IScene
     {
         HandleInput();
         _player.Update();
+        _player.Entity.MoveCamera(_timer.LastPassedTime);
     }
 
     private void HandleInput()
     {
-        if (IsKeyPressed(KeyboardKey.Enter)) _level.Save();
-
-        if (IsKeyPressed(KeyboardKey.F11))
-        {
-            ToggleBorderlessWindowed();
-        }
+        if (Input.IsKeyPressed(Key.Enter)) _level.Save();
     }
 
     private void TickedUpdate()
@@ -93,19 +107,18 @@ public class GameScene : IScene
         _player.Tick();
     }
 
-    public void Draw()
+    public void Render(MatrixStack matrices, double deltaTime)
     {
-        _player.Entity.MoveCamera(_timer.LastPassedTime);
+        Program.Gl.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+        
+        _player.Entity.Camera.Begin(matrices);
 
-        ClearBackground(ColorFromNormalized(new Vector4(0.5f, 0.8f, 1.0f, 1.0f)));
-
-        BeginMode3D(_player.Entity.Camera);
-
-        _levelRenderer.Draw(BlockLayer.Solid);
-        _levelRenderer.Draw(BlockLayer.Translucent);
+        _levelRenderer.Draw(matrices, BlockLayer.Solid);
+        _levelRenderer.Draw(matrices, BlockLayer.Translucent);
         _player.Draw();
+        _mesh.Draw(matrices, PrimitiveType.Triangles, Resources.DefaultTerrainMaterial, Matrix4x4.CreateTranslation(_player.Entity.Camera.Position - Vector3.UnitZ));
 
-        EndMode3D();
+        Camera.End(matrices);
         
         _gameScreen.Draw();
         if (_paused) _pauseScreen.Draw();
@@ -114,5 +127,6 @@ public class GameScene : IScene
     public void Dispose()
     {
         _level.Save();
+        _levelRenderer.Dispose();
     }
 }

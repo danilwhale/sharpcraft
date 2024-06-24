@@ -1,5 +1,7 @@
 ﻿using System.Numerics;
+using SharpCraft.Physics;
 using SharpCraft.Utilities;
+using Silk.NET.Maths;
 
 namespace SharpCraft.Level.Blocks.Types;
 
@@ -31,7 +33,7 @@ public class PoleBlock : Block
         return block is not PoleBlock;
     }
 
-    public override Rectangle GetTextureCoordinates(Face face, int textureIndex)
+    public override Rectangle<float> GetTextureCoordinates(Face face, int textureIndex)
     {
         var x = textureIndex % 16.0f / 16.0f;
         var y = MathF.Floor(textureIndex / 16.0f) / 16.0f;
@@ -43,10 +45,10 @@ public class PoleBlock : Block
 
         if (face is Face.Bottom or Face.Top)
         {
-            return new Rectangle(x + offset, y + offset, size, size);
+            return new Rectangle<float>(x + offset, y + offset, size, size);
         }
 
-        return new Rectangle(
+        return new Rectangle<float>(
             x + offset,
             y,
             size,

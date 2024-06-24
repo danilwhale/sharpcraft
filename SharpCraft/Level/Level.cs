@@ -1,8 +1,10 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Serilog;
 using SharpCraft.Level.Blocks;
 using SharpCraft.Level.Generation;
+using SharpCraft.Physics;
 using SharpCraft.Utilities;
 
 namespace SharpCraft.Level;
@@ -83,7 +85,7 @@ public class Level
 
             if (stream.ReadByte() != Format)
             {
-                TraceLog(TraceLogLevel.Warning, "Unknown level format detected! Big chance that this is old level format, generating new level");
+                Log.Warning("Unknown level format detected! Big chance that this is old level format, generating new level");
                 return false;
             }
 
@@ -93,12 +95,14 @@ public class Level
             }
         
             OnAreaUpdate?.Invoke(new BlockPosition(0, 0, 0), new BlockPosition(Width, Height, Length));
+            
+            Log.Information("Loaded level from {0}!", path);
         
             return true;
         }
         catch (Exception e)
         {
-            TraceLog(TraceLogLevel.Warning, e.ToString());
+            Log.Error(e.ToString());
         }
 
         return false;
@@ -117,10 +121,12 @@ public class Level
             {
                 chunk.Write(stream);
             }
+            
+            Log.Information("Saved level to {0}!", path);
         }
         catch (Exception e)
         {
-            TraceLog(TraceLogLevel.Warning, e.ToString());
+            Log.Error(e.ToString());
         }
     }
 
@@ -274,106 +280,106 @@ public class Level
         return map[x % Chunk.Size, z % Chunk.Size];
     }
 
-    public RayCollision DoRayCast(Ray ray, float maxDistance)
-    {
-        var col = new RayCollision();
-
-        var t = 0.0f;
-
-        var ix = Floor(ray.Position.X) | 0;
-        var iy = Floor(ray.Position.Y) | 0;
-        var iz = Floor(ray.Position.Z) | 0;
-
-        var stepX = ray.Direction.X > 0 ? 1 : -1;
-        var stepY = ray.Direction.Y > 0 ? 1 : -1;
-        var stepZ = ray.Direction.Z > 0 ? 1 : -1;
-
-        var txDelta = MathF.Abs(1 / ray.Direction.X);
-        var tyDelta = MathF.Abs(1 / ray.Direction.Y);
-        var tzDelta = MathF.Abs(1 / ray.Direction.Z);
-
-        var xDist = stepX > 0 ? ix + 1 - ray.Position.X : ray.Position.X - ix;
-        var yDist = stepY > 0 ? iy + 1 - ray.Position.Y : ray.Position.Y - iy;
-        var zDist = stepZ > 0 ? iz + 1 - ray.Position.Z : ray.Position.Z - iz;
-
-        var txMax = txDelta < float.PositiveInfinity ? txDelta * xDist : float.PositiveInfinity;
-        var tyMax = tyDelta < float.PositiveInfinity ? tyDelta * yDist : float.PositiveInfinity;
-        var tzMax = tzDelta < float.PositiveInfinity ? tzDelta * zDist : float.PositiveInfinity;
-
-        var steppedIndex = -1;
-
-        while (t <= maxDistance)
-        {
-            if (IsBlock(ix, iy, iz))
-            {
-                col.Point = ray.Position + t * ray.Direction;
-
-                switch (steppedIndex)
-                {
-                    case 0:
-                        col.Normal.X = -stepX;
-                        break;
-                    case 1:
-                        col.Normal.Y = -stepY;
-                        break;
-                    case 2:
-                        col.Normal.Z = -stepZ;
-                        break;
-                }
-
-                col.Hit = true;
-                col.Distance = t;
-
-                return col;
-            }
-
-            if (txMax < tyMax)
-            {
-                if (txMax < tzMax)
-                {
-                    ix += stepX;
-                    t = txMax;
-                    txMax += txDelta;
-                    steppedIndex = 0;
-                }
-                else
-                {
-                    iz += stepZ;
-                    t = tzMax;
-                    tzMax += tzDelta;
-                    steppedIndex = 2;
-                }
-            }
-            else
-            {
-                if (tyMax < tzMax)
-                {
-                    iy += stepY;
-                    t = tyMax;
-                    tyMax += tyDelta;
-                    steppedIndex = 1;
-                }
-                else
-                {
-                    iz += stepZ;
-                    t = tzMax;
-                    tzMax += tzDelta;
-                    steppedIndex = 2;
-                }
-            }
-        }
-
-        col.Point = ray.Position + t * ray.Direction;
-        col.Hit = false;
-        col.Distance = t;
-
-        return col;
-
-        int Floor(float f)
-        {
-            return (int)MathF.Floor(f);
-        }
-    }
+    // public RayCollision DoRayCast(Ray ray, float maxDistance)
+    // {
+    //     var col = new RayCollision();
+    //
+    //     var t = 0.0f;
+    //
+    //     var ix = Floor(ray.Position.X) | 0;
+    //     var iy = Floor(ray.Position.Y) | 0;
+    //     var iz = Floor(ray.Position.Z) | 0;
+    //
+    //     var stepX = ray.Direction.X > 0 ? 1 : -1;
+    //     var stepY = ray.Direction.Y > 0 ? 1 : -1;
+    //     var stepZ = ray.Direction.Z > 0 ? 1 : -1;
+    //
+    //     var txDelta = MathF.Abs(1 / ray.Direction.X);
+    //     var tyDelta = MathF.Abs(1 / ray.Direction.Y);
+    //     var tzDelta = MathF.Abs(1 / ray.Direction.Z);
+    //
+    //     var xDist = stepX > 0 ? ix + 1 - ray.Position.X : ray.Position.X - ix;
+    //     var yDist = stepY > 0 ? iy + 1 - ray.Position.Y : ray.Position.Y - iy;
+    //     var zDist = stepZ > 0 ? iz + 1 - ray.Position.Z : ray.Position.Z - iz;
+    //
+    //     var txMax = txDelta < float.PositiveInfinity ? txDelta * xDist : float.PositiveInfinity;
+    //     var tyMax = tyDelta < float.PositiveInfinity ? tyDelta * yDist : float.PositiveInfinity;
+    //     var tzMax = tzDelta < float.PositiveInfinity ? tzDelta * zDist : float.PositiveInfinity;
+    //
+    //     var steppedIndex = -1;
+    //
+    //     while (t <= maxDistance)
+    //     {
+    //         if (IsBlock(ix, iy, iz))
+    //         {
+    //             col.Point = ray.Position + t * ray.Direction;
+    //
+    //             switch (steppedIndex)
+    //             {
+    //                 case 0:
+    //                     col.Normal.X = -stepX;
+    //                     break;
+    //                 case 1:
+    //                     col.Normal.Y = -stepY;
+    //                     break;
+    //                 case 2:
+    //                     col.Normal.Z = -stepZ;
+    //                     break;
+    //             }
+    //
+    //             col.Hit = true;
+    //             col.Distance = t;
+    //
+    //             return col;
+    //         }
+    //
+    //         if (txMax < tyMax)
+    //         {
+    //             if (txMax < tzMax)
+    //             {
+    //                 ix += stepX;
+    //                 t = txMax;
+    //                 txMax += txDelta;
+    //                 steppedIndex = 0;
+    //             }
+    //             else
+    //             {
+    //                 iz += stepZ;
+    //                 t = tzMax;
+    //                 tzMax += tzDelta;
+    //                 steppedIndex = 2;
+    //             }
+    //         }
+    //         else
+    //         {
+    //             if (tyMax < tzMax)
+    //             {
+    //                 iy += stepY;
+    //                 t = tyMax;
+    //                 tyMax += tyDelta;
+    //                 steppedIndex = 1;
+    //             }
+    //             else
+    //             {
+    //                 iz += stepZ;
+    //                 t = tzMax;
+    //                 tzMax += tzDelta;
+    //                 steppedIndex = 2;
+    //             }
+    //         }
+    //     }
+    //
+    //     col.Point = ray.Position + t * ray.Direction;
+    //     col.Hit = false;
+    //     col.Distance = t;
+    //
+    //     return col;
+    //
+    //     int Floor(float f)
+    //     {
+    //         return (int)MathF.Floor(f);
+    //     }
+    // }
 
     public bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Length;
 }

@@ -1,8 +1,11 @@
 ﻿using System.Numerics;
 using SharpCraft.Entities;
+using SharpCraft.Framework;
 using SharpCraft.Gui.Elements;
 using SharpCraft.Level.Blocks;
 using SharpCraft.Utilities;
+using Silk.NET.Input;
+using Silk.NET.OpenGL;
 
 namespace SharpCraft;
 
@@ -13,11 +16,11 @@ public class BlockEditor(Level.Level level, float maxHitDistance)
     public BlockSelectionElement SelectionElement;
     public byte CurrentBlock = 1;
     
-    private RayCollision _rayCast;
+    // private RayCollision _rayCast;
 
     public void Update(PlayerEntity playerEntity)
     {
-        var mouseScroll = GetMouseWheelMove();
+        var mouseScroll = Input.ScrollDelta;
 
         if (mouseScroll > 0)
         {
@@ -29,47 +32,47 @@ public class BlockEditor(Level.Level level, float maxHitDistance)
         }
         
         SelectionElement.CurrentBlock = CurrentBlock;
-        
-        _rayCast = level.DoRayCast(
-            GetMouseRay(new Vector2(GetScreenWidth(), GetScreenHeight()) / 2, playerEntity.Camera),
-            maxHitDistance);
+        //
+        // _rayCast = level.DoRayCast(
+        //     GetMouseRay(new Vector2(GetScreenWidth(), GetScreenHeight()) / 2, playerEntity.Camera),
+        //     maxHitDistance);
         
         HandleInput();
     }
 
     private void HandleInput()
     {
-        if (IsMouseButtonPressed(MouseButton.Left) && _rayCast.Hit)
-        {
-            var hitPoint = _rayCast.Point + _rayCast.Normal / 2;
-
-            level.SetBlock(hitPoint, CurrentBlock);
-        }
-
-        if (IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
-        {
-            var hitPoint = _rayCast.Point - _rayCast.Normal / 2;
-
-            level.SetBlock(hitPoint, 0);
-        }
+        // if (Input.IsMouseButtonPressed(MouseButton.Left) && _rayCast.Hit)
+        // {
+        //     var hitPoint = _rayCast.Point + _rayCast.Normal / 2;
+        //
+        //     level.SetBlock(hitPoint, CurrentBlock);
+        // }
+        //
+        // if (Input.IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
+        // {
+        //     var hitPoint = _rayCast.Point - _rayCast.Normal / 2;
+        //
+        //     level.SetBlock(hitPoint, 0);
+        // }
     }
 
     public void Draw()
     {
-        if (!_rayCast.Hit) return;
-        
-        var position = (BlockPosition)(_rayCast.Point - _rayCast.Normal / 2.0f);
-
-        var id = level.GetBlock(position);
-        var block = BlockRegistry.Blocks.GetUnsafeRef(id);
-        if (block == null) return;
-
-        Rlgl.DisableDepthTest();
-
-        var collision = block.GetCollision(position.X, position.Y, position.Z);
-        var size = collision.Max - collision.Min;
-        DrawCubeWiresV(collision.Min + size / 2, size, Color.Black);
-        
-        Rlgl.EnableDepthTest();
+        // if (!_rayCast.Hit) return;
+        //
+        // var position = (BlockPosition)(_rayCast.Point - _rayCast.Normal / 2.0f);
+        //
+        // var id = level.GetBlock(position);
+        // var block = BlockRegistry.Blocks.GetUnsafeRef(id);
+        // if (block == null) return;
+        //
+        // Program.GL.Disable(EnableCap.DepthTest);
+        //
+        // var collision = block.GetCollision(position.X, position.Y, position.Z);
+        // var size = collision.Max - collision.Min;
+        // DrawCubeWiresV(collision.Min + size / 2, size, Color.Black);
+        //
+        // Program.GL.Enable(EnableCap.DepthTest);
     }
 }

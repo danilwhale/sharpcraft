@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Numerics;
+using SharpCraft.Framework;
 using SharpCraft.Level.Blocks;
 using SharpCraft.Rendering;
 using SharpCraft.Utilities;
@@ -22,31 +23,29 @@ public class LevelRenderer : IDisposable
 
     private void RebuildLoop()
     {
-        while (!WindowShouldClose())
+        while (!Program.MainWindow.IsClosing)
         {
             foreach (var chunk in Level.Chunks)
             {
                 if (!chunk.TryBeginRebuild()) continue;
                 _rebuildStack.Add(chunk);
             }
-            
-            WaitTime(GetFrameTime());
         }
     }
 
-    public void Draw(BlockLayer layer)
+    public void Draw(MatrixStack matrices, BlockLayer layer)
     {
         while (_rebuildStack.TryTake(out var chunk))
         {
             chunk.EndRebuild();
         }
 
-        var frustum = Frustum.Instance;
+        var frustum = Frustum.GetInstance(matrices);
 
         foreach (var chunk in Level.Chunks)
         {
             if (!frustum.IsCubeVisible(chunk.BBox)) continue;
-            chunk.Draw(layer);
+            chunk.Draw(matrices, layer);
         }
     }
 

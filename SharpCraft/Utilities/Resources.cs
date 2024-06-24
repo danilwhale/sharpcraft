@@ -1,4 +1,6 @@
-﻿namespace SharpCraft.Utilities;
+﻿using SharpCraft.Framework;
+
+namespace SharpCraft.Utilities;
 
 public static class Resources
 {
@@ -6,15 +8,14 @@ public static class Resources
 
     public static void Load()
     {
-        DefaultTerrainMaterial = LoadMaterialDefault();
-        SetMaterialTexture(ref DefaultTerrainMaterial, MaterialMapIndex.Albedo, ResourceManager.GetTexture("terrain.png"));
-
-        var shader = LoadShaderFromMemory(null, ResourceManager.GetText("DiscardShader.frag"));
-        DefaultTerrainMaterial.Shader = shader;
+        DefaultTerrainMaterial = new Material(
+            ResourceManager.GetTexture("terrain.png"),
+            ResourceManager.GetShader()
+        );
     }
 
     public static void Unload()
     {
-        UnloadMaterial(DefaultTerrainMaterial);
+        DefaultTerrainMaterial.Dispose();
     }
 }
