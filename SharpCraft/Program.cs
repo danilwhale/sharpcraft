@@ -50,8 +50,8 @@ internal static class Program
         
         Log.Debug("hi");
     }
-
-    private static void Main()
+    
+    private static void Main()  
     {
         ConfigureLog();
         

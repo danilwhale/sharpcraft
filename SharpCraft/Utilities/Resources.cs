@@ -9,7 +9,7 @@ public static class Resources
         DefaultTerrainMaterial = LoadMaterialDefault();
         SetMaterialTexture(ref DefaultTerrainMaterial, MaterialMapIndex.Albedo, ResourceManager.GetTexture("Terrain.png"));
 
-        var shader = LoadShaderFromMemory(null, ResourceManager.GetText("DiscardShader.frag"));
+        var shader = LoadShaderFromMemory(null, ResourceManager.GetText("Chunk.frag"));
         DefaultTerrainMaterial.Shader = shader;
     }
 
