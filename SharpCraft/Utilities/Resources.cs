@@ -1,4 +1,6 @@
-﻿namespace SharpCraft.Utilities;
+﻿using SharpCraft.Rendering;
+
+namespace SharpCraft.Utilities;
 
 public static class Resources
 {
@@ -8,9 +10,8 @@ public static class Resources
     {
         DefaultTerrainMaterial = LoadMaterialDefault();
         SetMaterialTexture(ref DefaultTerrainMaterial, MaterialMapIndex.Albedo, ResourceManager.GetTexture("Terrain.png"));
-
-        var shader = LoadShaderFromMemory(null, ResourceManager.GetText("Chunk.frag"));
-        DefaultTerrainMaterial.Shader = shader;
+        
+        DefaultTerrainMaterial.Shader = ChunkShader.Shader;
     }
 
     public static void Unload()

@@ -3,6 +3,7 @@ using SharpCraft.Entities;
 using SharpCraft.Gui.Screens;
 using SharpCraft.Level;
 using SharpCraft.Level.Blocks;
+using SharpCraft.Rendering;
 using SharpCraft.Utilities;
 using Timer = SharpCraft.Utilities.Timer;
 
@@ -76,6 +77,7 @@ public class GameScene : IScene
     {
         HandleInput();
         _player.Update();
+        ChunkShader.Update(_player);
     }
 
     private void HandleInput()

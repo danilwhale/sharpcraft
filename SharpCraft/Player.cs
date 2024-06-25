@@ -1,4 +1,5 @@
 ﻿using SharpCraft.Entities;
+using SharpCraft.Utilities;
 
 namespace SharpCraft;
 
@@ -12,7 +13,7 @@ public class Player(Level.Level level)
         Entity.Tick();
     }
 
-    public void Update()
+    public unsafe void Update()
     {
         Entity.Update();
         

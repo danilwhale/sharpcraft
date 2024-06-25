@@ -12,7 +12,6 @@ public class Chunk : IDisposable, ILevelSerializable
 
     public static int Updates;
     private static readonly int LayerCount = Enum.GetValues<BlockLayer>().Length;
-    private static readonly int ChunkTimeLoc = GetShaderLocation(Resources.DefaultTerrainMaterial.Shader, "chunkTime");
 
     public readonly int X;
     public readonly int Y;
@@ -145,7 +144,7 @@ public class Chunk : IDisposable, ILevelSerializable
 
     public void Draw(BlockLayer layer)
     {
-        SetShaderValue(Resources.DefaultTerrainMaterial.Shader, ChunkTimeLoc, (float)(GetTime() - _firstBuildTime), ShaderUniformDataType.Float);
+        ChunkShader.SetTime(GetTime() - _firstBuildTime);
         _layers.GetUnsafeRef((int)layer).Draw(Resources.DefaultTerrainMaterial);
     }
 
