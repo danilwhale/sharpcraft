@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Serilog;
 using SharpCraft.Level.Blocks;
 using SharpCraft.Level.Generation;
 using SharpCraft.Utilities;
@@ -83,7 +84,7 @@ public class Level
 
             if (stream.ReadByte() != Format)
             {
-                TraceLog(TraceLogLevel.Warning, "Unknown level format detected! Big chance that this is old level format, generating new level");
+                Log.Warning("Unknown level format detected! Big chance that this is old level format, generating new level");
                 return false;
             }
 
@@ -93,12 +94,12 @@ public class Level
             }
         
             OnAreaUpdate?.Invoke(new BlockPosition(0, 0, 0), new BlockPosition(Width, Height, Length));
-        
+            
             return true;
         }
         catch (Exception e)
         {
-            TraceLog(TraceLogLevel.Warning, e.ToString());
+            Log.Error(e, "Failed to load level");
         }
 
         return false;
@@ -120,7 +121,7 @@ public class Level
         }
         catch (Exception e)
         {
-            TraceLog(TraceLogLevel.Warning, e.ToString());
+            Log.Error(e, "Failed to save level");
         }
     }
 

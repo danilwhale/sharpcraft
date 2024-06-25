@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Serilog;
 
 namespace SharpCraft.Utilities;
 
@@ -16,7 +17,8 @@ public static class ResourceManager
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Program), $"{Root}.{path}");
         if (stream == null)
         {
-            throw new Exception("explod no such resource explod explod!!");
+            Log.Error("No such resource: {0}", path);
+            return new Texture2D();
         }
         
         using var ms = new MemoryStream();
@@ -36,7 +38,8 @@ public static class ResourceManager
         using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(Program), $"{Root}.{path}");
         if (stream == null)
         {
-            throw new Exception("explod no such resource explod explod!!");
+            Log.Error("No such resource: {0}", path);
+            return string.Empty;
         }
 
         using var reader = new StreamReader(stream);
