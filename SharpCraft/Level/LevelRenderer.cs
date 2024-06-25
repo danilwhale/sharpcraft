@@ -22,15 +22,13 @@ public class LevelRenderer : IDisposable
 
     private void RebuildLoop()
     {
-        while (!WindowShouldClose())
+        while (Program.IsRunning)
         {
             foreach (var chunk in Level.Chunks)
             {
                 if (!chunk.TryBeginRebuild()) continue;
                 _rebuildStack.Add(chunk);
             }
-            
-            WaitTime(GetFrameTime());
         }
     }
 

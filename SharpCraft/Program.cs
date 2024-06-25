@@ -19,6 +19,7 @@ namespace SharpCraft;
 internal static class Program
 {
     public static IScene Scene = null!;
+    public static bool IsRunning;
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static unsafe void TraceLogCallback(int logLevel, sbyte* text, sbyte* args)
@@ -61,6 +62,8 @@ internal static class Program
         
         Scene = new SplashScene();
 
+        IsRunning = true;
+        
         while (!WindowShouldClose())
         {
             Scene.Update();
@@ -72,11 +75,13 @@ internal static class Program
             EndDrawing();
         }
 
+        IsRunning = false;
+        
         Scene.Dispose();
         
         ResourceManager.Unload();
         Resources.Unload();
-
+        
         CloseWindow();
     }
 }
