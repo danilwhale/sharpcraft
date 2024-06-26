@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using Serilog;
 using SharpCraft.Level.Blocks;
 using SharpCraft.Level.Generation.Structures;
 using SharpCraft.Utilities;
@@ -14,6 +15,30 @@ public static class LevelGeneration
         GenerateHeightMap(level, random, seed);
         GenerateTerrain(level, random, seed);
         DoTreePass(level, random, seed);
+        GenerateBottom(level);
+    }
+
+    public static void GenerateMissingBottom(Level level)
+    {
+        if (level.GetBlock(0, 0, 0) == BlockRegistry.BottomRock.Id)
+        {
+            return;
+        }
+        
+        Log.Information("Level doesn't have bottom. Generating it...");
+        
+        GenerateBottom(level);
+    }
+
+    private static void GenerateBottom(Level level)
+    {
+        for (var x = 0; x < level.Width; x++)
+        {
+            for (var z = 0; z < level.Length; z++)
+            {
+                level.SetBlock(x, 0, z, BlockRegistry.BottomRock.Id, false);
+            }
+        }
     }
     
     private static void SetupNoise(FastNoiseLite noise)

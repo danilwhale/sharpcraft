@@ -20,6 +20,8 @@ public static class BlockRegistry
     public static readonly Block Glass = new(11, 12,
         BlockConfig.Default with { Layer = BlockLayer.Translucent, IsLightBlocker = false });
 
+    public static readonly Block BottomRock = new(12, 13, new BlockConfig(IsBreakable: false, IsPlaceable: false));
+
     public static int GetExistingBlockCount()
     {
         return Blocks.Count(t => t != null);

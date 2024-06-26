@@ -13,7 +13,16 @@ public class PlayerEntity : Entity
     public PlayerEntity(Level.Level level) : base(level, HalfWidth, HalfHeight)
     {
         Camera = new Camera3D(Vector3.Zero, Vector3.Zero, Vector3.UnitY, 70.0f, CameraProjection.Perspective);
+        EyeLevel = 1.62f;
         MoveToRandom();
+    }
+
+    private void MoveToRandom()
+    {
+        var x = Random.Shared.NextSingle() * Level.Width;
+        var y = Level.Height + 10;
+        var z = Random.Shared.NextSingle() * Level.Length;
+        MoveTo(new Vector3(x, y, z));
     }
     
     public void MoveCamera(float lastDelta)

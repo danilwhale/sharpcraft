@@ -46,6 +46,83 @@ public class LevelRenderer : IDisposable
             if (!frustum.IsCubeVisible(chunk.BBox)) continue;
             chunk.Draw(layer);
         }
+        
+        BeginShaderMode(ChunkShader.Shader);
+
+        DrawGrassPlanes();
+        DrawGrassInside();
+        DrawDirtInside();
+        
+        EndShaderMode();
+    }
+
+    private void DrawGrassPlanes()
+    {
+        Rlgl.SetTexture(ResourceManager.GetTexture("Grass.png").Id);
+        
+        Rlgl.Begin(DrawMode.Quads);
+        Rlgl.Color4ub(255, 255, 255, 255);
+
+        var y = Level.Height * 0.5f;
+        
+        PlaneRenderer.DrawTopPlane(-1000.0f, -1000.0f, Level.Width + 1000.0f, 0, y);
+        PlaneRenderer.DrawTopPlane(-1000.0f, Level.Length, Level.Width + 1000.0f, Level.Length + 1000.0f, y);
+        PlaneRenderer.DrawTopPlane(-1000.0f, 0, 0, Level.Length, y);
+        PlaneRenderer.DrawTopPlane(Level.Width, 0, Level.Width + 1000.0f, Level.Length, y);
+        
+        Rlgl.End();
+        
+        Rlgl.SetTexture(0);
+    }
+
+    private void DrawGrassInside()
+    {
+        Rlgl.SetTexture(ResourceManager.GetTexture("GrassSide.png").Id);
+
+        Rlgl.Begin(DrawMode.Quads);
+        
+        var y = Level.Height * 0.5f;
+
+        Rlgl.Color4f(BlockRender.Darkest, BlockRender.Darkest, BlockRender.Darkest, 1.0f);
+        PlaneRenderer.DrawLeftPlane(y - 1.0f, 0.0f, y, Level.Length, Level.Width);
+        
+        Rlgl.Color4f(BlockRender.Darkest, BlockRender.Darkest, BlockRender.Darkest, 1.0f);
+        PlaneRenderer.DrawRightPlane(y - 1.0f, 0.0f, y, Level.Length, 0.0f);
+        
+        Rlgl.Color4f(BlockRender.Darker, BlockRender.Darker, BlockRender.Darker, 1.0f);
+        PlaneRenderer.DrawFrontPlane(0.0f, y - 1.0f, Level.Width, y, 0.0f);
+        
+        Rlgl.Color4f(BlockRender.Darker, BlockRender.Darker, BlockRender.Darker, 1.0f);
+        PlaneRenderer.DrawBackPlane(0.0f, y - 1.0f, Level.Width, y, Level.Length);
+        
+        Rlgl.End();
+        
+        Rlgl.SetTexture(0);
+    }
+
+    private void DrawDirtInside()
+    {
+        Rlgl.SetTexture(ResourceManager.GetTexture("Dirt.png").Id);
+
+        Rlgl.Begin(DrawMode.Quads);
+        
+        var y = Level.Height * 0.5f;
+
+        Rlgl.Color4f(BlockRender.Darkest, BlockRender.Darkest, BlockRender.Darkest, 1.0f);
+        PlaneRenderer.DrawLeftPlane(0.0f, 0.0f, y - 1.0f, Level.Length, Level.Width);
+        
+        Rlgl.Color4f(BlockRender.Darkest, BlockRender.Darkest, BlockRender.Darkest, 1.0f);
+        PlaneRenderer.DrawRightPlane(0.0f, 0.0f, y - 1.0f, Level.Length, 0.0f);
+        
+        Rlgl.Color4f(BlockRender.Darker, BlockRender.Darker, BlockRender.Darker, 1.0f);
+        PlaneRenderer.DrawFrontPlane(0.0f, 0.0f, Level.Width, y - 1.0f, 0.0f);
+        
+        Rlgl.Color4f(BlockRender.Darker, BlockRender.Darker, BlockRender.Darker, 1.0f);
+        PlaneRenderer.DrawBackPlane(0.0f, 0.0f, Level.Width, y - 1.0f, Level.Length);
+        
+        Rlgl.End();
+        
+        Rlgl.SetTexture(0);
     }
 
     public void SetDirtyArea(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)

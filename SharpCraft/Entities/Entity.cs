@@ -3,30 +3,26 @@ using SharpCraft.Physics;
 
 namespace SharpCraft.Entities;
 
-public class Entity(Level.Level level, float halfWidth, float halfHeight)
+public abstract class Entity(Level.Level level, float halfWidth, float halfHeight)
 {
+    protected float EyeLevel;
+    
     protected Vector3 LastPosition;
-    public Vector3 Position;
+    protected Vector3 Position;
     protected Vector3 Direction;
-    protected BoundingBox BBox;
+    private BoundingBox _bbox;
     
     protected bool IsOnGround;
     
     protected float Yaw;
     protected float Pitch;
-    
-    protected void MoveToRandom()
-    {
-        var x = Random.Shared.NextSingle() * level.Width;
-        var y = level.Height + 10;
-        var z = Random.Shared.NextSingle() * level.Length;
-        MoveTo(new Vector3(x, y, z));
-    }
 
-    protected void MoveTo(Vector3 newPosition)
+    protected readonly Level.Level Level = level;
+
+    public void MoveTo(Vector3 newPosition)
     {
         Position = newPosition;
-        BBox = new BoundingBox(
+        _bbox = new BoundingBox(
             newPosition - new Vector3(halfWidth, halfHeight, halfWidth),
             newPosition + new Vector3(halfWidth, halfHeight, halfWidth)
         );
@@ -47,29 +43,31 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
     {
         var oldDirection = direction;
 
-        var boxes = level.GetBoxes(BBox.Expand(direction));
+        var boxes = Level.GetBoxes(_bbox.Expand(direction));
         
         foreach (var box in boxes)
         {
-            direction.X = box.ClipXCollide(BBox, direction.X);
+            direction.X = box.ClipXCollide(_bbox, direction.X);
         }
 
-        BBox.Move(direction.X, 0.0f, 0.0f);
+        _bbox.Move(direction.X, 0.0f, 0.0f);
         
         foreach (var box in boxes)
         {
-            direction.Y = box.ClipYCollide(BBox, direction.Y);
+            direction.Y = box.ClipYCollide(_bbox, direction.Y);
         }
 
-        BBox.Move(0.0f, direction.Y, 0.0f);
+        _bbox.Move(0.0f, direction.Y, 0.0f);
         
         foreach (var box in boxes)
         {
-            direction.Z = box.ClipZCollide(BBox, direction.Z);
+            direction.Z = box.ClipZCollide(_bbox, direction.Z);
         }
 
-        BBox.Move(0.0f, 0.0f, direction.Z);
+        _bbox.Move(0.0f, 0.0f, direction.Z);
 
+        ClampBox();
+        
         // ReSharper disable CompareOfFloatsByEqualityOperator
         IsOnGround = oldDirection.Y != direction.Y && oldDirection.Y < 0.0f;
 
@@ -79,10 +77,37 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
         // ReSharper restore CompareOfFloatsByEqualityOperator
 
         Position = new Vector3(
-            (BBox.Min.X + BBox.Max.X) / 2.0f,
-            BBox.Min.Y + 1.62f,
-            (BBox.Min.Z + BBox.Max.Z) / 2.0f
+            (_bbox.Min.X + _bbox.Max.X) / 2.0f,
+            _bbox.Min.Y + EyeLevel,
+            (_bbox.Min.Z + _bbox.Max.Z) / 2.0f
         );
+    }
+
+    private void ClampBox()
+    {
+        if (_bbox.Min.X < 0.0f)
+        {
+            _bbox.Min.X = 0.0f;
+            _bbox.Max.X = halfWidth;
+        }
+
+        if (_bbox.Min.Z < 0.0f)
+        {
+            _bbox.Min.Z = 0.0f;
+            _bbox.Max.Z = halfWidth;
+        }
+        
+        if (_bbox.Max.X > Level.Width)
+        {
+            _bbox.Min.X = Level.Width - halfWidth;
+            _bbox.Max.X = Level.Width;
+        }
+
+        if (_bbox.Max.Z > Level.Length)
+        {
+            _bbox.Min.Z = Level.Length - halfWidth;
+            _bbox.Max.Z = Level.Length;
+        }
     }
 
     protected void MoveRelative(float x, float z, float speed)

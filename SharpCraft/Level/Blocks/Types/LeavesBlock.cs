@@ -5,6 +5,6 @@ public class LeavesBlock(byte id, int textureIndex) :
 {
     public override bool ShouldKeepFace(Level level, int x, int y, int z, Face face)
     {
-        return true;
+        return level.IsInRange(x, y, z);
     }
 }

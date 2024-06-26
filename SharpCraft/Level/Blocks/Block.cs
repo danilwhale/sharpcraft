@@ -105,6 +105,8 @@ public class Block
 
     public virtual bool ShouldKeepFace(Level level, int x, int y, int z, Face face)
     {
+        if (face != Face.Top && !level.IsInRange(x, y, z)) return false;
+        
         var id = level.GetBlock(x, y, z);
         var block = BlockRegistry.Blocks.GetUnsafeRef(id);
 

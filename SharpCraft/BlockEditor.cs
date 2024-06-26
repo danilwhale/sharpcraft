@@ -50,7 +50,10 @@ public class BlockEditor(Level.Level level, float maxHitDistance)
         {
             var hitPoint = _rayCast.Point - _rayCast.Normal / 2;
 
-            level.SetBlock(hitPoint, 0);
+            if (BlockRegistry.Blocks[level.GetBlock(hitPoint)]?.Config.IsBreakable ?? false)
+            {
+                level.SetBlock(hitPoint, 0);
+            } 
         }
     }
 
@@ -63,6 +66,7 @@ public class BlockEditor(Level.Level level, float maxHitDistance)
         var id = level.GetBlock(position);
         var block = BlockRegistry.Blocks.GetUnsafeRef(id);
         if (block == null) return;
+        if (!block.Config.IsBreakable) return;
 
         Rlgl.DisableDepthTest();
 

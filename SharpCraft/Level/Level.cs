@@ -92,6 +92,8 @@ public class Level
             {
                 chunk.Read(stream);
             }
+            
+            LevelGeneration.GenerateMissingBottom(this);
         
             OnAreaUpdate?.Invoke(new BlockPosition(0, 0, 0), new BlockPosition(Width, Height, Length));
             

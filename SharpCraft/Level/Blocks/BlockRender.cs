@@ -4,9 +4,9 @@ namespace SharpCraft.Level.Blocks;
 
 public static class BlockRender
 {
-    private const float Darkest = 0.6f;
-    private const float Darker = 0.8f;
-    private const float Light = 1.0f;
+    public const float Darkest = 0.6f;
+    public const float Darker = 0.8f;
+    public const float Light = 1.0f;
 
     public static void BuildLeftFace(IVertexBuilder builder, float brightness, Block block, int x, int y, int z)
     {

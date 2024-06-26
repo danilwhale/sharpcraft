@@ -21,12 +21,14 @@ public class GameOverlayScreen : Screen
     private int _fps;
     private int _frames;
     private double _lastSecondTime;
+    private readonly Player _player;
 
-    public GameOverlayScreen()
+    public GameOverlayScreen(Player player)
     {
         Elements.Add(_debugText);
         Elements.Add(_crosshair);
         Elements.Add(BlockSelection);
+        _player = player;
     }
 
     public override void Update()
@@ -52,7 +54,8 @@ public class GameOverlayScreen : Screen
                           $"{Chunk.Updates} chunk updates\n" +
                           $"Memory:\n" +
                           $"- Heap: {GC.GetTotalMemory(false) / MegaByte:0.###} MB\n" +
-                          $"- Process: {process.PrivateMemorySize64 / MegaByte:0.###}/{process.WorkingSet64 / MegaByte:0.###} MB";
+                          $"- Process: {process.PrivateMemorySize64 / MegaByte:0.###}/{process.WorkingSet64 / MegaByte:0.###} MB\n" +
+                          $"XYZ: {_player.Entity.Camera.Position:#.###}";
     }
 
     public override void Draw()

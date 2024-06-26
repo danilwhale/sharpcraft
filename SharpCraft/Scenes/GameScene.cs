@@ -29,7 +29,7 @@ public class GameScene : IScene
         _levelRenderer = new LevelRenderer(_level);
         _player = new Player(_level);
 
-        _gameScreen = new GameOverlayScreen();
+        _gameScreen = new GameOverlayScreen(_player);
         _pauseScreen = new PauseScreen();
         _player.Editor.SelectionElement = _gameScreen.BlockSelection;
     }

@@ -25,6 +25,7 @@ public class BlockSelectionElement : Element
         for (var i = PreviewRange.Start.Value; i <= PreviewRange.End.Value; i++)
         {
             var block = BlockRegistry.Blocks.GetUnsafeRef(i)!;
+            if (!block.Config.IsPlaceable) continue;
 
             var x = 64 + i * (Size + 8);
             var y = GetScreenHeight() - 64;
