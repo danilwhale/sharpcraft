@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace SharpCraft.Utilities;
+﻿namespace SharpCraft.Utilities;
 
 public static class ResourceManager
 {
