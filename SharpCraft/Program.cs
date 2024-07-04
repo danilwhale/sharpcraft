@@ -22,7 +22,7 @@ internal static class Program
         {
             Scene = new NoAssetsScene();
         }
-        else Scene = new SplashScene();
+        else Scene = new GameScene();
 
         while (!WindowShouldClose())
         {
