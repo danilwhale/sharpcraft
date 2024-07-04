@@ -62,7 +62,7 @@ public partial class MeshBuilder : IDisposable
         UploadMesh(ref _mesh, false);
 
         if (_oldMesh.VaoId == 0) return;
-        UnloadMesh(ref _oldMesh);
+        UnloadMesh(_oldMesh);
         _oldMesh.VaoId = 0;
     }
 
@@ -83,9 +83,9 @@ public partial class MeshBuilder : IDisposable
 
     public void Dispose()
     {
-        if (_oldMesh.VaoId != 0) UnloadMesh(ref _oldMesh);
+        if (_oldMesh.VaoId != 0) UnloadMesh(_oldMesh);
         if (_mesh.VaoId == 0) return;
 
-        UnloadMesh(ref _mesh);
+        UnloadMesh(_mesh);
     }
 }
