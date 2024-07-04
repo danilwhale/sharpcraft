@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 
 namespace SharpCraft.Level;
 
-public class Level
+public sealed class Level
 {
     public delegate void OnTileChangedEvent(int x, int y, int z);
 

@@ -3,7 +3,7 @@ using SharpCraft.Utilities;
 
 namespace SharpCraft.Scenes;
 
-public class SplashScene : IScene
+public sealed class SplashScene : IScene
 {
     private readonly double _startTime = GetTime();
 

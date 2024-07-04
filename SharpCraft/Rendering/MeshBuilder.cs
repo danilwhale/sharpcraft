@@ -5,7 +5,7 @@ using System.Security;
 namespace SharpCraft.Rendering;
 
 [SuppressUnmanagedCodeSecurity]
-public partial class MeshBuilder : IDisposable
+public sealed partial class MeshBuilder : IDisposable
 {
     [LibraryImport(NativeLibName)]
     private static partial void UploadMesh(ref Mesh mesh, [MarshalAs(UnmanagedType.I1)] bool isDynamic);

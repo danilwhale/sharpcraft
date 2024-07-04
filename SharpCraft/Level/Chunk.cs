@@ -4,7 +4,7 @@ using SharpCraft.Utilities;
 
 namespace SharpCraft.Level;
 
-public class Chunk : IDisposable
+public sealed class Chunk : IDisposable
 {
     public const int Size = 16;
 

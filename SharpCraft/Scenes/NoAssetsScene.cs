@@ -1,6 +1,6 @@
 ﻿namespace SharpCraft.Scenes;
 
-public class NoAssetsScene : IScene
+public sealed class NoAssetsScene : IScene
 {
     public void Update()
     {

@@ -5,12 +5,12 @@ using Timer = SharpCraft.Utilities.Timer;
 
 namespace SharpCraft.Scenes;
 
-public class GameScene : IScene
+public sealed class GameScene : IScene
 {
-    private Timer _timer;
-    private Level.Level _level;
-    private LevelRenderer _levelRenderer;
-    private Player _player;
+    private readonly Timer _timer;
+    private readonly Level.Level _level;
+    private readonly LevelRenderer _levelRenderer;
+    private readonly Player _player;
     private RayCollision _rayCast;
 
     private int _fps;

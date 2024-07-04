@@ -2,7 +2,7 @@
 
 namespace SharpCraft.Level;
 
-public readonly struct TilePosition(int x, int y, int z)
+public readonly struct TilePosition(int x, int y, int z) : IEquatable<TilePosition>
 {
     public static readonly TilePosition One = new(1, 1, 1);
     public static readonly TilePosition Zero = new(0, 0, 0);
@@ -43,7 +43,12 @@ public readonly struct TilePosition(int x, int y, int z)
     public override bool Equals(object? obj)
     {
         return obj is TilePosition position && 
-               position.X == X && position.Y == Y && position.Z == Z;
+               Equals(position);
+    }
+    
+    public bool Equals(TilePosition other)
+    {
+        return X == other.X && Y == other.Y && Z == other.Z;
     }
 
     public override int GetHashCode()

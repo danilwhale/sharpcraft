@@ -2,7 +2,7 @@
 
 namespace SharpCraft.Level;
 
-public class Tile(int textureIndex)
+public sealed class Tile(int textureIndex)
 {
     private const float Darkest = 0.6f;
     private const float Darker = 0.8f;

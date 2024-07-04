@@ -3,7 +3,7 @@ using SharpCraft.Rendering;
 
 namespace SharpCraft.Level;
 
-public class LevelRenderer : IDisposable
+public sealed class LevelRenderer : IDisposable
 {
     public readonly int ChunksX;
     public readonly int ChunksY;
