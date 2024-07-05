@@ -14,7 +14,7 @@ public sealed class Player : Entity
     {
         HeightOffset = 1.62f;
         Camera = new Camera3D(Vector3.Zero, Vector3.Zero, Vector3.UnitY, 70.0f, CameraProjection.Perspective);
-        MoveToRandom();
+        ResetToRandomPosition();
     }
     
     public void MoveCamera(float lastDelta)
@@ -35,14 +35,14 @@ public sealed class Player : Entity
     public override void Rotate(float pitch, float yaw)
     {
         base.Rotate(pitch * MouseSensitivity, yaw * MouseSensitivity);
-        Pitch = Math.Clamp(Pitch, -89.0f, 89.0f);
+        Pitch = Math.Clamp(Pitch, -89.9f, 89.9f);
     }
 
     public override void Tick()
     {
         base.Tick();
         
-        if (IsKeyDown(KeyboardKey.R)) MoveToRandom();
+        if (IsKeyDown(KeyboardKey.R)) ResetToRandomPosition();
 
         var x = IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left) ? 1
             : IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right) ? -1
@@ -54,15 +54,15 @@ public sealed class Player : Entity
 
         if (IsOnGround && (IsKeyDown(KeyboardKey.Space) || IsKeyDown(KeyboardKey.LeftSuper)))
         {
-            Direction.Y = 0.12f;
+            Motion.Y = 0.12f;
         }
 
-        MoveRelative(x, z, IsOnGround ? 0.02f : 0.005f);
-        Direction.Y -= 0.005f;
-        Move(Direction);
+        ApplyRelativeMotion(x, z, IsOnGround ? 0.02f : 0.005f);
+        Motion.Y -= 0.005f;
+        ApplyMotion(Motion);
         
-        Direction *= new Vector3(0.91f, 0.98f, 0.91f);
+        Motion *= new Vector3(0.91f, 0.98f, 0.91f);
 
-        if (IsOnGround) Direction *= new Vector3(0.8f, 1.0f, 0.8f);
+        if (IsOnGround) Motion *= new Vector3(0.8f, 1.0f, 0.8f);
     }
 }

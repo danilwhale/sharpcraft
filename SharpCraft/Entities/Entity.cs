@@ -5,9 +5,24 @@ namespace SharpCraft.Entities;
 
 public class Entity(Level.Level level, float halfWidth, float halfHeight)
 {
-    protected Vector3 LastPosition;
-    public Vector3 Position;
-    protected Vector3 Direction;
+    public Vector3 Position
+    {
+        get => _position;
+        set
+        {
+            _position = value;
+            
+            // center position
+            _bbox = new BoundingBox(
+                value - new Vector3(halfWidth, halfHeight, halfWidth),
+                value + new Vector3(halfWidth, halfHeight, halfWidth)
+            );
+        }
+    }
+
+    private Vector3 _position;
+    private Vector3 _lastPosition;
+    protected Vector3 Motion;
     private BoundingBox _bbox;
     
     protected bool IsOnGround;
@@ -19,80 +34,72 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
 
     public Vector3 GetInterpolatedPosition(float lastDelta)
     {
-        return LastPosition + (Position - LastPosition) * lastDelta;
+        return _lastPosition + (Position - _lastPosition) * lastDelta;
     }
     
-    protected void MoveToRandom()
+    protected void ResetToRandomPosition()
     {
         var x = Random.Shared.NextSingle() * level.Width;
         var y = level.Height + 10;
         var z = Random.Shared.NextSingle() * level.Length;
-        MoveTo(new Vector3(x, y, z));
-    }
 
-    private void MoveTo(Vector3 newPosition)
-    {
-        Position = newPosition;
-        _bbox = new BoundingBox(
-            newPosition - new Vector3(halfWidth, halfHeight, halfWidth),
-            newPosition + new Vector3(halfWidth, halfHeight, halfWidth)
-        );
+        Position = new Vector3(x, y, z);
     }
 
     public virtual void Rotate(float pitch, float yaw)
     {
         Pitch += pitch;
-        Yaw -= yaw;
+        Yaw += yaw;
     }
 
     public virtual void Tick()
     {
-        LastPosition = Position;
+        _lastPosition = Position;
     }
     
-    protected void Move(Vector3 direction)
+    protected void ApplyMotion(Vector3 motion)
     {
-        var oldDirection = direction;
+        var oldMotion = motion;
 
-        var boxes = level.GetBoxes(_bbox.Expand(direction));
+        var boxes = level.GetBoxes(_bbox.Expand(motion));
         
         foreach (var box in boxes)
         {
-            direction.X = box.ClipXCollide(_bbox, direction.X);
+            motion.X = box.ClipXCollide(_bbox, motion.X);
         }
 
-        _bbox.Move(direction.X, 0.0f, 0.0f);
+        _bbox.Move(motion.X, 0.0f, 0.0f);
         
         foreach (var box in boxes)
         {
-            direction.Y = box.ClipYCollide(_bbox, direction.Y);
+            motion.Y = box.ClipYCollide(_bbox, motion.Y);
         }
 
-        _bbox.Move(0.0f, direction.Y, 0.0f);
+        _bbox.Move(0.0f, motion.Y, 0.0f);
         
         foreach (var box in boxes)
         {
-            direction.Z = box.ClipZCollide(_bbox, direction.Z);
+            motion.Z = box.ClipZCollide(_bbox, motion.Z);
         }
 
-        _bbox.Move(0.0f, 0.0f, direction.Z);
+        _bbox.Move(0.0f, 0.0f, motion.Z);
 
         // ReSharper disable CompareOfFloatsByEqualityOperator
-        IsOnGround = oldDirection.Y != direction.Y && oldDirection.Y < 0.0f;
+        IsOnGround = oldMotion.Y != motion.Y && oldMotion.Y < 0.0f;
 
-        Direction.X = oldDirection.X != direction.X ? 0.0f : direction.X;
-        Direction.Y = oldDirection.Y != direction.Y ? 0.0f : direction.Y;
-        Direction.Z = oldDirection.Z != direction.Z ? 0.0f : direction.Z;
+        Motion.X = oldMotion.X != motion.X ? 0.0f : motion.X;
+        Motion.Y = oldMotion.Y != motion.Y ? 0.0f : motion.Y;
+        Motion.Z = oldMotion.Z != motion.Z ? 0.0f : motion.Z;
         // ReSharper restore CompareOfFloatsByEqualityOperator
 
-        Position = new Vector3(
+        _position = new Vector3(
             (_bbox.Min.X + _bbox.Max.X) / 2.0f,
             _bbox.Min.Y + HeightOffset,
             (_bbox.Min.Z + _bbox.Max.Z) / 2.0f
         );
     }
 
-    protected void MoveRelative(float x, float z, float speed)
+    protected void ApplyRelativeMotion(float x, float z, float speed)
     {
         var dist = x * x + z * z;
 
@@ -106,7 +113,7 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
         var sin = MathF.Sin(Yaw * DEG2RAD);
         var cos = MathF.Cos(Yaw * DEG2RAD);
 
-        Direction.X += x * cos + z * sin;
-        Direction.Z += z * cos - x * sin;
+        Motion.X += x * cos + z * sin;
+        Motion.Z += z * cos - x * sin;
     }
 }

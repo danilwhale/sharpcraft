@@ -13,7 +13,7 @@ public sealed class NoAssetsScene : IScene
         DrawRectangleGradientV(0, 0, GetScreenWidth(), GetScreenHeight(), new Color(65, 32, 24, 255), new Color(176, 32, 24, 255));
 
         DrawTextCentered("no assets found!", 48, 0, Color.White);
-        DrawTextCentered("please read the instructions in readme to get assets", 28, 48, Color.White);
+        DrawTextCentered("please read the instructions in readme (in github repo) to get assets", 28, 48, Color.White);
     }
     
     private void DrawTextCentered(string text, int fontSize, int yOffset, Color color)

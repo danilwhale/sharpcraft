@@ -63,7 +63,7 @@ public sealed class GameScene : IScene
     private void HandleInput()
     {
         var mouseDelta = GetMouseDelta();
-        _player.Rotate(mouseDelta.Y, mouseDelta.X);
+        _player.Rotate(mouseDelta.Y, -mouseDelta.X);
         
         _rayCast = _level.DoRayCast(
             GetMouseRay(new Vector2(GetScreenWidth(), GetScreenHeight()) / 2, _player.Camera),
@@ -99,7 +99,7 @@ public sealed class GameScene : IScene
 
     public void Draw()
     {
-        _player.MoveCamera(_timer.LastPassedTime);
+        _player.MoveCamera(_timer.LastDeltaTime);
 
         ClearBackground(ColorFromNormalized(new Vector4(0.5f, 0.8f, 1.0f, 1.0f)));
         
@@ -107,7 +107,7 @@ public sealed class GameScene : IScene
 
         _levelRenderer.Draw();
         _levelRenderer.DrawHit(_rayCast);
-        _zombies.ForEach(z => z.Draw(_timer.LastPassedTime));
+        _zombies.ForEach(z => z.Draw(_timer.LastDeltaTime));
 
         EndMode3D();
 
@@ -117,5 +117,7 @@ public sealed class GameScene : IScene
     public void Dispose()
     {
         _level.Save();
+        _levelRenderer.Dispose();
+        _zombies.ForEach(z => z.Dispose());
     }
 }
