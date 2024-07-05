@@ -12,13 +12,14 @@ public sealed class Player : Entity
 
     public Player(Level.Level level) : base(level, HalfWidth, HalfHeight)
     {
+        HeightOffset = 1.62f;
         Camera = new Camera3D(Vector3.Zero, Vector3.Zero, Vector3.UnitY, 70.0f, CameraProjection.Perspective);
         MoveToRandom();
     }
     
     public void MoveCamera(float lastDelta)
     {
-        Camera.Position = LastPosition + (Position - LastPosition) * lastDelta;
+        Camera.Position = GetInterpolatedPosition(lastDelta);
 
         var rotation = Matrix4x4.CreateFromYawPitchRoll(
             Yaw * DEG2RAD,

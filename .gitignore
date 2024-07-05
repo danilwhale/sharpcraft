@@ -483,4 +483,5 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-terrain.png
+# exclude all image assets
+/SharpCraft/Assets/*.png

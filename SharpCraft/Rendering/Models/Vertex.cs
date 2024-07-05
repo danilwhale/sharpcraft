@@ -1,23 +1,21 @@
-﻿using System.Numerics;
+using System.Numerics;
 
 namespace SharpCraft.Rendering.Models;
 
-public readonly struct Vertex(Vector3 position, Vector2 texCoords)
+public readonly struct Vertex(float textureWidth, float textureHeight, float x, float y, float z, float u = 0.0f, float v = 0.0f) : IMeshModel
 {
-    public readonly Vector3 Position = position;
-    public readonly Vector2 TexCoords = texCoords;
-
-    public Vertex(float x, float y, float z, float u, float v)
-        : this(new Vector3(x, y, z), new Vector2(u, v)) { }
-
-    public void Draw()
+    public Vertex WithTexCoords(float u0, float v0)
     {
-        Rlgl.TexCoord2f(TexCoords.X, TexCoords.Y);
-        Rlgl.Vertex3f(Position.X, Position.Y, Position.Z);
+        return new Vertex(textureWidth, textureHeight, x, y, z, u0, v0);
     }
-
-    public Vertex Move(float x, float y, float z)
+    
+    public unsafe void CopyTo(ref Mesh mesh, int vertexOffset)
     {
-        return new Vertex(Position + new Vector3(x, y, z), TexCoords);
+        mesh.Vertices[vertexOffset * 3] = x;
+        mesh.Vertices[vertexOffset * 3 + 1] = y;
+        mesh.Vertices[vertexOffset * 3 + 2] = z;
+
+        mesh.TexCoords[vertexOffset * 2] = u / textureWidth;
+        mesh.TexCoords[vertexOffset * 2 + 1] = v / textureHeight;
     }
 }

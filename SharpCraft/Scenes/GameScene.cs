@@ -1,6 +1,8 @@
 ﻿using System.Numerics;
 using SharpCraft.Entities;
 using SharpCraft.Level;
+using SharpCraft.Rendering.Models;
+using SharpCraft.Utilities;
 using Timer = SharpCraft.Utilities.Timer;
 
 namespace SharpCraft.Scenes;
@@ -12,6 +14,7 @@ public sealed class GameScene : IScene
     private readonly LevelRenderer _levelRenderer;
     private readonly Player _player;
     private RayCollision _rayCast;
+    private readonly List<Zombie> _zombies = new(100);
 
     private int _fps;
     private int _frames;
@@ -25,6 +28,11 @@ public sealed class GameScene : IScene
         _level = new Level.Level(256, 64, 256);
         _levelRenderer = new LevelRenderer(_level);
         _player = new Player(_level);
+
+        for (var i = 0; i < _zombies.Capacity; i++)
+        {
+            _zombies.Add(new Zombie(_level));
+        }
     }
     
     public void Update()
@@ -86,6 +94,7 @@ public sealed class GameScene : IScene
     private void TickedUpdate()
     {
         _player.Tick();
+        _zombies.ForEach(z => z.Tick());
     }
 
     public void Draw()
@@ -98,6 +107,7 @@ public sealed class GameScene : IScene
 
         _levelRenderer.Draw();
         _levelRenderer.DrawHit(_rayCast);
+        _zombies.ForEach(z => z.Draw(_timer.LastPassedTime));
 
         EndMode3D();
 

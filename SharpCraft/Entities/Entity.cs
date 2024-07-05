@@ -8,12 +8,19 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
     protected Vector3 LastPosition;
     public Vector3 Position;
     protected Vector3 Direction;
-    protected BoundingBox BBox;
+    private BoundingBox _bbox;
     
     protected bool IsOnGround;
     
     protected float Yaw;
     protected float Pitch;
+
+    protected float HeightOffset;
+
+    public Vector3 GetInterpolatedPosition(float lastDelta)
+    {
+        return LastPosition + (Position - LastPosition) * lastDelta;
+    }
     
     protected void MoveToRandom()
     {
@@ -23,10 +30,10 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
         MoveTo(new Vector3(x, y, z));
     }
 
-    protected void MoveTo(Vector3 newPosition)
+    private void MoveTo(Vector3 newPosition)
     {
         Position = newPosition;
-        BBox = new BoundingBox(
+        _bbox = new BoundingBox(
             newPosition - new Vector3(halfWidth, halfHeight, halfWidth),
             newPosition + new Vector3(halfWidth, halfHeight, halfWidth)
         );
@@ -47,28 +54,28 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
     {
         var oldDirection = direction;
 
-        var boxes = level.GetBoxes(BBox.Expand(direction));
+        var boxes = level.GetBoxes(_bbox.Expand(direction));
         
         foreach (var box in boxes)
         {
-            direction.X = box.ClipXCollide(BBox, direction.X);
+            direction.X = box.ClipXCollide(_bbox, direction.X);
         }
 
-        BBox.Move(direction.X, 0.0f, 0.0f);
+        _bbox.Move(direction.X, 0.0f, 0.0f);
         
         foreach (var box in boxes)
         {
-            direction.Y = box.ClipYCollide(BBox, direction.Y);
+            direction.Y = box.ClipYCollide(_bbox, direction.Y);
         }
 
-        BBox.Move(0.0f, direction.Y, 0.0f);
+        _bbox.Move(0.0f, direction.Y, 0.0f);
         
         foreach (var box in boxes)
         {
-            direction.Z = box.ClipZCollide(BBox, direction.Z);
+            direction.Z = box.ClipZCollide(_bbox, direction.Z);
         }
 
-        BBox.Move(0.0f, 0.0f, direction.Z);
+        _bbox.Move(0.0f, 0.0f, direction.Z);
 
         // ReSharper disable CompareOfFloatsByEqualityOperator
         IsOnGround = oldDirection.Y != direction.Y && oldDirection.Y < 0.0f;
@@ -79,9 +86,9 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
         // ReSharper restore CompareOfFloatsByEqualityOperator
 
         Position = new Vector3(
-            (BBox.Min.X + BBox.Max.X) / 2.0f,
-            BBox.Min.Y + 1.62f,
-            (BBox.Min.Z + BBox.Max.Z) / 2.0f
+            (_bbox.Min.X + _bbox.Max.X) / 2.0f,
+            _bbox.Min.Y + HeightOffset,
+            (_bbox.Min.Z + _bbox.Max.Z) / 2.0f
         );
     }
 

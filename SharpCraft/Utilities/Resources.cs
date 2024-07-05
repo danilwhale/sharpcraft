@@ -3,11 +3,19 @@
 public static class Resources
 {
     public static Material DefaultTerrainMaterial;
+    public static Material CharMaterial;
 
     public static void Load()
     {
-        DefaultTerrainMaterial = LoadMaterialDefault();
-        SetMaterialTexture(ref DefaultTerrainMaterial, MaterialMapIndex.Albedo, ResourceManager.GetTexture("terrain.png"));
+        DefaultTerrainMaterial = LoadTextureMaterial("terrain.png");
+        CharMaterial = LoadTextureMaterial("char.png");
+    }
+
+    private static Material LoadTextureMaterial(string path)
+    {
+        var material = LoadMaterialDefault();
+        SetMaterialTexture(ref material, MaterialMapIndex.Albedo, ResourceManager.GetTexture(path));
+        return material;
     }
 
     public static void Unload()

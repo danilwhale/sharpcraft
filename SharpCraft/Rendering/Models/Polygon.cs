@@ -1,25 +1,20 @@
-﻿namespace SharpCraft.Rendering.Models;
+namespace SharpCraft.Rendering.Models;
 
-public readonly struct Polygon(Vertex a, Vertex b, Vertex c, Vertex d)
+public readonly struct Polygon(Vertex a, Vertex b, Vertex c, Vertex d) : IMeshModel
 {
-    public readonly Vertex A = a;
-    public readonly Vertex B = b;
-    public readonly Vertex C = c;
-    public readonly Vertex D = d;
-
-    public void Draw()
+    public Polygon(Vertex a, Vertex b, Vertex c, Vertex d, float u0, float v0, float u1, float v1)
+        : this(a.WithTexCoords(u1, v0), b.WithTexCoords(u0, v0), c.WithTexCoords(u0, v1), d.WithTexCoords(u1, v1))
     {
-        A.Draw();
-        B.Draw();
-        C.Draw();
-        
-        A.Draw();
-        C.Draw();
-        D.Draw();
     }
-
-    public Polygon Move(float x, float y, float z)
+    
+    public void CopyTo(ref Mesh mesh, int vertexOffset)
     {
-        return new Polygon(A.Move(x, y, z), B.Move(x, y, z), C.Move(x, y, z), D.Move(x, y, z));
+        d.CopyTo(ref mesh, vertexOffset);
+        c.CopyTo(ref mesh, vertexOffset + 1);
+        b.CopyTo(ref mesh, vertexOffset + 2);
+        
+        d.CopyTo(ref mesh, vertexOffset + 3);
+        b.CopyTo(ref mesh, vertexOffset + 4);
+        a.CopyTo(ref mesh, vertexOffset + 5);
     }
 }
