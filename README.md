@@ -1,39 +1,34 @@
 ﻿## SharpCraft
 ### clone of minecraft, but on raylib (5.0) and c# (.net 8)
 
-this is a clone of minecraft (ancient versions), that is using own codebase,
-only some parts are ~~stolen~~ grabbed from original source code, because I have no clue how to reimplement them lol
-
-## found a bug?
-please report it in issues!!!!!!!
-
-## known bugs
-idk
+this is a clone of minecraft (ancient versions), that is using own codebase (kinda)
 
 ## won't fix
 - no shadows like in the original
   - this is a second implementation attempt, I had to do a lot of optimizations, yet it still runs like a shit.
   - TLDR: nop, I won't add them
+
 ## how to get the latest version??????
 [click here to go to GitHub actions](https://github.com/danilwhale/SharpCraft/actions/),
 then select top most link with checkmark from the left, click on it,
 scroll down, download artifact for your platform (windows or linux)
 
-> ⚠️ read a section below before downloading and running the game
+> [!IMPORTANT] read a section below before downloading and running the game
 
-> ⚠️ linux build is untested, if not working, build it yourself using the instructions in 'how to build' section
+> [!WARNING] untested on linux, except bugs
 
 ## assets
 now you need to extract assets from the original game yourselves.
 this is done so microsoft won't murder me for using their assets in my project.
 
-where to find rd-132211.jar:
-- official launcher: `%appdata%/.minecraft/versions/rd-132211` (can't tell path on linux)
-- prism launcher: `%appdata%/PrismLauncher/libraries/com/mojang/minecraft` (can't tell path on linux)
+where to find rd-132328.jar:
+- official launcher: `%appdata%/.minecraft/versions/rd-132328/rd-132328.jar` (can't tell path on linux)
+- prism launcher: `%appdata%/PrismLauncher/libraries/com/mojang/minecraft/rd-132328/minecraft-rd-132328-client.jar` (can't tell path on linux)
 
-find and open rd-132211.jar in any archiver (for example, 7-zip)
+find and open rd-132328.jar in any archiver (for example, 7-zip)
 and extract the following files:
 - terrain.png
+- char.png
 
 after this, create folder 'Assets' inside SharpCraft's directory and move them to this folder
 
