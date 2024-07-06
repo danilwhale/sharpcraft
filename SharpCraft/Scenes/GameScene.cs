@@ -96,7 +96,11 @@ public sealed class GameScene : IScene
     private void TickedUpdate()
     {
         _player.Tick();
-        _zombies.ForEach(z => z.Tick());
+
+        foreach (var zombie in _zombies)
+        {
+            zombie.Tick();
+        }
     }
 
     public void Draw()
@@ -109,7 +113,11 @@ public sealed class GameScene : IScene
 
         _levelRenderer.Draw();
         _levelRenderer.DrawHit(_rayCast);
-        _zombies.ForEach(z => z.Draw(_timer.LastPartialTicks));
+        
+        foreach (var zombie in _zombies)
+        {
+            zombie.Draw(_timer.LastPartialTicks);
+        }
 
         EndMode3D();
 
@@ -120,6 +128,10 @@ public sealed class GameScene : IScene
     {
         _level.Save();
         _levelRenderer.Dispose();
-        _zombies.ForEach(z => z.Dispose());
+
+        foreach (var zombie in _zombies)
+        {
+            zombie.Dispose();
+        }
     }
 }
