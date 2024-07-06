@@ -1,5 +1,5 @@
 ﻿using System.Numerics;
-using SharpCraft.Physics;
+using SharpCraft.Extensions;
 
 namespace SharpCraft.Entities;
 
@@ -32,16 +32,16 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
 
     protected float HeightOffset;
 
-    public Vector3 GetInterpolatedPosition(float lastDelta)
+    public Vector3 GetInterpolatedPosition(float lastPartTicks)
     {
-        return _lastPosition + (Position - _lastPosition) * lastDelta;
+        return _lastPosition + (Position - _lastPosition) * lastPartTicks;
     }
     
-    protected void ResetToRandomPosition()
+    protected void SetRandomLevelPosition()
     {
         var x = Random.Shared.NextSingle() * level.Width;
         var y = level.Height + 10;
-        var z = Random.Shared.NextSingle() * level.Length;
+        var z = Random.Shared.NextSingle() * level.Depth;
 
         Position = new Vector3(x, y, z);
     }

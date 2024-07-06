@@ -12,43 +12,30 @@ public sealed class LevelRenderer : IDisposable
     private readonly TilePosition _min;
     private readonly TilePosition _max;
     
-    private readonly Chunk[][][] _chunks;
+    private readonly Chunk[] _chunks;
 
     public readonly Level Level;
 
     public LevelRenderer(Level level)
     {
         Level = level;
-        level.OnEverythingChanged += () =>
-        {
-            SetDirtyArea(0, 0, 0, level.Width, level.Height, level.Length);
-        };
-        level.OnLightLevelChanged += (x, z, minY, maxY) =>
-        {
-            SetDirtyArea(x - 1, minY, z - 1, x + 1, maxY, z + 1);
-        };
-        level.OnTileChanged += (x, y, z) =>
-        {
-            SetDirtyArea(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
-        };
+        level.OnAreaUpdate += SetDirtyArea;
 
-        ChunksX = level.Width / Chunk.Size;
-        ChunksY = level.Height / Chunk.Size;
-        ChunksZ = level.Length / Chunk.Size;
+        ChunksX = level.Width >> 4;
+        ChunksY = level.Height >> 4;
+        ChunksZ = level.Depth >> 4;
 
         _min = new TilePosition(0, 0, 0);
-        _max = new TilePosition(level.Width, level.Height, level.Length);
+        _max = new TilePosition(level.Width, level.Height, level.Depth);
 
-        _chunks = new Chunk[ChunksX][][];
+        _chunks = new Chunk[ChunksX * ChunksY * ChunksZ];
         for (var x = 0; x < ChunksX; x++)
         {
-            _chunks[x] = new Chunk[ChunksY][];
             for (var y = 0; y < ChunksY; y++)
             {
-                _chunks[x][y] = new Chunk[ChunksZ];
                 for (var z = 0; z < ChunksZ; z++)
                 {
-                    _chunks[x][y][z] = new Chunk(level, x, y, z);
+                    _chunks[(y * ChunksZ + z) * ChunksX + x] = new Chunk(level, x, y, z);
                 }
             }
         }
@@ -59,29 +46,22 @@ public sealed class LevelRenderer : IDisposable
         Chunk.Rebuilds = 0;
         var frustum = Frustum.Instance;
 
-        for (var x = 0; x < ChunksX; x++)
+        foreach (var chunk in _chunks)
         {
-            for (var y = 0; y < ChunksY; y++)
-            {
-                for (var z = 0; z < ChunksZ; z++)
-                {
-                    var chunk = _chunks[x][y][z];
-                    if (!frustum.IsCubeVisible(chunk.BBox)) continue;
-                    chunk.Draw();
-                }
-            }
+            if (!frustum.IsCubeVisible(chunk.BBox)) continue;
+            chunk.Draw();
         }
     }
 
     public void SetDirtyArea(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {
-        minX = Math.Clamp(minX / Chunk.Size, 0, ChunksX - 1);
-        minY = Math.Clamp(minY / Chunk.Size, 0, ChunksY - 1);
-        minZ = Math.Clamp(minZ / Chunk.Size, 0, ChunksZ - 1);
+        minX = Math.Clamp(minX >> 4, 0, ChunksX - 1);
+        minY = Math.Clamp(minY >> 4, 0, ChunksY - 1);
+        minZ = Math.Clamp(minZ >> 4, 0, ChunksZ - 1);
 
-        maxX = Math.Clamp(maxX / Chunk.Size, 0, ChunksX - 1);
-        maxY = Math.Clamp(maxY / Chunk.Size, 0, ChunksY - 1);
-        maxZ = Math.Clamp(maxZ / Chunk.Size, 0, ChunksZ - 1);
+        maxX = Math.Clamp(maxX >> 4, 0, ChunksX - 1);
+        maxY = Math.Clamp(maxY >> 4, 0, ChunksY - 1);
+        maxZ = Math.Clamp(maxZ >> 4, 0, ChunksZ - 1);
         
         for (var x = minX; x <= maxX; x++)
         {
@@ -89,7 +69,7 @@ public sealed class LevelRenderer : IDisposable
             {
                 for (var z = minZ; z <= maxZ; z++)
                 {
-                    _chunks[x][y][z].IsDirty = true;
+                    _chunks[(y * ChunksZ + z) * ChunksX + x].IsDirty = true;
                 }
             }
         }
@@ -97,7 +77,7 @@ public sealed class LevelRenderer : IDisposable
 
     public void DrawHit(RayCollision hit)
     {
-        var alpha = MathF.Sin((float)GetTime() * 1000.0f / 100.0f) * 0.2f + 0.4f;
+        var alpha = MathF.Sin((float)GetTime() * 10.0f) * 0.2f + 0.4f;
         
         Rlgl.Begin(DrawMode.Quads);
         Rlgl.Color4f(1.0f, 1.0f, 1.0f, alpha);
@@ -116,15 +96,9 @@ public sealed class LevelRenderer : IDisposable
 
     public void Dispose()
     {
-        for (var x = 0; x < ChunksX; x++)
+        foreach (var chunk in _chunks)
         {
-            for (var y = 0; y < ChunksY; y++)
-            {
-                for (var z = 0; z < ChunksZ; z++)
-                {
-                    _chunks[x][y][z].Dispose();
-                }
-            }
+            chunk.Dispose();
         }
     }
 }

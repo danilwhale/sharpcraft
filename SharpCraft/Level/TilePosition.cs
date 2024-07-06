@@ -22,7 +22,7 @@ public readonly struct TilePosition(int x, int y, int z) : IEquatable<TilePositi
 
     public static TilePosition ToChunkPosition(TilePosition worldPosition)
     {
-        return new TilePosition(worldPosition.X / Chunk.Size, worldPosition.Y / Chunk.Size, worldPosition.Z / Chunk.Size);
+        return new TilePosition(worldPosition.X >> 4, worldPosition.Y >> 4, worldPosition.Z >> 4);
     }
 
     public static TilePosition Clamp(TilePosition value, TilePosition min, TilePosition max)

@@ -10,8 +10,8 @@ public sealed class Timer(float ticksPerSecond)
     private const float TimeScale = 1.0f;
     
     public int Ticks { get; private set; }
-    public float DeltaTime { get; private set; }
-    public float LastDeltaTime { get; private set; }
+    public float PartialTicks { get; private set; }
+    public float LastPartialTicks { get; private set; }
 
     private long _lastTime = Stopwatch.GetTimestamp() * TimeSpan.NanosecondsPerTick;
 
@@ -21,12 +21,10 @@ public sealed class Timer(float ticksPerSecond)
         var passedNs = Math.Clamp(now - _lastTime, 0, NanosecondsPerSecond);
         _lastTime = now;
 
-        passedNs = Math.Clamp(passedNs, 0, NanosecondsPerSecond);
+        PartialTicks += passedNs * ticksPerSecond * TimeScale / NanosecondsPerSecond;
+        Ticks = Math.Min(MaxTicks, (int)PartialTicks);
+        PartialTicks -= Ticks;
 
-        DeltaTime += passedNs * ticksPerSecond * TimeScale / NanosecondsPerSecond;
-        Ticks = Math.Min(MaxTicks, (int)DeltaTime);
-        DeltaTime -= Ticks;
-
-        LastDeltaTime = DeltaTime;
+        LastPartialTicks = PartialTicks;
     }
 }

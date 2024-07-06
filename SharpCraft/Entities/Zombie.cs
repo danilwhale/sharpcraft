@@ -19,7 +19,7 @@ public sealed class Zombie : Entity, IDisposable
     public Zombie(Level.Level level)
         : base(level, HalfWidth, HalfHeight)
     {
-        ResetToRandomPosition();
+        SetRandomLevelPosition();
 
         TimeOffset = Random.Shared.NextSingle() * TimeOffsetSize;
         Rotation = Random.Shared.NextSingle() * MathF.PI * 2.0f;
@@ -56,7 +56,7 @@ public sealed class Zombie : Entity, IDisposable
         
         if (Position.Y < -100.0f)
         {
-            ResetToRandomPosition();
+            SetRandomLevelPosition();
         }
 
         if (IsOnGround)
@@ -66,9 +66,9 @@ public sealed class Zombie : Entity, IDisposable
         }
     }
 
-    public void Draw(float lastDelta)
+    public void Draw(float lastPartTicks)
     {
-        _model.Draw(lastDelta);
+        _model.Draw(lastPartTicks);
     }
 
     public void Dispose()

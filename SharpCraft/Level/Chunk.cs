@@ -28,12 +28,12 @@ public sealed class Chunk : IDisposable
     public Chunk(Level level, int x, int y, int z)
     {
         _level = level;
-        X = x * Size;
-        Y = y * Size;
-        Z = z * Size;
-        MaxX = (x + 1) * Size;
-        MaxY = (y + 1) * Size;
-        MaxZ = (z + 1) * Size;
+        X = x << 4;
+        Y = y << 4;
+        Z = z << 4;
+        MaxX = (x + 1) << 4;
+        MaxY = (y + 1) << 4;
+        MaxZ = (z + 1) << 4;
         BBox = new BoundingBox(new Vector3(X, Y, Z), new Vector3(MaxX, MaxY, MaxZ));
     }
 
@@ -43,8 +43,9 @@ public sealed class Chunk : IDisposable
         
         Updates++;
         Rebuilds++;
-        
-        _builder.Begin(GetFaceCount() * 2);
+
+        var faces = GetFaceCount();
+        _builder.Begin(faces * 4, faces * 6);
         
         for (var x = X; x < MaxX; x++)
         {
@@ -72,7 +73,7 @@ public sealed class Chunk : IDisposable
             Rebuild();
         }
         
-        _builder.Draw(Resources.DefaultTerrainMaterial);
+        _builder.Draw(Assets.GetTextureMaterial("terrain.png"));
     }
 
     private int GetFaceCount()

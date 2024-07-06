@@ -55,11 +55,11 @@ public sealed class ZombieModel : IEntityModel, IDisposable
         ];
     }
 
-    public void Draw(float lastDelta)
+    public void Draw(float lastPartTicks)
     {
         Rlgl.PushMatrix();
 
-        var position = _zombie.GetInterpolatedPosition(lastDelta);
+        var position = _zombie.GetInterpolatedPosition(lastPartTicks);
         Rlgl.Translatef(position.X, position.Y, position.Z);
 
         const float size = 7.0f / 128.0f;
@@ -76,7 +76,7 @@ public sealed class ZombieModel : IEntityModel, IDisposable
 
         foreach (var limb in _limbs)
         {
-            limb.Draw(Resources.CharMaterial);
+            limb.Draw(Assets.GetTextureMaterial("char.png"));
         }
 
         Rlgl.PopMatrix();

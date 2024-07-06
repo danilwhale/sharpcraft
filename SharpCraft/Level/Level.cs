@@ -6,35 +6,28 @@ namespace SharpCraft.Level;
 
 public sealed class Level
 {
-    public delegate void OnTileChangedEvent(int x, int y, int z);
-
-    public delegate void OnLightLevelChangedEvent(int x, int z, int minY, int maxY);
-
-    public delegate void OnEverythingChangedEvent();
+    public delegate void OnAreaUpdateEvent(int x0, int y0, int z0, int x1, int y1, int z1);
 
     private const float LightValue = 1.0f;
     private const float DarkValue = 0.4f;
-
-    // I use 1d array only because it's easier to load/save level
+    
     private readonly byte[] _data;
     private readonly int[] _lightLevels;
 
     public readonly int Width;
     public readonly int Height;
-    public readonly int Length;
+    public readonly int Depth;
 
-    public event OnTileChangedEvent? OnTileChanged;
-    public event OnLightLevelChangedEvent? OnLightLevelChanged;
-    public event OnEverythingChangedEvent? OnEverythingChanged;
+    public event OnAreaUpdateEvent? OnAreaUpdate;
 
-    public Level(int width, int height, int length)
+    public Level(int width, int height, int depth)
     {
         Width = width;
         Height = height;
-        Length = length;
+        Depth = depth;
 
-        _data = new byte[width * height * length];
-        _lightLevels = new int[width * length];
+        _data = new byte[width * height * depth];
+        _lightLevels = new int[width * depth];
 
         if (!TryLoad())
         {
@@ -42,7 +35,7 @@ public sealed class Level
             {
                 for (var y = 0; y < height; y++)
                 {
-                    for (var z = 0; z < length; z++)
+                    for (var z = 0; z < depth; z++)
                     {
                         _data[GetDataIndex(x, y, z)] = (byte)(y > height * 2 / 3 ? 0 : 1);
                     }
@@ -50,7 +43,7 @@ public sealed class Level
             }
         }
         
-        UpdateLightLevels(0, 0, width, length);
+        UpdateLightLevels(0, 0, width, depth);
     }
 
     private bool TryLoad(string path = "level.dat")
@@ -63,7 +56,7 @@ public sealed class Level
             using var stream = new GZipStream(fileStream, CompressionMode.Decompress);
             stream.ReadExactly(_data);
             
-            OnEverythingChanged?.Invoke();
+            OnAreaUpdate?.Invoke(0, 0, 0, Width, Height, Depth);
 
             return true;
         }
@@ -89,11 +82,11 @@ public sealed class Level
         }
     }
 
-    private void UpdateLightLevels(int x, int z, int width, int length)
+    private void UpdateLightLevels(int x, int z, int width, int depth)
     {
         for (var i = x; i < x + width; i++)
         {
-            for (var j = z; j < z + length; j++)
+            for (var j = z; j < z + depth; j++)
             {
                 var oldY = _lightLevels[i + Width * j];
 
@@ -107,7 +100,7 @@ public sealed class Level
                 var minY = Math.Min(y, oldY);
                 var maxY = Math.Max(y, oldY);
 
-                OnLightLevelChanged?.Invoke(i, j, minY, maxY);
+                OnAreaUpdate?.Invoke(i - 1, minY, j - 1, i + 1, maxY, j +1);
                 _lightLevels[i + Width * j] = y;
             }
         }
@@ -138,11 +131,11 @@ public sealed class Level
 
         minX = Math.Clamp(minX, 0, Width);
         minY = Math.Clamp(minY, 0, Height);
-        minZ = Math.Clamp(minZ, 0, Length);
+        minZ = Math.Clamp(minZ, 0, Depth);
 
         maxX = Math.Clamp(maxX, 0, Width);
         maxY = Math.Clamp(maxY, 0, Height);
-        maxZ = Math.Clamp(maxZ, 0, Length);
+        maxZ = Math.Clamp(maxZ, 0, Depth);
 
         for (var x = minX; x <= maxX; x++)
         {
@@ -174,7 +167,7 @@ public sealed class Level
         
         _data[GetDataIndex(x, y, z)] = value;
         UpdateLightLevels(x, z, 1, 1);
-        OnTileChanged?.Invoke(x, y, z);
+        OnAreaUpdate?.Invoke(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
     }
 
     public void SetTile(TilePosition position, byte value) => SetTile(position.X, position.Y, position.Z, value);
@@ -281,9 +274,9 @@ public sealed class Level
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Length;
+    private bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Depth;
     
     // use original indexing to have compatibility with original levels
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private int GetDataIndex(int x, int y, int z) => (y * Length + z) * Width + x;
+    private int GetDataIndex(int x, int y, int z) => (y * Depth + z) * Width + x;
 }

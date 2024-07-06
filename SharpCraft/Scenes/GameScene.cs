@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using SharpCraft.Entities;
+using SharpCraft.Extensions;
 using SharpCraft.Level;
 using SharpCraft.Rendering.Models;
 using SharpCraft.Utilities;
@@ -65,9 +66,7 @@ public sealed class GameScene : IScene
         var mouseDelta = GetMouseDelta();
         _player.Rotate(mouseDelta.Y, -mouseDelta.X);
         
-        _rayCast = _level.DoRayCast(
-            GetMouseRay(new Vector2(GetScreenWidth(), GetScreenHeight()) / 2, _player.Camera),
-            4.0f);
+        _rayCast = _level.DoRayCast(_player.Camera.GetForwardRay(), 4.0f);
         
         if (IsMouseButtonPressed(MouseButton.Left) && _rayCast.Hit)
         {
@@ -83,7 +82,10 @@ public sealed class GameScene : IScene
             _level.SetTile(hitPoint, 0);
         }
 
-        if (IsKeyPressed(KeyboardKey.Enter)) _level.Save();
+        if (IsKeyPressed(KeyboardKey.Enter))
+        {
+            _level.Save();
+        }
 
         if (IsKeyPressed(KeyboardKey.F11))
         {
@@ -99,15 +101,15 @@ public sealed class GameScene : IScene
 
     public void Draw()
     {
-        _player.MoveCamera(_timer.LastDeltaTime);
+        _player.MoveCamera(_timer.LastPartialTicks);
 
-        ClearBackground(ColorFromNormalized(new Vector4(0.5f, 0.8f, 1.0f, 1.0f)));
+        ClearBackground(new Color(128, 204, 255, 255));
         
         BeginMode3D(_player.Camera);
 
         _levelRenderer.Draw();
         _levelRenderer.DrawHit(_rayCast);
-        _zombies.ForEach(z => z.Draw(_timer.LastDeltaTime));
+        _zombies.ForEach(z => z.Draw(_timer.LastPartialTicks));
 
         EndMode3D();
 

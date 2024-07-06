@@ -15,8 +15,6 @@ internal static class Program
     private static void Main()
     {
         InitWindow(1024, 768, "SharpCraft");
-        
-        Resources.Load();
 
         if (!Directory.Exists("Assets"))
         {
@@ -37,8 +35,7 @@ internal static class Program
 
         Scene.Dispose();
         
-        ResourceManager.Unload();
-        Resources.Unload();
+        Assets.Unload();
 
         CloseWindow();
     }

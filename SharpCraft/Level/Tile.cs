@@ -18,9 +18,6 @@ public sealed class Tile(int textureIndex)
         var v0 = MathF.Floor(textureIndex / 16.0f) / 16.0f;
         var v1 = v0 + 1.0f / 16;
 
-        var x0 = x;
-        var y0 = y;
-        var z0 = z;
         var x1 = x + 1;
         var y1 = y + 1;
         var z1 = z + 1;
@@ -31,13 +28,13 @@ public sealed class Tile(int textureIndex)
 
             builder.Color(b, b, b);
 
-            builder.VertexWithTex(x0, y0, z0, u0, v1);
-            builder.VertexWithTex(x0, y0, z1, u1, v1);
-            builder.VertexWithTex(x0, y1, z1, u1, v0);
-
-            builder.VertexWithTex(x0, y0, z0, u0, v1);
-            builder.VertexWithTex(x0, y1, z1, u1, v0);
-            builder.VertexWithTex(x0, y1, z0, u0, v0);
+            builder.Triangle(0, 1, 2);
+            builder.Triangle(0, 2, 3);
+            
+            builder.VertexTex(x, y, z, u0, v1);
+            builder.VertexTex(x, y, z1, u1, v1);
+            builder.VertexTex(x, y1, z1, u1, v0);
+            builder.VertexTex(x, y1, z, u0, v0);
         }
 
         if (!level.IsSolidTile(x + 1, y, z))
@@ -46,13 +43,13 @@ public sealed class Tile(int textureIndex)
 
             builder.Color(b, b, b);
 
-            builder.VertexWithTex(x1, y0, z0, u1, v1);
-            builder.VertexWithTex(x1, y1, z0, u1, v0);
-            builder.VertexWithTex(x1, y1, z1, u0, v0);
+            builder.Triangle(0, 1, 2);
+            builder.Triangle(0, 2, 3);
 
-            builder.VertexWithTex(x1, y0, z0, u1, v1);
-            builder.VertexWithTex(x1, y1, z1, u0, v0);
-            builder.VertexWithTex(x1, y0, z1, u0, v1);
+            builder.VertexTex(x1, y, z, u1, v1);
+            builder.VertexTex(x1, y1, z, u1, v0);
+            builder.VertexTex(x1, y1, z1, u0, v0);
+            builder.VertexTex(x1, y, z1, u0, v1);
         }
 
         if (!level.IsSolidTile(x, y + 1, z))
@@ -61,13 +58,13 @@ public sealed class Tile(int textureIndex)
             
             builder.Color(b, b, b);
 
-            builder.VertexWithTex(x0, y1, z0, u0, v0);
-            builder.VertexWithTex(x0, y1, z1, u0, v1);
-            builder.VertexWithTex(x1, y1, z1, u1, v1);
+            builder.Triangle(0, 1, 2);
+            builder.Triangle(0, 2, 3);
 
-            builder.VertexWithTex(x0, y1, z0, u0, v0);
-            builder.VertexWithTex(x1, y1, z1, u1, v1);
-            builder.VertexWithTex(x1, y1, z0, u1, v0);
+            builder.VertexTex(x, y1, z, u0, v0);
+            builder.VertexTex(x, y1, z1, u0, v1);
+            builder.VertexTex(x1, y1, z1, u1, v1);
+            builder.VertexTex(x1, y1, z, u1, v0);
         }
 
         if (!level.IsSolidTile(x, y - 1, z))
@@ -75,14 +72,14 @@ public sealed class Tile(int textureIndex)
             var b = level.GetBrightness(x, y - 1, z) * Light;
 
             builder.Color(b, b, b);
+            
+            builder.Triangle(0, 1, 2);
+            builder.Triangle(0, 2, 3);
 
-            builder.VertexWithTex(x0, y0, z0, u1, v0);
-            builder.VertexWithTex(x1, y0, z0, u0, v0);
-            builder.VertexWithTex(x1, y0, z1, u0, v1);
-
-            builder.VertexWithTex(x0, y0, z0, u1, v0);
-            builder.VertexWithTex(x1, y0, z1, u0, v1);
-            builder.VertexWithTex(x0, y0, z1, u1, v1);
+            builder.VertexTex(x, y, z, u1, v0);
+            builder.VertexTex(x1, y, z, u0, v0);
+            builder.VertexTex(x1, y, z1, u0, v1);
+            builder.VertexTex(x, y, z1, u1, v1);
         }
 
         if (!level.IsSolidTile(x, y, z + 1))
@@ -91,13 +88,13 @@ public sealed class Tile(int textureIndex)
 
             builder.Color(b, b, b);
 
-            builder.VertexWithTex(x0, y0, z1, u0, v1);
-            builder.VertexWithTex(x1, y0, z1, u1, v1);
-            builder.VertexWithTex(x1, y1, z1, u1, v0);
+            builder.Triangle(0, 1, 2);
+            builder.Triangle(0, 2, 3);
 
-            builder.VertexWithTex(x0, y0, z1, u0, v1);
-            builder.VertexWithTex(x1, y1, z1, u1, v0);
-            builder.VertexWithTex(x0, y1, z1, u0, v0);
+            builder.VertexTex(x, y, z1, u0, v1);
+            builder.VertexTex(x1, y, z1, u1, v1);
+            builder.VertexTex(x1, y1, z1, u1, v0);
+            builder.VertexTex(x, y1, z1, u0, v0);
         }
 
         if (!level.IsSolidTile(x, y, z - 1))
@@ -106,13 +103,13 @@ public sealed class Tile(int textureIndex)
 
             builder.Color(b, b, b);
 
-            builder.VertexWithTex(x0, y0, z0, u1, v1);
-            builder.VertexWithTex(x0, y1, z0, u1, v0);
-            builder.VertexWithTex(x1, y1, z0, u0, v0);
+            builder.Triangle(0, 1, 2);
+            builder.Triangle(0, 2, 3);
 
-            builder.VertexWithTex(x0, y0, z0, u1, v1);
-            builder.VertexWithTex(x1, y1, z0, u0, v0);
-            builder.VertexWithTex(x1, y0, z0, u0, v1);
+            builder.VertexTex(x, y, z, u1, v1);
+            builder.VertexTex(x, y1, z, u1, v0);
+            builder.VertexTex(x1, y1, z, u0, v0);
+            builder.VertexTex(x1, y, z, u0, v1);
         }
     }
 
@@ -193,6 +190,8 @@ public sealed class Tile(int textureIndex)
                 Rlgl.Vertex3f(x1, y1, z0);
                 Rlgl.Vertex3f(x1, y0, z0);
                 break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(face), face, null);
         }
     }
 }

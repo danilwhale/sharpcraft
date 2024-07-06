@@ -14,12 +14,12 @@ public sealed class Player : Entity
     {
         HeightOffset = 1.62f;
         Camera = new Camera3D(Vector3.Zero, Vector3.Zero, Vector3.UnitY, 70.0f, CameraProjection.Perspective);
-        ResetToRandomPosition();
+        SetRandomLevelPosition();
     }
     
-    public void MoveCamera(float lastDelta)
+    public void MoveCamera(float lastPartTicks)
     {
-        Camera.Position = GetInterpolatedPosition(lastDelta);
+        Camera.Position = GetInterpolatedPosition(lastPartTicks);
 
         var rotation = Matrix4x4.CreateFromYawPitchRoll(
             Yaw * DEG2RAD,
@@ -42,7 +42,7 @@ public sealed class Player : Entity
     {
         base.Tick();
         
-        if (IsKeyDown(KeyboardKey.R)) ResetToRandomPosition();
+        if (IsKeyDown(KeyboardKey.R)) SetRandomLevelPosition();
 
         var x = IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left) ? 1
             : IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right) ? -1
