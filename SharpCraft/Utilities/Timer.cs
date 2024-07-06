@@ -4,7 +4,8 @@ namespace SharpCraft.Utilities;
 
 public sealed class Timer(float ticksPerSecond)
 {
-    private const long NanosecondsPerSecond = TimeSpan.TicksPerSecond * TimeSpan.NanosecondsPerTick;
+    private static readonly Stopwatch Stopwatch = Stopwatch.StartNew();
+    
     private const int MaxTicks = 100;
     
     private const float TimeScale = 1.0f;
@@ -13,15 +14,15 @@ public sealed class Timer(float ticksPerSecond)
     public float PartialTicks { get; private set; }
     public float LastPartialTicks { get; private set; }
 
-    private long _lastTime = Stopwatch.GetTimestamp() * TimeSpan.NanosecondsPerTick;
+    private double _lastTime = Stopwatch.Elapsed.Ticks;
 
     public void Advance()
     {
-        var now = Stopwatch.GetTimestamp() * TimeSpan.NanosecondsPerTick;
-        var passedNs = Math.Clamp(now - _lastTime, 0, NanosecondsPerSecond);
+        var now = Stopwatch.Elapsed.Ticks;
+        var passedNs = Math.Clamp(now - _lastTime, 0, Stopwatch.Frequency);
         _lastTime = now;
 
-        PartialTicks += passedNs * ticksPerSecond * TimeScale / NanosecondsPerSecond;
+        PartialTicks += (float)(passedNs * ticksPerSecond * TimeScale / Stopwatch.Frequency);
         Ticks = Math.Min(MaxTicks, (int)PartialTicks);
         PartialTicks -= Ticks;
 
