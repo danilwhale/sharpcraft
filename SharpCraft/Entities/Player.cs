@@ -4,7 +4,7 @@ namespace SharpCraft.Entities;
 
 public sealed class Player : Entity
 {
-    private const float MouseSensitivity = 0.075f;
+    private const float MouseSensitivity = 0.1f;
     private const float HalfWidth = 0.3f;
     private const float HalfHeight = 0.9f;
     
