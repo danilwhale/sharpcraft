@@ -13,9 +13,11 @@ this is a clone of minecraft (ancient versions), that is using own codebase (kin
 then select top most link with checkmark from the left, click on it,
 scroll down, download artifact for your platform (windows or linux)
 
-> [!IMPORTANT] read a section below before downloading and running the game
+> [!IMPORTANT] 
+> read a section below before downloading and running the game
 
-> [!WARNING] untested on linux, except bugs
+> [!WARNING] 
+> untested on linux, except bugs
 
 ## assets
 now you need to extract assets from the original game yourselves.
