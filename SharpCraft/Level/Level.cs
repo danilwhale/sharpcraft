@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using SharpCraft.Tiles;
 
 namespace SharpCraft.Level;
 
@@ -105,16 +106,15 @@ public sealed class Level
             }
         }
     }
-
-    public bool IsTile(int x, int y, int z)
+    
+    public byte GetTile(int x, int y, int z)
     {
-        if (!IsInRange(x, y, z)) return false;
-        return _data[GetDataIndex(x, y, z)] == 1;
+        return !IsInRange(x, y, z) ? (byte)0 : _data[GetDataIndex(x, y, z)];
     }
 
-    public bool IsTile(TilePosition position) => IsTile(position.X, position.Y, position.Z);
-
-    public bool IsSolidTile(int x, int y, int z) => IsTile(x, y, z);
+    public byte GetTile(TilePosition position) => GetTile(position.X, position.Y, position.Z);
+    
+    public bool IsSolidTile(int x, int y, int z) => Tiles.TileRegistry.Registry[GetTile(x, y, z)] != null;
 
     public bool IsSolidTile(TilePosition position) => IsSolidTile(position.X, position.Y, position.Z);
 

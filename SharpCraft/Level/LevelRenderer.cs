@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using SharpCraft.Rendering;
+using SharpCraft.Tiles;
 
 namespace SharpCraft.Level;
 
@@ -83,13 +84,16 @@ public sealed class LevelRenderer : IDisposable
         Rlgl.Color4f(1.0f, 1.0f, 1.0f, alpha);
 
         var position = (TilePosition)(hit.Point - hit.Normal / 2.0f);
+
+        var face = Face.None;
+        if (hit.Normal == Vector3.UnitX) face = Face.Right;
+        if (hit.Normal == -Vector3.UnitX) face = Face.Left;
+        if (hit.Normal == Vector3.UnitY) face = Face.Top;
+        if (hit.Normal == -Vector3.UnitY) face = Face.Bottom;
+        if (hit.Normal == Vector3.UnitZ) face = Face.Front;
+        if (hit.Normal == -Vector3.UnitZ) face = Face.Back;
         
-        if (hit.Normal == new Vector3(1.0f, 0.0f, 0.0f)) Tile.Rock.DrawRlGlFace(position, Face.Right);
-        else if (hit.Normal == new Vector3(-1.0f, 0.0f, 0.0f)) Tile.Rock.DrawRlGlFace(position, Face.Left);
-        else if (hit.Normal == new Vector3(0.0f, 1.0f, 0.0f)) Tile.Rock.DrawRlGlFace(position, Face.Top);
-        else if (hit.Normal == new Vector3(0.0f, -1.0f, 0.0f)) Tile.Rock.DrawRlGlFace(position, Face.Bottom);
-        else if (hit.Normal == new Vector3(0.0f, 0.0f, 1.0f)) Tile.Rock.DrawRlGlFace(position, Face.Front);
-        else if (hit.Normal == new Vector3(0.0f, 0.0f, -1.0f)) Tile.Rock.DrawRlGlFace(position, Face.Back);
+        TileRender.RenderFace(position, face);
         
         Rlgl.End();
     }

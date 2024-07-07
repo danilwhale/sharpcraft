@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace SharpCraft.Level;
+namespace SharpCraft.Tiles;
 
 public readonly struct TilePosition(int x, int y, int z) : IEquatable<TilePosition>
 {

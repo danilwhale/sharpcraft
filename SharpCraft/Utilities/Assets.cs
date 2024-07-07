@@ -2,7 +2,7 @@
 
 public static class Assets
 {
-    private const string Root = "Assets";
+    public const string Root = "Assets";
     private static readonly Dictionary<string, Texture2D> Textures = [];
     private static readonly Dictionary<string, Material> Materials = [];
 

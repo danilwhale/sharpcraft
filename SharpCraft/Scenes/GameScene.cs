@@ -20,6 +20,8 @@ public sealed class GameScene : IScene
     private int _fps;
     private int _frames;
     private double _lastSecondTime;
+
+    private byte _currentTile = 1;
     
     public GameScene()
     {
@@ -72,7 +74,7 @@ public sealed class GameScene : IScene
         {
             var hitPoint = _rayCast.Point + _rayCast.Normal / 2;
 
-            _level.SetTile(hitPoint, 1);
+            _level.SetTile(hitPoint, _currentTile);
         }
 
         if (IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
@@ -91,6 +93,15 @@ public sealed class GameScene : IScene
         {
             ToggleBorderlessWindowed();
         }
+
+        if (IsKeyPressed(KeyboardKey.One)) _currentTile = 1;
+        if (IsKeyPressed(KeyboardKey.Two)) _currentTile = 2;
+        if (IsKeyPressed(KeyboardKey.Three)) _currentTile = 3;
+        if (IsKeyPressed(KeyboardKey.Four)) _currentTile = 4;
+        if (IsKeyPressed(KeyboardKey.Five)) _currentTile = 5;
+        
+        // hide silly sapling texture
+        if (IsKeyPressed(KeyboardKey.Seven)) _currentTile = 6;
     }
 
     private void TickedUpdate()
