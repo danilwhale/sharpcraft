@@ -43,9 +43,8 @@ public sealed class Chunk : IDisposable
         
         Updates++;
         Rebuilds++;
-
-        var faces = GetFaceCount();
-        _builder.Begin(faces * 4, faces * 6);
+        
+        _builder.Begin();
         
         for (var x = X; x < MaxX; x++)
         {

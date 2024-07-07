@@ -11,6 +11,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="NoAlloq" Version="0.2.0" />
       <PackageReference Include="Raylib-cs" Version="6.1.1" />
     </ItemGroup>
 
