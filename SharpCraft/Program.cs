@@ -12,13 +12,17 @@ internal static class Program
 {
     public static IScene Scene = null!;
 
+    private static readonly string[] RequiredFiles = ["terrain.png", "char.png"]; 
+
     private static void Main()
     {
         InitWindow(1024, 768, "SharpCraft");
+        
+        var missingFiles = RequiredFiles.Where(file => !File.Exists(Path.Join(Assets.Root, file))).ToList();
 
-        if (!Directory.Exists("Assets"))
+        if (missingFiles.Count > 0)
         {
-            Scene = new NoAssetsScene();
+            Scene = new NoAssetsScene(missingFiles);
         }
         else Scene = new GameScene();
 
