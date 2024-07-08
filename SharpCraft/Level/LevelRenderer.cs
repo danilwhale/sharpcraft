@@ -42,7 +42,7 @@ public sealed class LevelRenderer : IDisposable
         }
     }
 
-    public void Draw()
+    public void Draw(ChunkLayer layer)
     {
         Chunk.Rebuilds = 0;
         var frustum = Frustum.Instance;
@@ -50,7 +50,7 @@ public sealed class LevelRenderer : IDisposable
         foreach (var chunk in _chunks)
         {
             if (!frustum.IsCubeVisible(chunk.BBox)) continue;
-            chunk.Draw();
+            chunk.Draw(layer);
         }
     }
 

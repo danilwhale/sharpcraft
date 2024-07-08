@@ -4,7 +4,7 @@ namespace SharpCraft.Tiles;
 
 public static class TileRender
 {
-    private const float TexFactor = 1.0f / 16;
+    public const float TexFactor = 1.0f / 16;
 
     private const float Darkest = 0.6f;
     private const float Darker = 0.8f;
@@ -28,7 +28,7 @@ public static class TileRender
 
             var u0 = (texIndex & 15) * TexFactor;
             var u1 = u0 + TexFactor;
-            var v0 = (int)(texIndex * TexFactor) * TexFactor;
+            var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
             SetBrightness(b, level, x - 1, y, z, Darkest);
@@ -47,7 +47,7 @@ public static class TileRender
 
             var u0 = (texIndex & 15) * TexFactor;
             var u1 = u0 + TexFactor;
-            var v0 = (int)(texIndex * TexFactor) * TexFactor;
+            var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
             SetBrightness(b, level, x + 1, y, z, Darkest);
@@ -66,7 +66,7 @@ public static class TileRender
 
             var u0 = (texIndex & 15) * TexFactor;
             var u1 = u0 + TexFactor;
-            var v0 = (int)(texIndex * TexFactor) * TexFactor;
+            var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
             SetBrightness(b, level, x, y + 1, z, Light);
@@ -85,7 +85,7 @@ public static class TileRender
 
             var u0 = (texIndex & 15) * TexFactor;
             var u1 = u0 + TexFactor;
-            var v0 = (int)(texIndex * TexFactor) * TexFactor;
+            var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
             SetBrightness(b, level, x, y - 1, z, Light);
@@ -104,7 +104,7 @@ public static class TileRender
 
             var u0 = (texIndex & 15) * TexFactor;
             var u1 = u0 + TexFactor;
-            var v0 = (int)(texIndex * TexFactor) * TexFactor;
+            var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
             SetBrightness(b, level, x, y, z + 1, Darker);
@@ -123,7 +123,7 @@ public static class TileRender
 
             var u0 = (texIndex & 15) * TexFactor;
             var u1 = u0 + TexFactor;
-            var v0 = (int)(texIndex * TexFactor) * TexFactor;
+            var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
             SetBrightness(b, level, x, y, z - 1, Darker);

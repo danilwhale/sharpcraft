@@ -9,6 +9,9 @@ public sealed class Chunk : IDisposable
 {
     public const int Size = 16;
 
+    // cache amount of ChunkLayer values
+    private static readonly int Layers = Enum.GetValues<ChunkLayer>().Length;
+
     public static int Updates;
     public static int Rebuilds;
 
@@ -24,7 +27,7 @@ public sealed class Chunk : IDisposable
     public bool IsDirty = true;
 
     private readonly Level _level;
-    private readonly MeshBuilder _builder = new();
+    private readonly MeshBuilder[] _layers = new MeshBuilder[Layers];
 
     public Chunk(Level level, int x, int y, int z)
     {
@@ -36,16 +39,20 @@ public sealed class Chunk : IDisposable
         MaxY = (y + 1) << 4;
         MaxZ = (z + 1) << 4;
         BBox = new BoundingBox(new Vector3(X, Y, Z), new Vector3(MaxX, MaxY, MaxZ));
+
+        for (var i = 0; i < _layers.Length; i++) _layers[i] = new MeshBuilder();
     }
 
-    private void Rebuild()
+    private void Rebuild(ChunkLayer layer)
     {
         if (Rebuilds >= 2) return;
         
         Updates++;
         Rebuilds++;
+
+        var builder = _layers[(byte)layer];
         
-        _builder.Begin();
+        builder.Begin();
         
         for (var x = X; x < MaxX; x++)
         {
@@ -54,28 +61,31 @@ public sealed class Chunk : IDisposable
                 for (var z = Z; z < MaxZ; z++)
                 {
                     var tile = _level.GetTile(x, y, z);
-                    TileRegistry.Registry[tile]?.Build(_builder, _level, x, y, z);
+                    TileRegistry.Registry[tile]?.Build(builder, _level, x, y, z, layer);
                 }
             }
         }
         
-        _builder.End();
+        builder.End();
         
         IsDirty = false;
     }
 
-    public void Draw()
+    public void Draw(ChunkLayer layer)
     {
         if (IsDirty)
         {
-            Rebuild();
+            for (var i = 0; i < Layers; i++) Rebuild((ChunkLayer)i);
         }
         
-        _builder.Draw(Assets.GetTextureMaterial("terrain.png"));
+        _layers[(byte)layer].Draw(Assets.GetTextureMaterial("terrain.png"));
     }
 
     public void Dispose()
     {
-        _builder.Dispose();
+        foreach (var builder in _layers)
+        {
+            builder.Dispose();
+        }
     }
 }

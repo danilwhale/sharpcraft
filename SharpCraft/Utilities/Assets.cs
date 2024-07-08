@@ -16,20 +16,27 @@ public static class Assets
         return texture;
     }
 
-    public static Material GetTextureMaterial(string path)
+    // NOTE: file extension from `texturePath` gets removed: "terrain.png" -> "terrain"
+    public static Material GetTextureMaterial(string texturePath)
     {
+        var path = Path.GetFileNameWithoutExtension(texturePath);
         if (Materials.TryGetValue(path, out var material)) return material;
 
         material = LoadMaterialDefault();
-        SetMaterialTexture(ref material, MaterialMapIndex.Albedo, GetTexture(path));
+        SetMaterialTexture(ref material, MaterialMapIndex.Albedo, GetTexture(texturePath));
         Materials[path] = material;
 
         return material;
     }
 
+    public static void SetMaterial(string path, Material material)
+    {
+        Materials[path] = material;
+    }
+
     public static string GetText(string path)
     {
-        if (!File.Exists(path))
+        if (!File.Exists(Path.Join(Root, path)))
         {
             throw new Exception("Asset not found: " + path);
         }

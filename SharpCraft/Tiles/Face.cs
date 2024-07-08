@@ -1,7 +1,7 @@
 ﻿namespace SharpCraft.Tiles;
 
 [Flags]
-public enum Face
+public enum Face : byte
 {
     None = 0,
     

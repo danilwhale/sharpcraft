@@ -1,23 +1,45 @@
-﻿using SharpCraft.Rendering;
+﻿using SharpCraft.Level;
+using SharpCraft.Rendering;
 
 namespace SharpCraft.Tiles;
 
 public class Tile
 {
-    private readonly int _textureIndex;
+    public readonly TileCapabilities Capabilities = TileCapabilities.Default;
+
+    public readonly byte Id;
+    protected readonly int TextureIndex;
 
     protected Tile(byte id)
     {
-        TileRegistry.Registry[id] = this;
+        TileRegistry.Registry[Id = id] = this;
     }
 
     public Tile(byte id, int textureIndex)
         : this(id)
     {
-        _textureIndex = textureIndex;
+        TextureIndex = textureIndex;
     }
 
-    public void Build(MeshBuilder builder, Level.Level level, int x, int y, int z)
+    protected Tile(byte id, TileCapabilities capabilities)
+        : this(id)
+    {
+        Capabilities = capabilities;
+    }
+
+    public Tile(byte id, int textureIndex, TileCapabilities capabilities)
+        : this(id, textureIndex)
+    {
+        Capabilities = capabilities;
+    }
+
+    public void Build(MeshBuilder builder, Level.Level level, int x, int y, int z, ChunkLayer layer)
+    {
+        if (Capabilities.Layer != layer) return;
+        Build(builder, level, x, y, z);
+    }
+
+    protected virtual void Build(MeshBuilder builder, Level.Level level, int x, int y, int z) 
     {
         TileRender.Render(builder, level, this, GetFaces(level, x, y, z), x, y, z);
     }
@@ -27,9 +49,9 @@ public class Tile
         return !level.IsSolidTile(x, y, z);
     }
 
-    public int GetFaceTextureIndex(Face face)
+    public virtual int GetFaceTextureIndex(Face face)
     {
-        return _textureIndex;
+        return TextureIndex;
     }
 
     public Face GetFaces(Level.Level level, int x, int y, int z)
@@ -46,17 +68,7 @@ public class Tile
         return faces;
     }
 
-    public int GetFaceCount(Level.Level level, int x, int y, int z)
+    public virtual void Tick(Level.Level level, int x, int y, int z, Random random)
     {
-        var count = 0;
-        
-        if (ShouldKeepFace(level, x + 1, y, z)) count++;
-        if (ShouldKeepFace(level, x - 1, y, z)) count++;
-        if (ShouldKeepFace(level, x, y + 1, z)) count++;
-        if (ShouldKeepFace(level, x, y - 1, z)) count++;
-        if (ShouldKeepFace(level, x, y, z + 1)) count++;
-        if (ShouldKeepFace(level, x, y, z - 1)) count++;
-
-        return count;
     }
 }

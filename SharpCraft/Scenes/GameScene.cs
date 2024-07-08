@@ -36,6 +36,10 @@ public sealed class GameScene : IScene
         {
             _zombies.Add(new Zombie(_level));
         }
+
+        var material = Assets.GetTextureMaterial("terrain.png");
+        material.Shader = LoadShaderFromMemory(null, Assets.GetText("Terrain.fsh"));
+        Assets.SetMaterial("terrain", material);
     }
     
     public void Update()
@@ -107,6 +111,7 @@ public sealed class GameScene : IScene
     private void TickedUpdate()
     {
         _player.Tick();
+        _level.Tick();
 
         foreach (var zombie in _zombies)
         {
@@ -122,13 +127,16 @@ public sealed class GameScene : IScene
         
         BeginMode3D(_player.Camera);
 
-        _levelRenderer.Draw();
-        _levelRenderer.DrawHit(_rayCast);
+        _levelRenderer.Draw(ChunkLayer.Solid);
         
         foreach (var zombie in _zombies)
         {
             zombie.Draw(_timer.LastPartialTicks);
         }
+        
+        _levelRenderer.Draw(ChunkLayer.Translucent);
+        
+        _levelRenderer.DrawHit(_rayCast);
 
         EndMode3D();
 

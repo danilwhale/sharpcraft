@@ -10,14 +10,16 @@ public sealed class Level
     public delegate void OnAreaUpdateEvent(int x0, int y0, int z0, int x1, int y1, int z1);
 
     private const float LightValue = 1.0f;
-    private const float DarkValue = 0.4f;
-    
+    private const float DarkValue = 0.6f;
+
     private readonly byte[] _data;
     private readonly int[] _lightLevels;
 
     public readonly int Width;
     public readonly int Height;
     public readonly int Depth;
+
+    private readonly Random _random;
 
     public event OnAreaUpdateEvent? OnAreaUpdate;
 
@@ -29,6 +31,8 @@ public sealed class Level
 
         _data = new byte[width * height * depth];
         _lightLevels = new int[width * depth];
+
+        _random = new Random();
 
         if (!TryLoad())
         {
@@ -43,7 +47,7 @@ public sealed class Level
                 }
             }
         }
-        
+
         UpdateLightLevels(0, 0, width, depth);
     }
 
@@ -56,7 +60,7 @@ public sealed class Level
             using var fileStream = File.OpenRead(path);
             using var stream = new GZipStream(fileStream, CompressionMode.Decompress);
             stream.ReadExactly(_data);
-            
+
             OnAreaUpdate?.Invoke(0, 0, 0, Width, Height, Depth);
 
             return true;
@@ -101,24 +105,23 @@ public sealed class Level
                 var minY = Math.Min(y, oldY);
                 var maxY = Math.Max(y, oldY);
 
-                OnAreaUpdate?.Invoke(i - 1, minY, j - 1, i + 1, maxY, j +1);
+                OnAreaUpdate?.Invoke(i - 1, minY, j - 1, i + 1, maxY, j + 1);
                 _lightLevels[i + Width * j] = y;
             }
         }
     }
-    
-    public byte GetTile(int x, int y, int z)
-    {
-        return !IsInRange(x, y, z) ? (byte)0 : _data[GetDataIndex(x, y, z)];
-    }
+
+    public byte GetTile(int x, int y, int z) => !IsInRange(x, y, z) ? (byte)0 : _data[GetDataIndex(x, y, z)];
 
     public byte GetTile(TilePosition position) => GetTile(position.X, position.Y, position.Z);
-    
-    public bool IsSolidTile(int x, int y, int z) => Tiles.TileRegistry.Registry[GetTile(x, y, z)] != null;
+
+    public bool IsSolidTile(int x, int y, int z) =>
+        TileRegistry.Registry[GetTile(x, y, z)]?.Capabilities.IsSolid ?? false;
 
     public bool IsSolidTile(TilePosition position) => IsSolidTile(position.X, position.Y, position.Z);
 
-    public bool IsLightBlocker(int x, int y, int z) => IsSolidTile(x, y, z);
+    public bool IsLightBlocker(int x, int y, int z) =>
+        TileRegistry.Registry[GetTile(x, y, z)]?.Capabilities.CanBlockLight ?? false;
 
     public bool IsLightBlocker(TilePosition position) => IsLightBlocker(position.X, position.Y, position.Z);
 
@@ -153,24 +156,37 @@ public sealed class Level
         return boxes;
     }
 
-    public float GetBrightness(int x, int y, int z)
-    {
-        if (!IsInRange(x, y, z)) return LightValue;
-        return _lightLevels[x + Width * z] >= y ? DarkValue : LightValue;
-    }
+    public bool IsLit(int x, int y, int z) => !IsInRange(x, y, z) || y >= _lightLevels[x + Width * z];
+
+    public bool IsLit(TilePosition position) => IsLit(position.X, position.Y, position.Z);
+
+    public float GetBrightness(int x, int y, int z) => IsLit(x, y, z) ? LightValue : DarkValue;
 
     public float GetBrightness(TilePosition position) => GetBrightness(position.X, position.Y, position.Z);
 
     public void SetTile(int x, int y, int z, byte value)
     {
         if (!IsInRange(x, y, z)) return;
-        
+
         _data[GetDataIndex(x, y, z)] = value;
         UpdateLightLevels(x, z, 1, 1);
         OnAreaUpdate?.Invoke(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
     }
 
     public void SetTile(TilePosition position, byte value) => SetTile(position.X, position.Y, position.Z, value);
+
+    public void Tick()
+    {
+        var ticks = Width * Height * Depth * 0.0025f; // 0.0025 = 1 / 400
+        for (var t = 0; t < ticks; t++)
+        {
+            var x = _random.Next(Width);
+            var y = _random.Next(Height);
+            var z = _random.Next(Depth);
+
+            TileRegistry.Registry[GetTile(x, y, z)]?.Tick(this, x, y, z, _random);
+        }
+    }
 
     public RayCollision DoRayCast(Ray ray, float maxDistance)
     {
@@ -202,7 +218,7 @@ public sealed class Level
 
         while (t <= maxDistance)
         {
-            if (IsSolidTile(ix, iy, iz))
+            if (TileRegistry.Registry[GetTile(ix, iy, iz)] != null)
             {
                 col.Point = ray.Position + t * ray.Direction;
 
@@ -275,7 +291,7 @@ public sealed class Level
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Depth;
-    
+
     // use original indexing to have compatibility with original levels
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private int GetDataIndex(int x, int y, int z) => (y * Depth + z) * Width + x;
