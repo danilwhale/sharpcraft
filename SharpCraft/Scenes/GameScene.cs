@@ -2,7 +2,9 @@
 using SharpCraft.Entities;
 using SharpCraft.Extensions;
 using SharpCraft.Level;
+using SharpCraft.Particles;
 using SharpCraft.Rendering.Models;
+using SharpCraft.Tiles;
 using SharpCraft.Utilities;
 using Timer = SharpCraft.Utilities.Timer;
 
@@ -15,8 +17,9 @@ public sealed class GameScene : IScene
     private readonly LevelRenderer _levelRenderer;
     private readonly Player _player;
     private RayCollision _rayCast;
-    private readonly List<Zombie> _zombies = new(100);
-
+    private readonly EntitySystem _entitySystem;
+    private readonly ParticleSystem _particleSystem;
+    
     private int _fps;
     private int _frames;
     private double _lastSecondTime;
@@ -31,17 +34,19 @@ public sealed class GameScene : IScene
         _level = new Level.Level(256, 64, 256);
         _levelRenderer = new LevelRenderer(_level);
         _player = new Player(_level);
+        _entitySystem = new EntitySystem();
+        _particleSystem = new ParticleSystem();
+        
+        _entitySystem.Add(_player);
 
-        for (var i = 0; i < _zombies.Capacity; i++)
+        for (var i = 0; i < 100; i++)
         {
             var zombie = new Zombie(_level, new Vector3(128.0f, 0.0f, 128.0f));
             zombie.SetRandomLevelPosition();
-            _zombies.Add(zombie);
+            _entitySystem.Add(zombie);
         }
 
-        var material = Assets.GetTextureMaterial("terrain.png");
-        material.Shader = LoadShaderFromMemory(null, Assets.GetText("Terrain.fsh"));
-        Assets.SetMaterial("terrain", material);
+        Assets.SetMaterialShader("terrain.png", LoadShaderFromMemory(null, Assets.GetText("Terrain.fsh")));
     }
     
     public void Update()
@@ -80,14 +85,19 @@ public sealed class GameScene : IScene
         {
             var hitPoint = _rayCast.Point + _rayCast.Normal / 2;
 
-            _level.SetTile(hitPoint, _currentTile);
+            _level.TrySetTile(hitPoint, _currentTile);
         }
 
         if (IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
         {
             var hitPoint = _rayCast.Point - _rayCast.Normal / 2;
 
-            _level.SetTile(hitPoint, 0);
+            var oldTile = _level.GetTile(hitPoint);
+            if (_level.TrySetTile(hitPoint, 0))
+            {
+                var position = (TilePosition)hitPoint;
+                TileRegistry.Registry[oldTile]?.Break(_level, position.X, position.Y, position.Z, _particleSystem);
+            }
         }
 
         if (IsKeyPressed(KeyboardKey.Enter))
@@ -111,19 +121,15 @@ public sealed class GameScene : IScene
 
         if (IsKeyPressed(KeyboardKey.G))
         {
-            _zombies.Add(new Zombie(_level, _player.Position));
+            _entitySystem.Add(new Zombie(_level, _player.Position));
         }
     }
 
     private void TickedUpdate()
     {
-        _player.Tick();
         _level.Tick();
-
-        foreach (var zombie in _zombies)
-        {
-            zombie.Tick();
-        }
+        _entitySystem.Tick();
+        _particleSystem.Tick();
     }
 
     public void Draw()
@@ -134,14 +140,12 @@ public sealed class GameScene : IScene
         
         BeginMode3D(_player.Camera);
 
-        _levelRenderer.Draw(ChunkLayer.Solid);
+        _levelRenderer.Draw(RenderLayer.Solid);
         
-        foreach (var zombie in _zombies)
-        {
-            zombie.Draw(_timer.LastPartialTicks);
-        }
+        _entitySystem.Draw(_timer.LastPartialTicks);
+        _particleSystem.Draw(_player, _timer.LastPartialTicks);
         
-        _levelRenderer.Draw(ChunkLayer.Translucent);
+        _levelRenderer.Draw(RenderLayer.Translucent);
         
         _levelRenderer.DrawHit(_rayCast);
 
@@ -154,10 +158,6 @@ public sealed class GameScene : IScene
     {
         _level.Save();
         _levelRenderer.Dispose();
-
-        foreach (var zombie in _zombies)
-        {
-            zombie.Dispose();
-        }
+        _entitySystem.Dispose();
     }
 }

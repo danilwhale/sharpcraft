@@ -16,7 +16,7 @@ public sealed class GrassTile(byte id) : Tile(id)
     {
         if (!level.IsLit(x, y, z))
         {
-            level.SetTile(x, y, z, TileRegistry.Dirt.Id);
+            level.TrySetTile(x, y, z, TileRegistry.Dirt.Id);
             return;
         }
 
@@ -29,7 +29,7 @@ public sealed class GrassTile(byte id) : Tile(id)
             if (level.IsLit(targetX, targetY, targetZ) &&
                 level.GetTile(targetX, targetY, targetZ) == TileRegistry.Dirt.Id)
             {
-                level.SetTile(targetX, targetY, targetZ, TileRegistry.Grass.Id);
+                level.TrySetTile(targetX, targetY, targetZ, TileRegistry.Grass.Id);
             }
         }
     }

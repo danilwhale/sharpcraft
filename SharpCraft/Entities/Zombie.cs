@@ -1,13 +1,14 @@
 using System.Numerics;
 using SharpCraft.Entities.Models;
+using SharpCraft.Level;
+using SharpCraft.Utilities;
 
 namespace SharpCraft.Entities;
 
 public sealed class Zombie : WalkingEntity, IDisposable
 {
-    private const float HalfWidth = 0.3f;
-    private const float HalfHeight = 0.9f;
     private const float TimeOffsetSize = 1_239_831.0f;
+    private const byte DarkenColor = (byte)(0.6f * 255);
 
     private readonly ZombieModel _model;
 
@@ -17,14 +18,14 @@ public sealed class Zombie : WalkingEntity, IDisposable
     private float _rotationDelta;
 
     public Zombie(Level.Level level, Vector3 position)
-        : base(level, HalfWidth, HalfHeight)
+        : base(level, 0.6f, 1.8f)
     {
         Position = position;
-        
+
         TimeOffset = Random.Shared.NextSingle() * TimeOffsetSize;
         Rotation = Random.Shared.NextSingle() * MathF.PI * 2.0f;
         _rotationDelta = (Random.Shared.NextSingle() + 1.0f) * 0.01f;
-        
+
         _model = new ZombieModel(this);
     }
 
@@ -33,7 +34,7 @@ public sealed class Zombie : WalkingEntity, IDisposable
         base.Tick();
 
         Rotation += _rotationDelta;
-        
+
         _rotationDelta *= 0.99f;
         _rotationDelta +=
             (Random.Shared.NextSingle() - Random.Shared.NextSingle()) *
@@ -49,19 +50,24 @@ public sealed class Zombie : WalkingEntity, IDisposable
         }
 
         TickPhysics(x, z);
-        
+
         if (Position.Y < -100.0f)
         {
-            SetRandomLevelPosition();
+            Destroy();
         }
     }
 
-    public void Draw(float lastPartTicks)
+    public override void Draw(float lastPartTicks)
     {
+        Assets.SetMaterialColor("char.png", MaterialMapIndex.Albedo,
+            !IsLit()
+                ? new Color(DarkenColor, DarkenColor, DarkenColor, (byte)255)
+                : Color.White);
+
         _model.Draw(lastPartTicks);
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         _model.Dispose();
     }

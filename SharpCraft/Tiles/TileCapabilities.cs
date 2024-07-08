@@ -8,10 +8,10 @@ public readonly struct TileCapabilities
     {
         IsSolid = true,
         CanBlockLight = true,
-        Layer = ChunkLayer.Solid
+        Layer = RenderLayer.Solid
     };
     
     public bool IsSolid { get; init; }
     public bool CanBlockLight { get; init; }
-    public ChunkLayer Layer { get; init; }
+    public RenderLayer Layer { get; init; }
 }   

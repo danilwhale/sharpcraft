@@ -10,7 +10,7 @@ public sealed class Chunk : IDisposable
     public const int Size = 16;
 
     // cache amount of ChunkLayer values
-    private static readonly int Layers = Enum.GetValues<ChunkLayer>().Length;
+    private static readonly int Layers = Enum.GetValues<RenderLayer>().Length;
 
     public static int Updates;
     public static int Rebuilds;
@@ -43,7 +43,7 @@ public sealed class Chunk : IDisposable
         for (var i = 0; i < _layers.Length; i++) _layers[i] = new MeshBuilder();
     }
 
-    private void Rebuild(ChunkLayer layer)
+    private void Rebuild(RenderLayer layer)
     {
         if (Rebuilds >= 2) return;
         
@@ -71,11 +71,11 @@ public sealed class Chunk : IDisposable
         IsDirty = false;
     }
 
-    public void Draw(ChunkLayer layer)
+    public void Draw(RenderLayer layer)
     {
         if (IsDirty)
         {
-            for (var i = 0; i < Layers; i++) Rebuild((ChunkLayer)i);
+            for (var i = 0; i < Layers; i++) Rebuild((RenderLayer)i);
         }
         
         _layers[(byte)layer].Draw(Assets.GetTextureMaterial("terrain.png"));

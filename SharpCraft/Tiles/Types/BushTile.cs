@@ -51,7 +51,7 @@ public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
         if (!level.IsLit(x, y, z) || 
             (tileBelow != TileRegistry.Grass.Id && tileBelow != TileRegistry.Dirt.Id))
         {   
-            level.SetTile(x, y, z, 0);
+            level.TrySetTile(x, y, z, 0);
         }
     }
 }

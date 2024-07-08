@@ -1,20 +1,21 @@
 ﻿using System.Numerics;
+using SharpCraft.Level;
 
 namespace SharpCraft.Entities;
 
 public sealed class Player : WalkingEntity
 {
     private const float MouseSensitivity = 0.1f;
-    private const float HalfWidth = 0.3f;
-    private const float HalfHeight = 0.9f;
     
     public Camera3D Camera;
 
-    public Player(Level.Level level) : base(level, HalfWidth, HalfHeight)
+    public Player(Level.Level level) 
+        : base(level, 0.6f, 1.8f)
     {
         HeightOffset = 1.62f;
-        Camera = new Camera3D(Vector3.Zero, Vector3.Zero, Vector3.UnitY, 70.0f, CameraProjection.Perspective);
         SetRandomLevelPosition();
+        
+        Camera = new Camera3D(Vector3.Zero, Vector3.Zero, Vector3.UnitY, 70.0f, CameraProjection.Perspective);
     }
     
     public void MoveCamera(float lastPartTicks)
@@ -58,5 +59,15 @@ public sealed class Player : WalkingEntity
         }
 
         TickPhysics(x, z);
+    }
+
+    public override void Draw(float lastPartTicks)
+    {
+        
+    }
+
+    public override void Dispose()
+    {
+        
     }
 }

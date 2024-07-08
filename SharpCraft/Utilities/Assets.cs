@@ -15,23 +15,35 @@ public static class Assets
         Textures[path] = texture;
         return texture;
     }
-
-    // NOTE: file extension from `texturePath` gets removed: "terrain.png" -> "terrain"
+    
     public static Material GetTextureMaterial(string texturePath)
     {
-        var path = Path.GetFileNameWithoutExtension(texturePath);
-        if (Materials.TryGetValue(path, out var material)) return material;
+        if (Materials.TryGetValue(texturePath, out var material)) return material;
 
         material = LoadMaterialDefault();
         SetMaterialTexture(ref material, MaterialMapIndex.Albedo, GetTexture(texturePath));
-        Materials[path] = material;
+        Materials[texturePath] = material;
 
         return material;
     }
 
-    public static void SetMaterial(string path, Material material)
+    public static unsafe void SetMaterialColor(string texturePath, MaterialMapIndex mapIndex, Color color)
     {
-        Materials[path] = material;
+        var material = GetTextureMaterial(texturePath);
+        material.Maps[(int)mapIndex].Color = color;
+        SetMaterial(texturePath, material);
+    }
+
+    public static void SetMaterialShader(string texturePath, Shader shader)
+    {
+        var material = GetTextureMaterial(texturePath);
+        material.Shader = shader;
+        SetMaterial(texturePath, material);
+    }
+
+    public static void SetMaterial(string texturePath, Material material)
+    {
+        Materials[texturePath] = material;
     }
 
     public static string GetText(string path)

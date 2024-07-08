@@ -42,7 +42,7 @@ public sealed class LevelRenderer : IDisposable
         }
     }
 
-    public void Draw(ChunkLayer layer)
+    public void Draw(RenderLayer layer)
     {
         Chunk.Rebuilds = 0;
         var frustum = Frustum.Instance;

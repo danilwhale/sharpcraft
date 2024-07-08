@@ -1,6 +1,6 @@
 namespace SharpCraft.Level;
 
-public enum ChunkLayer : byte
+public enum RenderLayer : byte
 {
     Solid,
     Translucent

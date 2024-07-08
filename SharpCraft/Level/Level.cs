@@ -9,8 +9,8 @@ public sealed class Level
 {
     public delegate void OnAreaUpdateEvent(int x0, int y0, int z0, int x1, int y1, int z1);
 
-    private const float LightValue = 1.0f;
-    private const float DarkValue = 0.6f;
+    public const float LightValue = 1.0f;
+    public const float DarkValue = 0.6f;
 
     private readonly byte[] _data;
     private readonly int[] _lightLevels;
@@ -164,16 +164,19 @@ public sealed class Level
 
     public float GetBrightness(TilePosition position) => GetBrightness(position.X, position.Y, position.Z);
 
-    public void SetTile(int x, int y, int z, byte value)
+    public bool TrySetTile(int x, int y, int z, byte value)
     {
-        if (!IsInRange(x, y, z)) return;
+        if (!IsInRange(x, y, z)) return false;
+        if (_data[GetDataIndex(x, y, z)] == value) return false;
 
         _data[GetDataIndex(x, y, z)] = value;
         UpdateLightLevels(x, z, 1, 1);
         OnAreaUpdate?.Invoke(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
+
+        return true;
     }
 
-    public void SetTile(TilePosition position, byte value) => SetTile(position.X, position.Y, position.Z, value);
+    public bool TrySetTile(TilePosition position, byte value) => TrySetTile(position.X, position.Y, position.Z, value);
 
     public void Tick()
     {

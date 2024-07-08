@@ -1,9 +1,10 @@
 ﻿using System.Numerics;
 using SharpCraft.Extensions;
+using SharpCraft.Level;
 
 namespace SharpCraft.Entities;
 
-public class Entity(Level.Level level, float halfWidth, float halfHeight)
+public abstract class Entity(Level.Level level, float width, float height) : IDisposable
 {
     public Vector3 Position
     {
@@ -11,26 +12,35 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
         set
         {
             _position = value;
+
+            var halfSize = new Vector3(Width * 0.5f, Height * 0.5f, Width * 0.5f);
             
             // center position
-            _bbox = new BoundingBox(
-                value - new Vector3(halfWidth, halfHeight, halfWidth),
-                value + new Vector3(halfWidth, halfHeight, halfWidth)
+            BBox = new BoundingBox(
+                value - halfSize,
+                value + halfSize
             );
         }
     }
 
+    protected float Width = width;
+    protected float Height = height;
+    
     private Vector3 _position;
     private Vector3 _lastPosition;
     protected Vector3 Motion;
-    private BoundingBox _bbox;
+    protected BoundingBox BBox;
     
     protected bool IsOnGround;
     
-    protected float Yaw;
-    protected float Pitch;
+    public float Yaw;
+    public float Pitch;
 
     protected float HeightOffset;
+
+    internal bool IsDestroyed;
+
+    public EntitySystem? System;
 
     public Vector3 GetInterpolatedPosition(float lastPartTicks)
     {
@@ -56,33 +66,40 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
     {
         _lastPosition = Position;
     }
+
+    public abstract void Draw(float lastPartTicks);
+
+    public void Destroy()
+    {
+        IsDestroyed = true;
+    }
     
     protected void ApplyMotion(Vector3 motion)
     {
         var oldMotion = motion;
 
-        var boxes = level.GetBoxes(_bbox.Expand(motion));
+        var boxes = level.GetBoxes(BBox.Expand(motion));
         
         foreach (var box in boxes)
         {
-            motion.X = box.ClipXCollide(_bbox, motion.X);
+            motion.X = box.ClipXCollide(BBox, motion.X);
         }
 
-        _bbox.Move(motion.X, 0.0f, 0.0f);
+        BBox.Move(motion.X, 0.0f, 0.0f);
         
         foreach (var box in boxes)
         {
-            motion.Y = box.ClipYCollide(_bbox, motion.Y);
+            motion.Y = box.ClipYCollide(BBox, motion.Y);
         }
 
-        _bbox.Move(0.0f, motion.Y, 0.0f);
+        BBox.Move(0.0f, motion.Y, 0.0f);
         
         foreach (var box in boxes)
         {
-            motion.Z = box.ClipZCollide(_bbox, motion.Z);
+            motion.Z = box.ClipZCollide(BBox, motion.Z);
         }
 
-        _bbox.Move(0.0f, 0.0f, motion.Z);
+        BBox.Move(0.0f, 0.0f, motion.Z);
 
         // ReSharper disable CompareOfFloatsByEqualityOperator
         IsOnGround = oldMotion.Y != motion.Y && oldMotion.Y < 0.0f;
@@ -93,9 +110,9 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
         // ReSharper restore CompareOfFloatsByEqualityOperator
 
         _position = new Vector3(
-            (_bbox.Min.X + _bbox.Max.X) / 2.0f,
-            _bbox.Min.Y + HeightOffset,
-            (_bbox.Min.Z + _bbox.Max.Z) / 2.0f
+            (BBox.Min.X + BBox.Max.X) / 2.0f,
+            BBox.Min.Y + HeightOffset,
+            (BBox.Min.Z + BBox.Max.Z) / 2.0f
         );
     }
 
@@ -116,4 +133,14 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
         Motion.X += x * cos + z * sin;
         Motion.Z += z * cos - x * sin;
     }
+
+    protected bool IsLit() => level.IsLit(Position);
+
+    protected void ApplyLighting(float baseLightValue)
+    {
+        var value = !IsLit() ? Level.Level.DarkValue : baseLightValue;
+        Rlgl.Color3f(value, value, value);
+    }
+    
+    public abstract void Dispose();
 }

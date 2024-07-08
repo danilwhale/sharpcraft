@@ -9,12 +9,12 @@ public sealed class ZombieModel : IEntityModel, IDisposable
     private const float TextureWidth = 64.0f;
     private const float TextureHeight = 32.0f;
 
-    private Boxes _head;
-    private Boxes _body;
-    private Boxes _leftArm;
-    private Boxes _rightArm;
-    private Boxes _leftLeg;
-    private Boxes _rightLeg;
+    private readonly Boxes _head;
+    private readonly Boxes _body;
+    private readonly Boxes _leftArm;
+    private readonly Boxes _rightArm;
+    private readonly Boxes _leftLeg;
+    private readonly Boxes _rightLeg;
 
     private readonly Boxes[] _limbs;
     
