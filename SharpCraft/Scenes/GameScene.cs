@@ -34,7 +34,9 @@ public sealed class GameScene : IScene
 
         for (var i = 0; i < _zombies.Capacity; i++)
         {
-            _zombies.Add(new Zombie(_level));
+            var zombie = new Zombie(_level, new Vector3(128.0f, 0.0f, 128.0f));
+            zombie.SetRandomLevelPosition();
+            _zombies.Add(zombie);
         }
 
         var material = Assets.GetTextureMaterial("terrain.png");
@@ -106,6 +108,11 @@ public sealed class GameScene : IScene
         
         // hide silly sapling texture
         if (IsKeyPressed(KeyboardKey.Seven)) _currentTile = 6;
+
+        if (IsKeyPressed(KeyboardKey.G))
+        {
+            _zombies.Add(new Zombie(_level, _player.Position));
+        }
     }
 
     private void TickedUpdate()

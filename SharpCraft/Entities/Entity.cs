@@ -37,7 +37,7 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
         return _lastPosition + (Position - _lastPosition) * lastPartTicks;
     }
     
-    protected void SetRandomLevelPosition()
+    public void SetRandomLevelPosition()
     {
         var x = Random.Shared.NextSingle() * level.Width;
         var y = level.Height + 10;

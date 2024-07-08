@@ -16,15 +16,15 @@ public sealed class Zombie : Entity, IDisposable
     public float Rotation;
     private float _rotationDelta;
 
-    public Zombie(Level.Level level)
+    public Zombie(Level.Level level, Vector3 position)
         : base(level, HalfWidth, HalfHeight)
     {
-        SetRandomLevelPosition();
-
+        Position = position;
+        
         TimeOffset = Random.Shared.NextSingle() * TimeOffsetSize;
         Rotation = Random.Shared.NextSingle() * MathF.PI * 2.0f;
         _rotationDelta = (Random.Shared.NextSingle() + 1.0f) * 0.01f;
-
+        
         _model = new ZombieModel(this);
     }
 
