@@ -3,7 +3,7 @@ using SharpCraft.Entities.Models;
 
 namespace SharpCraft.Entities;
 
-public sealed class Zombie : Entity, IDisposable
+public sealed class Zombie : WalkingEntity, IDisposable
 {
     private const float HalfWidth = 0.3f;
     private const float HalfHeight = 0.9f;
@@ -45,24 +45,14 @@ public sealed class Zombie : Entity, IDisposable
 
         if (IsOnGround && Random.Shared.NextSingle() < 0.01f)
         {
-            Motion.Y = 0.12f;
+            Jump();
         }
 
-        ApplyRelativeMotion(x, z, IsOnGround ? 0.02f : 0.005f);
-        Motion.Y -= 0.005f;
-        ApplyMotion(Motion);
-
-        Motion *= new Vector3(0.91f, 0.98f, 0.91f);
+        TickPhysics(x, z);
         
         if (Position.Y < -100.0f)
         {
             SetRandomLevelPosition();
-        }
-
-        if (IsOnGround)
-        {
-            Motion.X *= 0.8f;
-            Motion.Z *= 0.8f;
         }
     }
 

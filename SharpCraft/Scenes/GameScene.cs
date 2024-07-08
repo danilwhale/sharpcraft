@@ -27,7 +27,7 @@ public sealed class GameScene : IScene
     {
         DisableCursor();
 
-        _timer = new Timer(60.0f);
+        _timer = new Timer(20.0f);
         _level = new Level.Level(256, 64, 256);
         _levelRenderer = new LevelRenderer(_level);
         _player = new Player(_level);

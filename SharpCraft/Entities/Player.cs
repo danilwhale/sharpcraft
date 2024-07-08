@@ -2,7 +2,7 @@
 
 namespace SharpCraft.Entities;
 
-public sealed class Player : Entity
+public sealed class Player : WalkingEntity
 {
     private const float MouseSensitivity = 0.1f;
     private const float HalfWidth = 0.3f;
@@ -54,15 +54,9 @@ public sealed class Player : Entity
 
         if (IsOnGround && (IsKeyDown(KeyboardKey.Space) || IsKeyDown(KeyboardKey.LeftSuper)))
         {
-            Motion.Y = 0.12f;
+            Jump();
         }
 
-        ApplyRelativeMotion(x, z, IsOnGround ? 0.02f : 0.005f);
-        Motion.Y -= 0.005f;
-        ApplyMotion(Motion);
-        
-        Motion *= new Vector3(0.91f, 0.98f, 0.91f);
-
-        if (IsOnGround) Motion *= new Vector3(0.8f, 1.0f, 0.8f);
+        TickPhysics(x, z);
     }
 }
