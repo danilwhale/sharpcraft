@@ -32,8 +32,8 @@ public sealed class GameScene : IScene
 
         _timer = new Timer(20.0f);
         _level = new Level.Level(256, 64, 256);
-        _levelRenderer = new LevelRenderer(_level);
         _player = new Player(_level);
+        _levelRenderer = new LevelRenderer(_level, _player);
         _entitySystem = new EntitySystem();
         _particleSystem = new ParticleSystem();
         
@@ -140,6 +140,8 @@ public sealed class GameScene : IScene
         
         BeginMode3D(_player.Camera);
 
+        _levelRenderer.UpdateDirtyChunks();
+        
         _levelRenderer.Draw(RenderLayer.Solid);
         
         _entitySystem.Draw(_timer.LastPartialTicks);

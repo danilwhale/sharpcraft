@@ -1,4 +1,7 @@
-﻿using System.Numerics;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
+using NoAlloq;
+using SharpCraft.Entities;
 using SharpCraft.Rendering;
 using SharpCraft.Tiles;
 
@@ -16,11 +19,14 @@ public sealed class LevelRenderer : IDisposable
     private readonly Chunk[] _chunks;
 
     public readonly Level Level;
+    private readonly Player _player;
 
-    public LevelRenderer(Level level)
+    public LevelRenderer(Level level, Player player)
     {
         Level = level;
         level.OnAreaUpdate += SetDirtyArea;
+        
+        _player = player;
 
         ChunksX = level.Width >> 4;
         ChunksY = level.Height >> 4;
@@ -52,6 +58,34 @@ public sealed class LevelRenderer : IDisposable
             if (!frustum.IsCubeVisible(chunk.BBox)) continue;
             chunk.Draw(layer);
         }
+    }
+
+    public void UpdateDirtyChunks()
+    {
+        if (TryGetDirtyChunks(out var dirtyChunks, 8))
+        {
+            dirtyChunks.Sort(new DirtyChunkComparer(_player, Frustum.Instance));
+            foreach (var dirtyChunk in dirtyChunks)
+            {
+                dirtyChunk.Rebuild();
+            }
+        }
+    }
+
+    private bool TryGetDirtyChunks([NotNullWhen(true)] out List<Chunk>? dirtyChunks, int maxChunks)
+    {
+        dirtyChunks = null;
+        
+        foreach (var chunk in _chunks)
+        {
+            if (dirtyChunks?.Count > maxChunks) break;
+            
+            if (!chunk.IsDirty) continue;
+            dirtyChunks ??= [];
+            dirtyChunks.Add(chunk);
+        }
+
+        return dirtyChunks != null;
     }
 
     public void SetDirtyArea(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
