@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Numerics;
-using NoAlloq;
+﻿using System.Numerics;
 using SharpCraft.Entities;
 using SharpCraft.Rendering;
 using SharpCraft.Tiles;
@@ -9,31 +7,28 @@ namespace SharpCraft.Level;
 
 public sealed class LevelRenderer : IDisposable
 {
+    private const int MaxUpdatesPerFrame = 8;
+
+    private static readonly DirtyChunkComparer DirtyChunkComparer = new();
+
     public readonly int ChunksX;
     public readonly int ChunksY;
     public readonly int ChunksZ;
 
-    private readonly TilePosition _min;
-    private readonly TilePosition _max;
-    
     private readonly Chunk[] _chunks;
 
     public readonly Level Level;
-    private readonly Player _player;
 
     public LevelRenderer(Level level, Player player)
     {
         Level = level;
         level.OnAreaUpdate += SetDirtyArea;
-        
-        _player = player;
+
+        DirtyChunkComparer.Player = player;
 
         ChunksX = level.Width >> 4;
         ChunksY = level.Height >> 4;
         ChunksZ = level.Depth >> 4;
-
-        _min = new TilePosition(0, 0, 0);
-        _max = new TilePosition(level.Width, level.Height, level.Depth);
 
         _chunks = new Chunk[ChunksX * ChunksY * ChunksZ];
         for (var x = 0; x < ChunksX; x++)
@@ -45,6 +40,26 @@ public sealed class LevelRenderer : IDisposable
                     _chunks[(y * ChunksZ + z) * ChunksX + x] = new Chunk(level, x, y, z);
                 }
             }
+        }
+    }
+
+    public void UpdateDirtyChunks()
+    {
+        var updates = 0;
+        
+        DirtyChunkComparer.Frustum = Frustum.Instance;
+
+        foreach (var chunk in _chunks
+                     .Order(DirtyChunkComparer))
+        {
+            if (updates > MaxUpdatesPerFrame) break;
+            
+            if (!chunk.IsDirty) continue;
+
+            Parallel.Invoke(chunk.Rebuild);
+            chunk.FinishRebuild();
+            
+            updates++;
         }
     }
 
@@ -60,34 +75,6 @@ public sealed class LevelRenderer : IDisposable
         }
     }
 
-    public void UpdateDirtyChunks()
-    {
-        if (TryGetDirtyChunks(out var dirtyChunks, 8))
-        {
-            dirtyChunks.Sort(new DirtyChunkComparer(_player, Frustum.Instance));
-            foreach (var dirtyChunk in dirtyChunks)
-            {
-                dirtyChunk.Rebuild();
-            }
-        }
-    }
-
-    private bool TryGetDirtyChunks([NotNullWhen(true)] out List<Chunk>? dirtyChunks, int maxChunks)
-    {
-        dirtyChunks = null;
-        
-        foreach (var chunk in _chunks)
-        {
-            if (dirtyChunks?.Count > maxChunks) break;
-            
-            if (!chunk.IsDirty) continue;
-            dirtyChunks ??= [];
-            dirtyChunks.Add(chunk);
-        }
-
-        return dirtyChunks != null;
-    }
-
     public void SetDirtyArea(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {
         minX = Math.Clamp(minX >> 4, 0, ChunksX - 1);
@@ -97,7 +84,7 @@ public sealed class LevelRenderer : IDisposable
         maxX = Math.Clamp(maxX >> 4, 0, ChunksX - 1);
         maxY = Math.Clamp(maxY >> 4, 0, ChunksY - 1);
         maxZ = Math.Clamp(maxZ >> 4, 0, ChunksZ - 1);
-        
+
         for (var x = minX; x <= maxX; x++)
         {
             for (var y = minY; y <= maxY; y++)
@@ -113,7 +100,7 @@ public sealed class LevelRenderer : IDisposable
     public void DrawHit(RayCollision hit)
     {
         var alpha = MathF.Sin((float)GetTime() * 10.0f) * 0.2f + 0.4f;
-        
+
         Rlgl.Begin(DrawMode.Quads);
         Rlgl.Color4f(1.0f, 1.0f, 1.0f, alpha);
 
@@ -126,9 +113,9 @@ public sealed class LevelRenderer : IDisposable
         if (hit.Normal == -Vector3.UnitY) face = Face.Bottom;
         if (hit.Normal == Vector3.UnitZ) face = Face.Front;
         if (hit.Normal == -Vector3.UnitZ) face = Face.Back;
-        
+
         TileRender.RenderFace(position, face);
-        
+
         Rlgl.End();
     }
 

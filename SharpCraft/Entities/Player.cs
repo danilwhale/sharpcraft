@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using SharpCraft.Level;
 
 namespace SharpCraft.Entities;
 

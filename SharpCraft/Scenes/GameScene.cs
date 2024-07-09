@@ -3,7 +3,6 @@ using SharpCraft.Entities;
 using SharpCraft.Extensions;
 using SharpCraft.Level;
 using SharpCraft.Particles;
-using SharpCraft.Rendering.Models;
 using SharpCraft.Tiles;
 using SharpCraft.Utilities;
 using Timer = SharpCraft.Utilities.Timer;

@@ -41,7 +41,7 @@ public sealed class Chunk : IDisposable
     public double DirtyTime;
 
     private readonly Level _level;
-    private readonly MeshBuilder[] _layers = new MeshBuilder[Layers];
+    private readonly ChunkBuilder[] _layers = new ChunkBuilder[Layers];
 
     public Chunk(Level level, int x, int y, int z)
     {
@@ -55,7 +55,7 @@ public sealed class Chunk : IDisposable
         Center = new Vector3(X + MaxX, Y + MaxY, Z + MaxZ) * 0.5f;
         BBox = new BoundingBox(new Vector3(X, Y, Z), new Vector3(MaxX, MaxY, MaxZ));
 
-        for (var i = 0; i < _layers.Length; i++) _layers[i] = new MeshBuilder();
+        for (var i = 0; i < _layers.Length; i++) _layers[i] = new ChunkBuilder();
     }
 
     private void Rebuild(RenderLayer layer)
@@ -79,9 +79,15 @@ public sealed class Chunk : IDisposable
             }
         }
 
-        builder.End();
-
         IsDirty = false;
+    }
+
+    public void FinishRebuild()
+    {
+        for (var i = 0; i < Layers; i++)
+        {
+            _layers[i].End();
+        }
     }
 
     public void Rebuild()

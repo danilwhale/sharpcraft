@@ -1,9 +1,7 @@
 ﻿namespace SharpCraft.Scenes;
 
-public sealed class NoAssetsScene(List<string> missingFiles) : IScene
+public sealed class NoAssetsScene : IScene
 {
-    private readonly List<string> _missingFiles = missingFiles;
-
     public void Update()
     {
         

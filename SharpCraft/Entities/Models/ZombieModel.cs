@@ -10,6 +10,7 @@ public sealed class ZombieModel : IEntityModel, IDisposable
     private const float TextureHeight = 32.0f;
 
     private readonly Boxes _head;
+    // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     private readonly Boxes _body;
     private readonly Boxes _leftArm;
     private readonly Boxes _rightArm;

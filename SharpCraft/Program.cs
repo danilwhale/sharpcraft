@@ -18,12 +18,10 @@ internal static class Program
     {
         InitWindow(1024, 768, "SharpCraft");
         SetTraceLogLevel(TraceLogLevel.Warning);
-        
-        var missingFiles = RequiredFiles.Where(file => !File.Exists(Path.Join(Assets.Root, file))).ToList();
 
-        if (missingFiles.Count > 0)
+        if (!RequiredFiles.All(file => File.Exists(Path.Join(Assets.Root, file))))
         {
-            Scene = new NoAssetsScene(missingFiles);
+            Scene = new NoAssetsScene();
         }
         else Scene = new GameScene();
 

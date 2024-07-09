@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace SharpCraft.Rendering.Models;
 
 public readonly struct Vertex(float textureWidth, float textureHeight, float x, float y, float z, float u = 0.0f, float v = 0.0f) : IMeshModel

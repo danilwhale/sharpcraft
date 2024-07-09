@@ -12,7 +12,7 @@ public static class TileRender
 
     // use OR to combine faces: Face.Left | Face.Right | Face.Top | Face.Bottom, etc.
     public static void Render(
-        MeshBuilder b,
+        ChunkBuilder b,
         Level.Level level,
         Tile tile,
         Face faces,
@@ -137,10 +137,9 @@ public static class TileRender
         }
     }
 
-    private static void SetBrightness(MeshBuilder b, Level.Level level, int x, int y, int z, float factor)
+    private static void SetBrightness(ChunkBuilder b, Level.Level level, int x, int y, int z, float factor)
     {
-        var brightness = level.GetBrightness(x, y, z) * factor;
-        b.Color(brightness, brightness, brightness);
+        b.Light(level.GetBrightness(x, y, z) * factor);
     }
     
     public static void RenderFace(TilePosition position, Face face)

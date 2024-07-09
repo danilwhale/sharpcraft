@@ -1,5 +1,3 @@
-using SharpCraft.Level;
-
 namespace SharpCraft.Entities;
 
 public sealed class EntitySystem : IDisposable

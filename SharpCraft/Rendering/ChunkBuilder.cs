@@ -2,30 +2,24 @@
 using System.Runtime.InteropServices;
 using System.Security;
 using NoAlloq;
+using SharpCraft.Rendering.Numerics;
 
 namespace SharpCraft.Rendering;
 
 [SuppressUnmanagedCodeSecurity]
-public sealed partial class MeshBuilder : IDisposable
+public sealed partial class ChunkBuilder : IDisposable
 {
-    private readonly struct VertexPrivate(Vector3 position, Vector2 texCoords, Color color)
-    {
-        public readonly Vector3 Position = position;
-        public readonly Vector2 TexCoords = texCoords;
-        public readonly Color Color = color;
-    }
-    
     [LibraryImport(NativeLibName)]
     private static partial void UploadMesh(ref Mesh mesh, [MarshalAs(UnmanagedType.I1)] bool isDynamic);
     
     private Mesh _mesh;
     private Mesh _oldMesh;
 
-    private Vector2 _texCoords;
-    private Color _color;
+    private Half _u, _v;
+    private byte _light;
 
-    private readonly List<VertexPrivate> _vertices = [];
-    private readonly List<ushort> _indices = [];
+    private List<ChunkVertex> _vertices = [];
+    private List<ushort> _indices = [];
 
     private bool _hasTexCoords;
     private bool _hasColors;
@@ -33,8 +27,6 @@ public sealed partial class MeshBuilder : IDisposable
 
     public void Begin()
     {
-        Clear();
-
         if (_mesh.VaoId != 0)
         {
             _oldMesh = _mesh;
@@ -44,18 +36,19 @@ public sealed partial class MeshBuilder : IDisposable
     public void TexCoords(float u, float v)
     {
         _hasTexCoords = true;
-        _texCoords = new Vector2(u, v);
+        _u = (Half)u;
+        _v = (Half)v;
     }
 
-    public void Color(float r, float g, float b)
+    public void Light(float tint)
     {
         _hasColors = true;
-        _color = ColorFromNormalized(new Vector4(r, g, b, 1.0f));
+        _light = (byte)(tint * 255.0f);
     }
 
     public void Vertex(float x, float y, float z)
     {
-        _vertices.Add(new VertexPrivate(new Vector3(x, y, z), _texCoords, _color));
+        _vertices.Add(new ChunkVertex((Half)x, (Half)y, (Half)z, _u, _v, _light));
     }
 
     public void VertexTex(float x, float y, float z, float u, float v)
@@ -118,6 +111,8 @@ public sealed partial class MeshBuilder : IDisposable
         }
         
         UploadMesh(ref _mesh, false);
+        
+        Clear();
 
         if (_oldMesh.VaoId == 0) return;
         UnloadMesh(_oldMesh);
@@ -126,11 +121,12 @@ public sealed partial class MeshBuilder : IDisposable
 
     private void Clear()
     {
-        _vertices.Clear();
-        _indices.Clear();
+        _vertices = [];
+        _indices = [];
         
-        _color = Raylib_cs.Color.White;
-        _texCoords = Vector2.Zero;
+        _light = 255;
+        _u = Half.Zero;
+        _v = Half.Zero;
 
         _hasTexCoords = false;
         _hasColors = false;

@@ -2,7 +2,7 @@
 
 namespace SharpCraft.Rendering;
 
-public readonly struct Frustum()
+public sealed class Frustum
 {
     private static readonly Frustum FInstance = new();
 

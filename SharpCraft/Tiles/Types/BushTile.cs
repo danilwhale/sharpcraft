@@ -10,7 +10,7 @@ public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
 {
     private const int Rotations = 2;
     
-    protected override void Build(MeshBuilder builder, Level.Level level, int x, int y, int z)
+    protected override void Build(ChunkBuilder builder, Level.Level level, int x, int y, int z)
     {
         var u0 = (TextureIndex & 15) * TileRender.TexFactor;
         var u1 = u0 + TileRender.TexFactor;
@@ -19,7 +19,7 @@ public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
 
         var y1 = y + 1.0f;
         
-        builder.Color(1.0f, 1.0f, 1.0f);
+        builder.Light(1.0f);
 
         for (var rot = 0; rot < Rotations; rot++)
         {

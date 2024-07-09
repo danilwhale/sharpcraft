@@ -38,13 +38,13 @@ public class Tile
         Capabilities = capabilities;
     }
 
-    public void Build(MeshBuilder builder, Level.Level level, int x, int y, int z, RenderLayer layer)
+    public void Build(ChunkBuilder builder, Level.Level level, int x, int y, int z, RenderLayer layer)
     {
         if (Capabilities.Layer != layer) return;
         Build(builder, level, x, y, z);
     }
 
-    protected virtual void Build(MeshBuilder builder, Level.Level level, int x, int y, int z) 
+    protected virtual void Build(ChunkBuilder builder, Level.Level level, int x, int y, int z) 
     {
         TileRender.Render(builder, level, this, GetFaces(level, x, y, z), x, y, z);
     }

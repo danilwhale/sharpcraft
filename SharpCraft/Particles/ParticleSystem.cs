@@ -1,5 +1,4 @@
 using SharpCraft.Entities;
-using SharpCraft.Level;
 using SharpCraft.Utilities;
 
 namespace SharpCraft.Particles;
