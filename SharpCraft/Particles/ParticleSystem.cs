@@ -6,12 +6,12 @@ namespace SharpCraft.Particles;
 public sealed class ParticleSystem
 {
     private readonly List<Particle> _particles = [];
-
+    
     public void Add(Particle particle)
     {
         _particles.Add(particle);
     }
-
+    
     public void Tick()
     {
         for (var i = 0; i < _particles.Count; i++)
@@ -20,12 +20,13 @@ public sealed class ParticleSystem
             particle.Tick();
 
             if (!particle.IsDestroyed) continue;
+            
             _particles.Remove(particle);
             i--;
         }
     }
-
-    public void Draw(Player player, float lastPartTicks)
+    
+    public void Draw(PlayerEntity player, float lastPartTicks)
     {
         var xOff1 = MathF.Cos(player.Yaw * DEG2RAD);
         var zOff1 = -MathF.Sin(player.Yaw * DEG2RAD);

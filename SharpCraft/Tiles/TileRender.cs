@@ -1,4 +1,4 @@
-using SharpCraft.Rendering;
+using SharpCraft.World.Rendering;
 
 namespace SharpCraft.Tiles;
 
@@ -13,7 +13,7 @@ public static class TileRender
     // use OR to combine faces: Face.Left | Face.Right | Face.Top | Face.Bottom, etc.
     public static void Render(
         ChunkBuilder b,
-        Level.Level level,
+        World.World world,
         Tile tile,
         Face faces,
         int x, int y, int z)
@@ -31,7 +31,7 @@ public static class TileRender
             var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
-            SetBrightness(b, level, x - 1, y, z, Darkest);
+            SetBrightness(b, world, x - 1, y, z, Darkest);
 
             b.Quad();
 
@@ -50,7 +50,7 @@ public static class TileRender
             var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
-            SetBrightness(b, level, x + 1, y, z, Darkest);
+            SetBrightness(b, world, x + 1, y, z, Darkest);
 
             b.Quad();
 
@@ -69,7 +69,7 @@ public static class TileRender
             var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
-            SetBrightness(b, level, x, y + 1, z, Light);
+            SetBrightness(b, world, x, y + 1, z, Light);
 
             b.Quad();
 
@@ -88,7 +88,7 @@ public static class TileRender
             var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
-            SetBrightness(b, level, x, y - 1, z, Light);
+            SetBrightness(b, world, x, y - 1, z, Light);
 
             b.Quad();
 
@@ -107,7 +107,7 @@ public static class TileRender
             var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
-            SetBrightness(b, level, x, y, z + 1, Darker);
+            SetBrightness(b, world, x, y, z + 1, Darker);
 
             b.Quad();
 
@@ -126,7 +126,7 @@ public static class TileRender
             var v0 = (texIndex >> 4) * TexFactor;
             var v1 = v0 + TexFactor;
 
-            SetBrightness(b, level, x, y, z - 1, Darker);
+            SetBrightness(b, world, x, y, z - 1, Darker);
 
             b.Quad();
 
@@ -137,9 +137,9 @@ public static class TileRender
         }
     }
 
-    private static void SetBrightness(ChunkBuilder b, Level.Level level, int x, int y, int z, float factor)
+    private static void SetBrightness(ChunkBuilder b, World.World world, int x, int y, int z, float factor)
     {
-        b.Light(level.GetBrightness(x, y, z) * factor);
+        b.Light(world.GetBrightness(x, y, z) * factor);
     }
     
     public static void RenderFace(TilePosition position, Face face)

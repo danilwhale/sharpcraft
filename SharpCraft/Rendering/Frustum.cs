@@ -19,54 +19,54 @@ public sealed class Frustum
     
     private void Recalculate()
     {
-        var combo = Matrix4x4.Transpose(Rlgl.GetMatrixModelview()) * Matrix4x4.Transpose(Rlgl.GetMatrixProjection());
+        var mvp = Matrix4x4.Transpose(Raymath.MatrixMultiply(Rlgl.GetMatrixModelview(), Rlgl.GetMatrixProjection()));
         
         // left
         _planes[0] = Plane.Normalize(new Plane(
-            combo.M14 + combo.M11,
-            combo.M24 + combo.M21,
-            combo.M34 + combo.M31,
-            combo.M44 + combo.M41
+            mvp.M14 + mvp.M11,
+            mvp.M24 + mvp.M21,
+            mvp.M34 + mvp.M31,
+            mvp.M44 + mvp.M41
         ));
         
         // right
         _planes[1] = Plane.Normalize(new Plane(
-            combo.M14 - combo.M11,
-            combo.M24 - combo.M21,
-            combo.M34 - combo.M31,
-            combo.M44 - combo.M41
+            mvp.M14 - mvp.M11,
+            mvp.M24 - mvp.M21,
+            mvp.M34 - mvp.M31,
+            mvp.M44 - mvp.M41
         ));
         
         // top
         _planes[2] = Plane.Normalize(new Plane(
-            combo.M14 - combo.M12,
-            combo.M24 - combo.M22,
-            combo.M34 - combo.M32,
-            combo.M44 - combo.M42
+            mvp.M14 - mvp.M12,
+            mvp.M24 - mvp.M22,
+            mvp.M34 - mvp.M32,
+            mvp.M44 - mvp.M42
         ));
         
         // bottom
         _planes[3] = Plane.Normalize(new Plane(
-            combo.M14 + combo.M12,
-            combo.M24 + combo.M22,
-            combo.M34 + combo.M32,
-            combo.M44 + combo.M42
+            mvp.M14 + mvp.M12,
+            mvp.M24 + mvp.M22,
+            mvp.M34 + mvp.M32,
+            mvp.M44 + mvp.M42
         ));
         
         // near
         _planes[4] = Plane.Normalize(new Plane(
-            combo.M14 + combo.M13,
-            combo.M24 + combo.M23,
-            combo.M34 + combo.M33,
-            combo.M44 + combo.M43
+            mvp.M14 + mvp.M13,
+            mvp.M24 + mvp.M23,
+            mvp.M34 + mvp.M33,
+            mvp.M44 + mvp.M43
         ));
         
         // far
         _planes[5] = Plane.Normalize(new Plane(
-            combo.M14 - combo.M13,
-            combo.M24 - combo.M23,
-            combo.M34 - combo.M33,
-            combo.M44 - combo.M43
+            mvp.M14 - mvp.M13,
+            mvp.M24 - mvp.M23,
+            mvp.M34 - mvp.M33,
+            mvp.M44 - mvp.M43
         ));
     }
 

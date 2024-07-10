@@ -1,9 +1,7 @@
 ﻿using System.Numerics;
 using SharpCraft.Entities;
-using SharpCraft.Extensions;
-using SharpCraft.Level;
+using SharpCraft.World.Rendering;
 using SharpCraft.Particles;
-using SharpCraft.Tiles;
 using SharpCraft.Utilities;
 using Timer = SharpCraft.Utilities.Timer;
 
@@ -12,35 +10,37 @@ namespace SharpCraft.Scenes;
 public sealed class GameScene : IScene
 {
     private readonly Timer _timer;
-    private readonly Level.Level _level;
-    private readonly LevelRenderer _levelRenderer;
+    private readonly World.World _world;
+    private readonly WorldRenderer _worldRenderer;
+    private readonly PlayerEntity _playerEntity;
     private readonly Player _player;
-    private RayCollision _rayCast;
     private readonly EntitySystem _entitySystem;
     private readonly ParticleSystem _particleSystem;
     
     private int _fps;
     private int _frames;
     private double _lastSecondTime;
-
-    private byte _currentTile = 1;
     
     public GameScene()
     {
         DisableCursor();
 
         _timer = new Timer(20.0f);
-        _level = new Level.Level(256, 64, 256);
-        _player = new Player(_level);
-        _levelRenderer = new LevelRenderer(_level, _player);
+        
         _entitySystem = new EntitySystem();
         _particleSystem = new ParticleSystem();
         
-        _entitySystem.Add(_player);
+        _world = new World.World(256, 64, 256);
+        
+        _playerEntity = new PlayerEntity(_world);
+        _worldRenderer = new WorldRenderer(_world, _playerEntity);
+
+        _player = new Player(_playerEntity, _worldRenderer, _particleSystem);
+        _entitySystem.Add(_playerEntity);
 
         for (var i = 0; i < 100; i++)
         {
-            var zombie = new Zombie(_level, new Vector3(128.0f, 0.0f, 128.0f));
+            var zombie = new ZombieEntity(_world, new Vector3(128.0f, 0.0f, 128.0f));
             zombie.SetRandomLevelPosition();
             _entitySystem.Add(zombie);
         }
@@ -71,84 +71,47 @@ public sealed class GameScene : IScene
         }
         
         HandleInput();
+        _player.Update();
     }
 
     private void HandleInput()
     {
-        var mouseDelta = GetMouseDelta();
-        _player.Rotate(mouseDelta.Y, -mouseDelta.X);
-        
-        _rayCast = _level.DoRayCast(_player.Camera.GetForwardRay(), 4.0f);
-        
-        if (IsMouseButtonPressed(MouseButton.Left) && _rayCast.Hit)
-        {
-            var hitPoint = _rayCast.Point + _rayCast.Normal / 2;
-
-            _level.TrySetTile(hitPoint, _currentTile);
-        }
-
-        if (IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
-        {
-            var hitPoint = _rayCast.Point - _rayCast.Normal / 2;
-
-            var oldTile = _level.GetTile(hitPoint);
-            if (_level.TrySetTile(hitPoint, 0))
-            {
-                var position = (TilePosition)hitPoint;
-                TileRegistry.Registry[oldTile]?.Break(_level, position.X, position.Y, position.Z, _particleSystem);
-            }
-        }
-
         if (IsKeyPressed(KeyboardKey.Enter))
         {
-            _level.Save();
+            _world.Save();
         }
 
         if (IsKeyPressed(KeyboardKey.F11))
         {
             ToggleBorderlessWindowed();
         }
-
-        if (IsKeyPressed(KeyboardKey.One)) _currentTile = 1;
-        if (IsKeyPressed(KeyboardKey.Two)) _currentTile = 2;
-        if (IsKeyPressed(KeyboardKey.Three)) _currentTile = 3;
-        if (IsKeyPressed(KeyboardKey.Four)) _currentTile = 4;
-        if (IsKeyPressed(KeyboardKey.Five)) _currentTile = 5;
-        
-        // hide silly sapling texture
-        if (IsKeyPressed(KeyboardKey.Seven)) _currentTile = 6;
-
-        if (IsKeyPressed(KeyboardKey.G))
-        {
-            _entitySystem.Add(new Zombie(_level, _player.Position));
-        }
     }
 
     private void TickedUpdate()
     {
-        _level.Tick();
+        _world.Tick();
         _entitySystem.Tick();
         _particleSystem.Tick();
     }
 
     public void Draw()
     {
-        _player.MoveCamera(_timer.LastPartialTicks);
+        _playerEntity.MoveCamera(_timer.LastPartialTicks);
 
         ClearBackground(new Color(128, 204, 255, 255));
         
-        BeginMode3D(_player.Camera);
+        BeginMode3D(_playerEntity.Camera);
 
-        _levelRenderer.UpdateDirtyChunks();
+        _worldRenderer.UpdateDirtyChunks();
         
-        _levelRenderer.Draw(RenderLayer.Solid);
+        _worldRenderer.Draw(RenderLayer.Solid);
         
         _entitySystem.Draw(_timer.LastPartialTicks);
-        _particleSystem.Draw(_player, _timer.LastPartialTicks);
+        _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks);
         
-        _levelRenderer.Draw(RenderLayer.Translucent);
+        _worldRenderer.Draw(RenderLayer.Translucent);
         
-        _levelRenderer.DrawHit(_rayCast);
+        _player.Draw();
 
         EndMode3D();
 
@@ -157,8 +120,8 @@ public sealed class GameScene : IScene
     
     public void Dispose()
     {
-        _level.Save();
-        _levelRenderer.Dispose();
+        _world.Save();
+        _worldRenderer.Dispose();
         _entitySystem.Dispose();
     }
 }

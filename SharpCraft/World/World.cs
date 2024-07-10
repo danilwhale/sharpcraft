@@ -1,11 +1,12 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using SharpCraft.Registries;
 using SharpCraft.Tiles;
 
-namespace SharpCraft.Level;
+namespace SharpCraft.World;
 
-public sealed class Level
+public sealed class World
 {
     public delegate void OnAreaUpdateEvent(int x0, int y0, int z0, int x1, int y1, int z1);
 
@@ -13,24 +14,24 @@ public sealed class Level
     public const float DarkValue = 0.6f;
 
     private readonly byte[] _data;
-    private readonly int[] _lightLevels;
+    private readonly byte[] _lightLevels;
 
     public readonly int Width;
-    public readonly int Height;
+    public readonly byte Height;
     public readonly int Depth;
 
     private readonly Random _random;
 
     public event OnAreaUpdateEvent? OnAreaUpdate;
 
-    public Level(int width, int height, int depth)
+    public World(int width, byte height, int depth)
     {
         Width = width;
         Height = height;
         Depth = depth;
 
         _data = new byte[width * height * depth];
-        _lightLevels = new int[width * depth];
+        _lightLevels = new byte[width * depth];
 
         _random = new Random();
 
@@ -116,12 +117,12 @@ public sealed class Level
     public byte GetTile(TilePosition position) => GetTile(position.X, position.Y, position.Z);
 
     public bool IsSolidTile(int x, int y, int z) =>
-        TileRegistry.Registry[GetTile(x, y, z)]?.Capabilities.IsSolid ?? false;
+        Registries.Tiles.Registry[GetTile(x, y, z)]?.Capabilities.IsSolid ?? false;
 
     public bool IsSolidTile(TilePosition position) => IsSolidTile(position.X, position.Y, position.Z);
 
     public bool IsLightBlocker(int x, int y, int z) =>
-        TileRegistry.Registry[GetTile(x, y, z)]?.Capabilities.CanBlockLight ?? false;
+        Registries.Tiles.Registry[GetTile(x, y, z)]?.Capabilities.CanBlockLight ?? false;
 
     public bool IsLightBlocker(TilePosition position) => IsLightBlocker(position.X, position.Y, position.Z);
 
@@ -187,7 +188,7 @@ public sealed class Level
             var y = _random.Next(Height);
             var z = _random.Next(Depth);
 
-            TileRegistry.Registry[GetTile(x, y, z)]?.Tick(this, x, y, z, _random);
+            Registries.Tiles.Registry[GetTile(x, y, z)]?.Tick(this, x, y, z, _random);
         }
     }
 
@@ -221,7 +222,7 @@ public sealed class Level
 
         while (t <= maxDistance)
         {
-            if (TileRegistry.Registry[GetTile(ix, iy, iz)] != null)
+            if (Registries.Tiles.Registry[GetTile(ix, iy, iz)] != null)
             {
                 col.Point = ray.Position + t * ray.Direction;
 

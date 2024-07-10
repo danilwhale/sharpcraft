@@ -1,13 +1,11 @@
 using System.Numerics;
 using SharpCraft.Entities.Models;
-using SharpCraft.Utilities;
 
 namespace SharpCraft.Entities;
 
-public sealed class Zombie : WalkingEntity, IDisposable
+public sealed class ZombieEntity : WalkingEntity
 {
     private const float TimeOffsetSize = 1_239_831.0f;
-    private const byte DarkenColor = (byte)(0.6f * 255);
 
     private readonly ZombieModel _model;
 
@@ -16,8 +14,8 @@ public sealed class Zombie : WalkingEntity, IDisposable
     public float Rotation;
     private float _rotationDelta;
 
-    public Zombie(Level.Level level, Vector3 position)
-        : base(level, 0.6f, 1.8f)
+    public ZombieEntity(World.World world, Vector3 position)
+        : base(world, 0.6f, 1.8f)
     {
         Position = position;
 
@@ -58,11 +56,7 @@ public sealed class Zombie : WalkingEntity, IDisposable
 
     public override void Draw(float lastPartTicks)
     {
-        Assets.SetMaterialColor("char.png", MaterialMapIndex.Albedo,
-            !IsLit()
-                ? new Color(DarkenColor, DarkenColor, DarkenColor, (byte)255)
-                : Color.White);
-
+        ApplyLighting("char.png", 1.0f);
         _model.Draw(lastPartTicks);
     }
 

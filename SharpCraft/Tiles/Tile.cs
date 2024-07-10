@@ -1,7 +1,8 @@
 ﻿using System.Numerics;
-using SharpCraft.Level;
 using SharpCraft.Particles;
-using SharpCraft.Rendering;
+using SharpCraft.Registries;
+using SharpCraft.World.Rendering;
+using ChunkBuilder = SharpCraft.World.Rendering.ChunkBuilder;
 
 namespace SharpCraft.Tiles;
 
@@ -17,7 +18,7 @@ public class Tile
 
     protected Tile(byte id)
     {
-        TileRegistry.Registry[Id = id] = this;
+        Registries.Tiles.Registry[Id = id] = this;
     }
 
     public Tile(byte id, int textureIndex)
@@ -38,20 +39,20 @@ public class Tile
         Capabilities = capabilities;
     }
 
-    public void Build(ChunkBuilder builder, Level.Level level, int x, int y, int z, RenderLayer layer)
+    public void Build(ChunkBuilder builder, World.World world, int x, int y, int z, RenderLayer layer)
     {
         if (Capabilities.Layer != layer) return;
-        Build(builder, level, x, y, z);
+        Build(builder, world, x, y, z);
     }
 
-    protected virtual void Build(ChunkBuilder builder, Level.Level level, int x, int y, int z) 
+    protected virtual void Build(ChunkBuilder builder, World.World world, int x, int y, int z) 
     {
-        TileRender.Render(builder, level, this, GetFaces(level, x, y, z), x, y, z);
+        TileRender.Render(builder, world, this, GetFaces(world, x, y, z), x, y, z);
     }
 
-    private bool ShouldKeepFace(Level.Level level, int x, int y, int z)
+    private bool ShouldKeepFace(World.World world, int x, int y, int z)
     {
-        return !level.IsSolidTile(x, y, z);
+        return !world.IsSolidTile(x, y, z);
     }
 
     public virtual int GetFaceTextureIndex(Face face)
@@ -59,25 +60,25 @@ public class Tile
         return TextureIndex;
     }
 
-    private Face GetFaces(Level.Level level, int x, int y, int z)
+    private Face GetFaces(World.World world, int x, int y, int z)
     {
         var faces = Face.None;
 
-        if (ShouldKeepFace(level, x + 1, y, z)) faces |= Face.Right;
-        if (ShouldKeepFace(level, x - 1, y, z)) faces |= Face.Left;
-        if (ShouldKeepFace(level, x, y + 1, z)) faces |= Face.Top;
-        if (ShouldKeepFace(level, x, y - 1, z)) faces |= Face.Bottom;
-        if (ShouldKeepFace(level, x, y, z + 1)) faces |= Face.Front;
-        if (ShouldKeepFace(level, x, y, z - 1)) faces |= Face.Back;
+        if (ShouldKeepFace(world, x + 1, y, z)) faces |= Face.Right;
+        if (ShouldKeepFace(world, x - 1, y, z)) faces |= Face.Left;
+        if (ShouldKeepFace(world, x, y + 1, z)) faces |= Face.Top;
+        if (ShouldKeepFace(world, x, y - 1, z)) faces |= Face.Bottom;
+        if (ShouldKeepFace(world, x, y, z + 1)) faces |= Face.Front;
+        if (ShouldKeepFace(world, x, y, z - 1)) faces |= Face.Back;
 
         return faces;
     }
 
-    public virtual void Tick(Level.Level level, int x, int y, int z, Random random)
+    public virtual void Tick(World.World world, int x, int y, int z, Random random)
     {
     }
 
-    public void Break(Level.Level level, int x, int y, int z, ParticleSystem particleSystem)
+    public void Break(World.World world, int x, int y, int z, ParticleSystem particleSystem)
     {
         for (var i = 0; i < ParticlesPerTile; i++)
         {
@@ -91,7 +92,7 @@ public class Tile
                     var particlePosition = new Vector3(particleX, particleY, particleZ);
                     
                     particleSystem.Add(new Particle(
-                        level,
+                        world,
                         particlePosition,
                         particlePosition - new Vector3(x, y, z) - new Vector3(0.5f),
                         TextureIndex));

@@ -3,9 +3,9 @@ using SharpCraft.Entities;
 using SharpCraft.Rendering;
 using SharpCraft.Tiles;
 
-namespace SharpCraft.Level;
+namespace SharpCraft.World.Rendering;
 
-public sealed class LevelRenderer : IDisposable
+public sealed class WorldRenderer : IDisposable
 {
     private const int MaxUpdatesPerFrame = 8;
 
@@ -17,18 +17,18 @@ public sealed class LevelRenderer : IDisposable
 
     private readonly Chunk[] _chunks;
 
-    public readonly Level Level;
+    public readonly World World;
 
-    public LevelRenderer(Level level, Player player)
+    public WorldRenderer(World world, PlayerEntity playerEntity)
     {
-        Level = level;
-        level.OnAreaUpdate += SetDirtyArea;
+        World = world;
+        world.OnAreaUpdate += SetDirtyArea;
 
-        DirtyChunkComparer.Player = player;
+        DirtyChunkComparer.Player = playerEntity;
 
-        ChunksX = level.Width >> 4;
-        ChunksY = level.Height >> 4;
-        ChunksZ = level.Depth >> 4;
+        ChunksX = world.Width >> 4;
+        ChunksY = world.Height >> 4;
+        ChunksZ = world.Depth >> 4;
 
         _chunks = new Chunk[ChunksX * ChunksY * ChunksZ];
         for (var x = 0; x < ChunksX; x++)
@@ -37,7 +37,7 @@ public sealed class LevelRenderer : IDisposable
             {
                 for (var z = 0; z < ChunksZ; z++)
                 {
-                    _chunks[(y * ChunksZ + z) * ChunksX + x] = new Chunk(level, x, y, z);
+                    _chunks[(y * ChunksZ + z) * ChunksX + x] = new Chunk(world, x, y, z);
                 }
             }
         }

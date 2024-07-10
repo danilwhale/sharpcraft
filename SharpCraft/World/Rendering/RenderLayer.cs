@@ -1,4 +1,4 @@
-namespace SharpCraft.Level;
+namespace SharpCraft.World.Rendering;
 
 public enum RenderLayer : byte
 {

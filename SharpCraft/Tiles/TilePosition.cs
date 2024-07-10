@@ -14,32 +14,7 @@ public readonly struct TilePosition(int x, int y, int z) : IEquatable<TilePositi
     public readonly int X = x;
     public readonly int Y = y;
     public readonly int Z = z;
-
-    public static bool IsInRange(TilePosition value, TilePosition min, TilePosition max)
-    {
-        return value >= min && value < max;
-    }
-
-    public static TilePosition ToChunkPosition(TilePosition worldPosition)
-    {
-        return new TilePosition(worldPosition.X >> 4, worldPosition.Y >> 4, worldPosition.Z >> 4);
-    }
-
-    public static TilePosition Clamp(TilePosition value, TilePosition min, TilePosition max)
-    {
-        return Max(min, Min(value, max));
-    }
-
-    public static TilePosition Min(TilePosition a, TilePosition b)
-    {
-        return a <= b ? a : b;
-    }
     
-    public static TilePosition Max(TilePosition a, TilePosition b)
-    {
-        return a >= b ? a : b;
-    }
-
     public override bool Equals(object? obj)
     {
         return obj is TilePosition position && 

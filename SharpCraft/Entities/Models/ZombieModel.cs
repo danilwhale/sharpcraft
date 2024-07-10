@@ -1,5 +1,5 @@
 using System.Numerics;
-using SharpCraft.Rendering.Models;
+using SharpCraft.Rendering.Parts;
 using SharpCraft.Utilities;
 
 namespace SharpCraft.Entities.Models;
@@ -9,41 +9,41 @@ public sealed class ZombieModel : IEntityModel, IDisposable
     private const float TextureWidth = 64.0f;
     private const float TextureHeight = 32.0f;
 
-    private readonly Boxes _head;
+    private readonly ModelPart _head;
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-    private readonly Boxes _body;
-    private readonly Boxes _leftArm;
-    private readonly Boxes _rightArm;
-    private readonly Boxes _leftLeg;
-    private readonly Boxes _rightLeg;
+    private readonly ModelPart _body;
+    private readonly ModelPart _leftArm;
+    private readonly ModelPart _rightArm;
+    private readonly ModelPart _leftLeg;
+    private readonly ModelPart _rightLeg;
 
-    private readonly Boxes[] _limbs;
+    private readonly ModelPart[] _limbs;
     
-    private readonly Zombie _zombie;
+    private readonly ZombieEntity _zombie;
 
-    public ZombieModel(Zombie zombie)
+    public ZombieModel(ZombieEntity zombie)
     {
         _zombie = zombie;
         
-        _head = new Boxes(0, 0, TextureWidth, TextureHeight);
+        _head = new ModelPart(0, 0, TextureWidth, TextureHeight);
         _head.AddBox(-4.0f, -8.0f, -4.0f, 8, 8, 8);
 
-        _body = new Boxes(16, 16, TextureWidth, TextureHeight);
+        _body = new ModelPart(16, 16, TextureWidth, TextureHeight);
         _body.AddBox(-4.0f, 0.0f, -2.0f, 8, 12, 4);
 
-        _leftArm = new Boxes(40, 16, TextureWidth, TextureHeight);
+        _leftArm = new ModelPart(40, 16, TextureWidth, TextureHeight);
         _leftArm.AddBox(-3.0f, -2.0f, -2.0f, 4, 12, 4);
         _leftArm.Position = new Vector3(-5.0f, 2.0f, 0.0f);
 
-        _rightArm = new Boxes(40, 16, TextureWidth, TextureHeight);
+        _rightArm = new ModelPart(40, 16, TextureWidth, TextureHeight);
         _rightArm.AddBox(-1.0f, -2.0f, -2.0f, 4, 12, 4);
         _rightArm.Position = new Vector3(5.0f, 2.0f, 0.0f);
 
-        _leftLeg = new Boxes(0, 16, TextureWidth, TextureHeight);
+        _leftLeg = new ModelPart(0, 16, TextureWidth, TextureHeight);
         _leftLeg.AddBox(-2.0f, 0.0f, -2.0f, 4, 12, 4);
         _leftLeg.Position = new Vector3(-2.0f, 12.0f, 0.0f);
 
-        _rightLeg = new Boxes(0, 16, TextureWidth, TextureHeight);
+        _rightLeg = new ModelPart(0, 16, TextureWidth, TextureHeight);
         _rightLeg.AddBox(-2.0f, 0.0f, -2.0f, 4, 12, 4);
         _rightLeg.Position = new Vector3(2.0f, 12.0f, 0.0f);
 
@@ -63,6 +63,7 @@ public sealed class ZombieModel : IEntityModel, IDisposable
         var position = _zombie.GetInterpolatedPosition(lastPartTicks);
         Rlgl.Translatef(position.X, position.Y, position.Z);
 
+        // downscale model and invert it on Y axis to look correct
         const float size = 7.0f / 128.0f;
         Rlgl.Scalef(size, -size, size);
 

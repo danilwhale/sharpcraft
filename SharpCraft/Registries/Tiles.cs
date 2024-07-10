@@ -1,8 +1,9 @@
+using SharpCraft.Tiles;
 using SharpCraft.Tiles.Types;
 
-namespace SharpCraft.Tiles;
+namespace SharpCraft.Registries;
 
-public static class TileRegistry
+public static class Tiles
 {
     public static readonly Tile?[] Registry = new Tile?[byte.MaxValue];
 

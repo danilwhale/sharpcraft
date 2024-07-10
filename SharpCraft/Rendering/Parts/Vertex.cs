@@ -1,6 +1,6 @@
-namespace SharpCraft.Rendering.Models;
+namespace SharpCraft.Rendering.Parts;
 
-public readonly struct Vertex(float textureWidth, float textureHeight, float x, float y, float z, float u = 0.0f, float v = 0.0f) : IMeshModel
+public readonly struct Vertex(float textureWidth, float textureHeight, float x, float y, float z, float u = 0.0f, float v = 0.0f) : IMeshPart
 {
     public Vertex WithTexCoords(float u0, float v0)
     {

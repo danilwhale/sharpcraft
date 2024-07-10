@@ -2,11 +2,11 @@ using System.Numerics;
 using SharpCraft.Entities;
 using SharpCraft.Rendering;
 
-namespace SharpCraft.Level;
+namespace SharpCraft.World.Rendering;
 
 public sealed class DirtyChunkComparer : IComparer<Chunk>
 {
-    public Player Player = null!;
+    public PlayerEntity Player = null!;
     public Frustum Frustum = null!;
     
     public int Compare(Chunk? x, Chunk? y)

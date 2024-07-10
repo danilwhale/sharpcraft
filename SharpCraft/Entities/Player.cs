@@ -1,72 +1,59 @@
-﻿using System.Numerics;
+using SharpCraft.Extensions;
+using SharpCraft.World.Rendering;
+using SharpCraft.Particles;
+using SharpCraft.Registries;
+using SharpCraft.Tiles;
 
 namespace SharpCraft.Entities;
 
-public sealed class Player : WalkingEntity
+public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, ParticleSystem particleSystem)
 {
-    private const float MouseSensitivity = 0.1f;
+    private byte _currentTile = 1;
+    private RayCollision _rayCast;
     
-    public Camera3D Camera;
-
-    public Player(Level.Level level) 
-        : base(level, 0.6f, 1.8f)
+    public void Update()
     {
-        HeightOffset = 1.62f;
-        SetRandomLevelPosition();
+        var mouseDelta = GetMouseDelta();
+        entity.Rotate(mouseDelta.Y, -mouseDelta.X);
         
-        Camera = new Camera3D(Vector3.Zero, Vector3.Zero, Vector3.UnitY, 70.0f, CameraProjection.Perspective);
-    }
-    
-    public void MoveCamera(float lastPartTicks)
-    {
-        Camera.Position = GetInterpolatedPosition(lastPartTicks);
-
-        var rotation = Matrix4x4.CreateFromYawPitchRoll(
-            Yaw * DEG2RAD,
-            Pitch * DEG2RAD,
-            0.0f
-        );
-
-        var forward = Vector3.Transform(Vector3.UnitZ, rotation);
-
-        Camera.Target = Camera.Position + forward;
-    }
-
-    public override void Rotate(float pitch, float yaw)
-    {
-        base.Rotate(pitch * MouseSensitivity, yaw * MouseSensitivity);
-        Pitch = Math.Clamp(Pitch, -89.9f, 89.9f);
-    }
-
-    public override void Tick()
-    {
-        base.Tick();
+        _rayCast = entity.World.DoRayCast(entity.Camera.GetForwardRay(), 4.0f);
         
-        if (IsKeyDown(KeyboardKey.R)) SetRandomLevelPosition();
-
-        var x = IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left) ? 1
-            : IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right) ? -1
-            : 0;
-
-        var z = IsKeyDown(KeyboardKey.W) || IsKeyDown(KeyboardKey.Up) ? 1
-            : IsKeyDown(KeyboardKey.S) || IsKeyDown(KeyboardKey.Down) ? -1
-            : 0;
-
-        if (IsOnGround && (IsKeyDown(KeyboardKey.Space) || IsKeyDown(KeyboardKey.LeftSuper)))
+        if (IsMouseButtonPressed(MouseButton.Left) && _rayCast.Hit)
         {
-            Jump();
+            var hitPoint = _rayCast.Point + _rayCast.Normal / 2;
+
+            entity.World.TrySetTile(hitPoint, _currentTile);
         }
 
-        TickPhysics(x, z);
+        if (IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
+        {
+            var hitPoint = _rayCast.Point - _rayCast.Normal / 2;
+
+            var oldTile = entity.World.GetTile(hitPoint);
+            if (entity.World.TrySetTile(hitPoint, 0))
+            {
+                var position = (TilePosition)hitPoint;
+                Registries.Tiles.Registry[oldTile]?.Break(entity.World, position.X, position.Y, position.Z, particleSystem);
+            }
+        }
+        
+        if (IsKeyPressed(KeyboardKey.One)) _currentTile = 1;
+        if (IsKeyPressed(KeyboardKey.Two)) _currentTile = 2;
+        if (IsKeyPressed(KeyboardKey.Three)) _currentTile = 3;
+        if (IsKeyPressed(KeyboardKey.Four)) _currentTile = 4;
+        if (IsKeyPressed(KeyboardKey.Five)) _currentTile = 5;
+        
+        // hide silly sapling texture
+        if (IsKeyPressed(KeyboardKey.Seven)) _currentTile = 6;
+
+        if (IsKeyPressed(KeyboardKey.G))
+        {
+            entity.System?.Add(new ZombieEntity(entity.World, entity.Position));
+        }
     }
 
-    public override void Draw(float lastPartTicks)
+    public void Draw()
     {
-        
-    }
-
-    public override void Dispose()
-    {
-        
+        worldRenderer.DrawHit(_rayCast);
     }
 }

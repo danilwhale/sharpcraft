@@ -1,6 +1,8 @@
+using SharpCraft.Registries;
+
 namespace SharpCraft.Tiles.Types;
 
-public sealed class GrassTile(byte id) : Tile(id)
+public sealed class GrassTile(byte id) : Tile(id, 3)
 {
     public override int GetFaceTextureIndex(Face face)
     {
@@ -12,11 +14,11 @@ public sealed class GrassTile(byte id) : Tile(id)
         };
     }
 
-    public override void Tick(Level.Level level, int x, int y, int z, Random random)
+    public override void Tick(World.World world, int x, int y, int z, Random random)
     {
-        if (!level.IsLit(x, y, z))
+        if (!world.IsLit(x, y, z))
         {
-            level.TrySetTile(x, y, z, TileRegistry.Dirt.Id);
+            world.TrySetTile(x, y, z, Registries.Tiles.Dirt.Id);
             return;
         }
 
@@ -26,10 +28,10 @@ public sealed class GrassTile(byte id) : Tile(id)
             var targetY = y + random.Next(5) - 3;
             var targetZ = z + random.Next(3) - 1;
 
-            if (level.IsLit(targetX, targetY, targetZ) &&
-                level.GetTile(targetX, targetY, targetZ) == TileRegistry.Dirt.Id)
+            if (world.IsLit(targetX, targetY, targetZ) &&
+                world.GetTile(targetX, targetY, targetZ) == Registries.Tiles.Dirt.Id)
             {
-                level.TrySetTile(targetX, targetY, targetZ, TileRegistry.Grass.Id);
+                world.TrySetTile(targetX, targetY, targetZ, Registries.Tiles.Grass.Id);
             }
         }
     }

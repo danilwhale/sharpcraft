@@ -2,8 +2,8 @@ using System.Numerics;
 
 namespace SharpCraft.Entities;
 
-public abstract class WalkingEntity(Level.Level level, float width, float height)
-    : Entity(level, width, height)
+public abstract class WalkingEntity(World.World world, float width, float height)
+    : Entity(world, width, height)
 {
     private const float GroundSpeed = 0.1f;
     private const float AirSpeed = 0.02f;

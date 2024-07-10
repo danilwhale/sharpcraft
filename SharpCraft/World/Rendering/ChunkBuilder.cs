@@ -2,16 +2,15 @@
 using System.Runtime.InteropServices;
 using System.Security;
 using NoAlloq;
-using SharpCraft.Rendering.Numerics;
 
-namespace SharpCraft.Rendering;
+namespace SharpCraft.World.Rendering;
 
 [SuppressUnmanagedCodeSecurity]
 public sealed partial class ChunkBuilder : IDisposable
 {
     [LibraryImport(NativeLibName)]
     private static partial void UploadMesh(ref Mesh mesh, [MarshalAs(UnmanagedType.I1)] bool isDynamic);
-    
+
     private Mesh _mesh;
     private Mesh _oldMesh;
 
@@ -79,7 +78,7 @@ public sealed partial class ChunkBuilder : IDisposable
     public void End()
     {
         _mesh = new Mesh(_vertices.Count, _hasIndices ? _indices.Count / 3 : _vertices.Count / 3);
-        
+
         var vertices = CollectionsMarshal.AsSpan(_vertices)[.._vertices.Count];
         
         _mesh.AllocVertices();
@@ -109,9 +108,9 @@ public sealed partial class ChunkBuilder : IDisposable
             CollectionsMarshal.AsSpan(_indices)[.._indices.Count]
                 .CopyTo(_mesh.IndicesAs<ushort>());
         }
-        
+
         UploadMesh(ref _mesh, false);
-        
+
         Clear();
 
         if (_oldMesh.VaoId == 0) return;
@@ -123,7 +122,7 @@ public sealed partial class ChunkBuilder : IDisposable
     {
         _vertices = [];
         _indices = [];
-        
+
         _light = 255;
         _u = Half.Zero;
         _v = Half.Zero;

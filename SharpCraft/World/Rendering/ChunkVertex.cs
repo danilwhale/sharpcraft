@@ -1,7 +1,7 @@
 using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace SharpCraft.Rendering.Numerics;
+namespace SharpCraft.World.Rendering;
 
 [StructLayout(LayoutKind.Sequential, Size = 14)]
 public readonly struct ChunkVertex(

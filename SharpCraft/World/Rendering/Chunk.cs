@@ -1,9 +1,9 @@
 ﻿using System.Numerics;
-using SharpCraft.Rendering;
+using SharpCraft.Registries;
 using SharpCraft.Tiles;
 using SharpCraft.Utilities;
 
-namespace SharpCraft.Level;
+namespace SharpCraft.World.Rendering;
 
 public sealed class Chunk : IDisposable
 {
@@ -40,12 +40,12 @@ public sealed class Chunk : IDisposable
 
     public double DirtyTime;
 
-    private readonly Level _level;
+    private readonly World _world;
     private readonly ChunkBuilder[] _layers = new ChunkBuilder[Layers];
 
-    public Chunk(Level level, int x, int y, int z)
+    public Chunk(World world, int x, int y, int z)
     {
-        _level = level;
+        _world = world;
         X = x << 4;
         Y = y << 4;
         Z = z << 4;
@@ -73,8 +73,8 @@ public sealed class Chunk : IDisposable
             {
                 for (var z = Z; z < MaxZ; z++)
                 {
-                    var tile = _level.GetTile(x, y, z);
-                    TileRegistry.Registry[tile]?.Build(builder, _level, x, y, z, layer);
+                    var tile = _world.GetTile(x, y, z);
+                    Registries.Tiles.Registry[tile]?.Build(builder, _world, x, y, z, layer);
                 }
             }
         }

@@ -6,8 +6,8 @@ public sealed class EntitySystem : IDisposable
 
     public void Add(Entity entity)
     {
-        entity.System = this;
         _entities.Add(entity);
+        entity.System = this;
     }
 
     public IEnumerable<T> OfType<T>() where T : Entity

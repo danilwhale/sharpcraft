@@ -1,4 +1,5 @@
-using SharpCraft.Rendering;
+using SharpCraft.Registries;
+using SharpCraft.World.Rendering;
 
 namespace SharpCraft.Tiles.Types;
 
@@ -10,7 +11,7 @@ public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
 {
     private const int Rotations = 2;
     
-    protected override void Build(ChunkBuilder builder, Level.Level level, int x, int y, int z)
+    protected override void Build(ChunkBuilder builder, World.World world, int x, int y, int z)
     {
         var u0 = (TextureIndex & 15) * TileRender.TexFactor;
         var u1 = u0 + TileRender.TexFactor;
@@ -45,13 +46,12 @@ public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
         }
     }
 
-    public override void Tick(Level.Level level, int x, int y, int z, Random random)
+    public override void Tick(World.World world, int x, int y, int z, Random random)
     {
-        var tileBelow = level.GetTile(x, y - 1, z);
-        if (!level.IsLit(x, y, z) || 
-            (tileBelow != TileRegistry.Grass.Id && tileBelow != TileRegistry.Dirt.Id))
+        var tileBelow = world.GetTile(x, y - 1, z);
+        if (!world.IsLit(x, y, z) || !TileGroups.Growable.HasTile(tileBelow))
         {   
-            level.TrySetTile(x, y, z, 0);
+            world.TrySetTile(x, y, z, 0);
         }
     }
 }

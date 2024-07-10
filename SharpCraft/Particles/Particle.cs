@@ -13,8 +13,8 @@ public sealed class Particle : Entity
     private readonly int _lifetimeTicks;
     private int _ageTicks;
     
-    public Particle(Level.Level level, Vector3 position, Vector3 offset, int textureIndex) 
-        : base(level, 0.2f, 0.2f)
+    public Particle(World.World world, Vector3 position, Vector3 offset, int textureIndex) 
+        : base(world, 0.2f, 0.2f)
     {
         _textureIndex = textureIndex;
         

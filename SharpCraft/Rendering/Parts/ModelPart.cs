@@ -1,8 +1,8 @@
 using System.Numerics;
 
-namespace SharpCraft.Rendering.Models;
+namespace SharpCraft.Rendering.Parts;
 
-public sealed class Boxes(int texOffsetX, int texOffsetY, float textureWidth, float textureHeight) : IDisposable
+public sealed class ModelPart(int texOffsetX, int texOffsetY, float textureWidth, float textureHeight) : IDisposable
 {
     public Vector3 Position;
     public Vector3 Rotation;
@@ -27,6 +27,11 @@ public sealed class Boxes(int texOffsetX, int texOffsetY, float textureWidth, fl
         var f2 = new Vertex(textureWidth, textureHeight, x1, y1, z1);
         var f3 = new Vertex(textureWidth, textureHeight, x, y1, z1);
 
+        /*
+         * polygons are inverted
+         * you need to invert Y axis (Rlgl.Scalef or Matrix4x4.CreateScale) to make them look correct
+         * see Entities.Models.ZombieModel
+         */
         var p0 = new Polygon(
             f1, b1, b2, f2,
             texOffsetX + depth + width, texOffsetY + depth,
@@ -73,7 +78,7 @@ public sealed class Boxes(int texOffsetX, int texOffsetY, float textureWidth, fl
         var transform =
             Matrix4x4.CreateFromYawPitchRoll(Rotation.Y, Rotation.X, Rotation.Z) *
             Matrix4x4.CreateTranslation(Position);
-        
+
         transform = Matrix4x4.Transpose(transform);
 
         foreach (var mesh in _meshes)
