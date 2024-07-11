@@ -31,10 +31,9 @@ public sealed class GameScene : IScene
         _particleSystem = new ParticleSystem();
         
         _world = new World.World(256, 64, 256);
+        _worldRenderer = new WorldRenderer(_world);
         
         _playerEntity = new PlayerEntity(_world);
-        _worldRenderer = new WorldRenderer(_world, _playerEntity);
-
         _player = new Player(_playerEntity, _worldRenderer, _particleSystem);
         _entitySystem.Add(_playerEntity);
 
@@ -65,7 +64,7 @@ public sealed class GameScene : IScene
             _fps = _frames;
             _frames = 0;
 
-            Chunk.Updates = 0;
+            Chunklet.Updates = 0;
 
             _lastSecondTime = time;
         }
@@ -115,7 +114,7 @@ public sealed class GameScene : IScene
 
         EndMode3D();
 
-        DrawText($"{_fps} FPS, {Chunk.Updates} chunk updates", 0, 0, 24, Color.White);
+        DrawText($"{_fps} FPS, {Chunklet.Updates} chunklet updates", 0, 0, 24, Color.White);
     }
     
     public void Dispose()

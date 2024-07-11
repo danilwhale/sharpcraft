@@ -1,9 +1,17 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace SharpCraft.Rendering;
 
 public sealed class Frustum
 {
+    private const int Left = 0;
+    private const int Right = 1;
+    private const int Top = 2;
+    private const int Bottom = 3;
+    private const int Near = 4;
+    private const int Far = 5;
+    
     private static readonly Frustum FInstance = new();
 
     public static Frustum Instance
@@ -21,48 +29,42 @@ public sealed class Frustum
     {
         var mvp = Matrix4x4.Transpose(Raymath.MatrixMultiply(Rlgl.GetMatrixModelview(), Rlgl.GetMatrixProjection()));
         
-        // left
-        _planes[0] = Plane.Normalize(new Plane(
+        _planes[Left] = Plane.Normalize(new Plane(
             mvp.M14 + mvp.M11,
             mvp.M24 + mvp.M21,
             mvp.M34 + mvp.M31,
             mvp.M44 + mvp.M41
         ));
         
-        // right
-        _planes[1] = Plane.Normalize(new Plane(
+        _planes[Right] = Plane.Normalize(new Plane(
             mvp.M14 - mvp.M11,
             mvp.M24 - mvp.M21,
             mvp.M34 - mvp.M31,
             mvp.M44 - mvp.M41
         ));
         
-        // top
-        _planes[2] = Plane.Normalize(new Plane(
+        _planes[Top] = Plane.Normalize(new Plane(
             mvp.M14 - mvp.M12,
             mvp.M24 - mvp.M22,
             mvp.M34 - mvp.M32,
             mvp.M44 - mvp.M42
         ));
         
-        // bottom
-        _planes[3] = Plane.Normalize(new Plane(
+        _planes[Bottom] = Plane.Normalize(new Plane(
             mvp.M14 + mvp.M12,
             mvp.M24 + mvp.M22,
             mvp.M34 + mvp.M32,
             mvp.M44 + mvp.M42
         ));
         
-        // near
-        _planes[4] = Plane.Normalize(new Plane(
-            mvp.M14 + mvp.M13,
-            mvp.M24 + mvp.M23,
-            mvp.M34 + mvp.M33,
-            mvp.M44 + mvp.M43
+        _planes[Near] = Plane.Normalize(new Plane(
+            mvp.M13,
+            mvp.M23,
+            mvp.M33,
+            mvp.M43
         ));
         
-        // far
-        _planes[5] = Plane.Normalize(new Plane(
+        _planes[Far] = Plane.Normalize(new Plane(
             mvp.M14 - mvp.M13,
             mvp.M24 - mvp.M23,
             mvp.M34 - mvp.M33,
@@ -70,52 +72,29 @@ public sealed class Frustum
         ));
     }
 
-    private float DistanceToPoint(Plane p, float x, float y, float z) =>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static float DistanceToPoint(Plane p, float x, float y, float z) =>
         Plane.DotCoordinate(p, new Vector3(x, y, z));
 
-    public bool IsPointVisible(float x, float y, float z)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool IsBoxSideOutside(Plane plane, BoundingBox bbox)
     {
-        foreach (var p in _planes)
-        {
-            if (DistanceToPoint(p, x, y, z) <= 0.0f) return false;
-        }
-
-        return true;
+        var x = plane.Normal.X >= 0.0f ? bbox.Max.X : bbox.Min.X;
+        var y = plane.Normal.Y >= 0.0f ? bbox.Max.Y : bbox.Min.Y;
+        var z = plane.Normal.Z >= 0.0f ? bbox.Max.Z : bbox.Min.Z;
+        
+        return DistanceToPoint(plane, x, y, z) < 0.0f;
     }
 
-    public bool IsSphereVisible(float x, float y, float z, float radius)
+    public bool IsBoxOutsideHorizontalPlane(BoundingBox box)
     {
-        foreach (var p in _planes)
-        {
-            if (DistanceToPoint(p, x, y, z) <= -radius) return false;
-        }
-
-        return true;
+        return IsBoxSideOutside(_planes[Left], box) || 
+               IsBoxSideOutside(_planes[Right], box);
     }
-    
-    public bool IsCubeVisible(BoundingBox bbox)
-    {
-        var x0 = bbox.Min.X;
-        var y0 = bbox.Min.Y;
-        var z0 = bbox.Min.Z;
-        
-        var x1 = bbox.Max.X;
-        var y1 = bbox.Max.Y;
-        var z1 = bbox.Max.Z;
-        
-        foreach (var p in _planes)
-        {
-            if (DistanceToPoint(p, x1, y1, z1) < 0.0f &&
-                DistanceToPoint(p, x0, y1, z1) < 0.0f &&
-                DistanceToPoint(p, x1, y0, z1) < 0.0f &&
-                DistanceToPoint(p, x0, y0, z1) < 0.0f &&
-                DistanceToPoint(p, x1, y1, z0) < 0.0f &&
-                DistanceToPoint(p, x0, y1, z0) < 0.0f &&
-                DistanceToPoint(p, x1, y0, z0) < 0.0f &&
-                DistanceToPoint(p, x0, y0, z0) < 0.0f)
-                return false;
-        }
 
-        return true;
+    public bool IsBoxOutsideVerticalPlane(BoundingBox box)
+    {
+        return IsBoxSideOutside(_planes[Top], box) ||
+               IsBoxSideOutside(_planes[Bottom], box);
     }
 }

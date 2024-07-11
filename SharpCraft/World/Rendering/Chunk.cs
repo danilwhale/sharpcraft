@@ -1,113 +1,52 @@
-﻿using System.Numerics;
-using SharpCraft.Registries;
-using SharpCraft.Tiles;
-using SharpCraft.Utilities;
+using System.Numerics;
+using SharpCraft.Rendering;
 
 namespace SharpCraft.World.Rendering;
 
 public sealed class Chunk : IDisposable
 {
-    public const int Size = 16;
+    private readonly BoundingBox _bbox;
+    public readonly Chunklet[] Chunklets;
+    
+    private readonly int _x;
+    private readonly int _z;
+    private readonly int _height;
 
-    // cache amount of ChunkLayer values
-    private static readonly int Layers = Enum.GetValues<RenderLayer>().Length;
-
-    public static int Updates;
-    public static int Rebuilds;
-
-    public readonly int X;
-    public readonly int Y;
-    public readonly int Z;
-
-    public readonly Vector3 Center;
-
-    public readonly int MaxX;
-    public readonly int MaxY;
-    public readonly int MaxZ;
-
-    public readonly BoundingBox BBox;
-    private bool _isDirty = true;
-
-    public bool IsDirty
+    public Chunk(World world, int x, int z)
     {
-        get => _isDirty;
-        set
+        _x = x;
+        _z = z;
+        _height = world.Height >> 4;
+        _bbox = new BoundingBox(
+            new Vector3(x * Chunklet.Size, 0.0f, z * Chunklet.Size), 
+            new Vector3((x + 1) * Chunklet.Size, world.Height, (z + 1) * Chunklet.Size)
+        );
+        
+        Chunklets = new Chunklet[_height];
+
+        for (var y = 0; y < _height; y++)
         {
-            _isDirty = value;
-            DirtyTime = GetTime();
+            Chunklets[y] = new Chunklet(world, x, y, z);
         }
     }
 
-    public double DirtyTime;
-
-    private readonly World _world;
-    private readonly ChunkBuilder[] _layers = new ChunkBuilder[Layers];
-
-    public Chunk(World world, int x, int y, int z)
+    public void Draw(RenderLayer layer, Frustum frustum)
     {
-        _world = world;
-        X = x << 4;
-        Y = y << 4;
-        Z = z << 4;
-        MaxX = (x + 1) << 4;
-        MaxY = (y + 1) << 4;
-        MaxZ = (z + 1) << 4;
-        Center = new Vector3(X + MaxX, Y + MaxY, Z + MaxZ) * 0.5f;
-        BBox = new BoundingBox(new Vector3(X, Y, Z), new Vector3(MaxX, MaxY, MaxZ));
-
-        for (var i = 0; i < _layers.Length; i++) _layers[i] = new ChunkBuilder();
-    }
-
-    private void Rebuild(RenderLayer layer)
-    {
-        Updates++;
-        Rebuilds++;
-
-        var builder = _layers[(byte)layer];
-
-        builder.Begin();
-
-        for (var x = X; x < MaxX; x++)
+        if (frustum.IsBoxOutsideHorizontalPlane(_bbox)) return;
+        
+        foreach (var chunklet in Chunklets)
         {
-            for (var y = Y; y < MaxY; y++)
-            {
-                for (var z = Z; z < MaxZ; z++)
-                {
-                    var tile = _world.GetTile(x, y, z);
-                    Registries.Tiles.Registry[tile]?.Build(builder, _world, x, y, z, layer);
-                }
-            }
+            if (frustum.IsBoxOutsideVerticalPlane(chunklet.BBox)) continue;
+            
+            chunklet.Draw(layer);
         }
-
-        IsDirty = false;
-    }
-
-    public void FinishRebuild()
-    {
-        for (var i = 0; i < Layers; i++)
-        {
-            _layers[i].End();
-        }
-    }
-
-    public void Rebuild()
-    {
-        for (var i = 0; i < Layers; i++)
-        {
-            Rebuild((RenderLayer)i);
-        }
-    }
-
-    public void Draw(RenderLayer layer)
-    {
-        _layers[(byte)layer].Draw(Assets.GetTextureMaterial("terrain.png"));
     }
 
     public void Dispose()
     {
-        foreach (var builder in _layers)
+        foreach (var chunklet in Chunklets)
         {
-            builder.Dispose();
+            chunklet.Dispose();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections.Concurrent;
+using System.Numerics;
 using SharpCraft.Entities;
 using SharpCraft.Rendering;
 using SharpCraft.Tiles;
@@ -9,81 +10,82 @@ public sealed class WorldRenderer : IDisposable
 {
     private const int MaxUpdatesPerFrame = 8;
 
-    private static readonly DirtyChunkComparer DirtyChunkComparer = new();
-
-    public readonly int ChunksX;
-    public readonly int ChunksY;
-    public readonly int ChunksZ;
+    private readonly int _chunksX;
+    private readonly int _chunksY;
+    private readonly int _chunksZ;
 
     private readonly Chunk[] _chunks;
 
-    public readonly World World;
+    private readonly ConcurrentStack<Chunklet> _finishStack = new();
 
-    public WorldRenderer(World world, PlayerEntity playerEntity)
+    public WorldRenderer(World world)
     {
-        World = world;
         world.OnAreaUpdate += SetDirtyArea;
 
-        DirtyChunkComparer.Player = playerEntity;
+        _chunksX = world.Width >> 4;
+        _chunksY = world.Height >> 4;
+        _chunksZ = world.Depth >> 4;
 
-        ChunksX = world.Width >> 4;
-        ChunksY = world.Height >> 4;
-        ChunksZ = world.Depth >> 4;
-
-        _chunks = new Chunk[ChunksX * ChunksY * ChunksZ];
-        for (var x = 0; x < ChunksX; x++)
+        _chunks = new Chunk[_chunksX * _chunksZ];
+        for (var x = 0; x < _chunksX; x++)
         {
-            for (var y = 0; y < ChunksY; y++)
+            for (var z = 0; z < _chunksZ; z++)
             {
-                for (var z = 0; z < ChunksZ; z++)
-                {
-                    _chunks[(y * ChunksZ + z) * ChunksX + x] = new Chunk(world, x, y, z);
-                }
+                _chunks[z * _chunksX + x] = new Chunk(world, x, z);
             }
         }
     }
 
     public void UpdateDirtyChunks()
     {
-        var updates = 0;
-        
-        DirtyChunkComparer.Frustum = Frustum.Instance;
+        Parallel.Invoke(RebuildDirtyChunks);
 
-        foreach (var chunk in _chunks
-                     .Order(DirtyChunkComparer))
+        while (_finishStack.TryPop(out var chunklet))
         {
-            if (updates > MaxUpdatesPerFrame) break;
-            
-            if (!chunk.IsDirty) continue;
+            chunklet.FinishRebuild();
+        }
+    }
 
-            Parallel.Invoke(chunk.Rebuild);
-            chunk.FinishRebuild();
-            
-            updates++;
+    private void RebuildDirtyChunks()
+    {
+        var updates = 0;
+
+        foreach (var chunk in _chunks)
+        {
+            foreach (var chunklet in chunk.Chunklets)
+            {
+                if (updates > MaxUpdatesPerFrame) return;
+                    
+                if (!chunklet.IsDirty) continue;
+                    
+                chunklet.Rebuild();
+                _finishStack.Push(chunklet);
+                    
+                updates++;
+            }
         }
     }
 
     public void Draw(RenderLayer layer)
     {
-        Chunk.Rebuilds = 0;
+        Chunklet.Rebuilds = 0;
         var frustum = Frustum.Instance;
 
         foreach (var chunk in _chunks)
         {
-            if (!frustum.IsCubeVisible(chunk.BBox)) continue;
-            chunk.Draw(layer);
+            chunk.Draw(layer, frustum);
         }
     }
 
     public void SetDirtyArea(int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {
-        minX = Math.Clamp(minX >> 4, 0, ChunksX - 1);
-        minY = Math.Clamp(minY >> 4, 0, ChunksY - 1);
-        minZ = Math.Clamp(minZ >> 4, 0, ChunksZ - 1);
+        minX = Math.Clamp(minX >> 4, 0, _chunksX - 1);
+        minY = Math.Clamp(minY >> 4, 0, _chunksY - 1);
+        minZ = Math.Clamp(minZ >> 4, 0, _chunksZ - 1);
 
-        maxX = Math.Clamp(maxX >> 4, 0, ChunksX - 1);
-        maxY = Math.Clamp(maxY >> 4, 0, ChunksY - 1);
-        maxZ = Math.Clamp(maxZ >> 4, 0, ChunksZ - 1);
+        maxX = Math.Clamp(maxX >> 4, 0, _chunksX - 1);
+        maxY = Math.Clamp(maxY >> 4, 0, _chunksY - 1);
+        maxZ = Math.Clamp(maxZ >> 4, 0, _chunksZ - 1);
 
         for (var x = minX; x <= maxX; x++)
         {
@@ -91,7 +93,7 @@ public sealed class WorldRenderer : IDisposable
             {
                 for (var z = minZ; z <= maxZ; z++)
                 {
-                    _chunks[(y * ChunksZ + z) * ChunksX + x].IsDirty = true;
+                    _chunks[z * _chunksX + x].Chunklets[y].IsDirty = true;
                 }
             }
         }
