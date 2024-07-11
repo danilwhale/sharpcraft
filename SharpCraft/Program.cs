@@ -16,6 +16,8 @@ internal static class Program
 
     private static void Main()
     {
+        GpuUtil.TryForceNvidiaGpu();
+        
         InitWindow(1024, 768, "SharpCraft");
         SetTraceLogLevel(TraceLogLevel.Warning);
 
