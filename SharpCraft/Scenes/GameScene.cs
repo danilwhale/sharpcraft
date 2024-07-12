@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using SharpCraft.Entities;
+using SharpCraft.Gui;
 using SharpCraft.World.Rendering;
 using SharpCraft.Particles;
 using SharpCraft.Utilities;
@@ -10,12 +11,16 @@ namespace SharpCraft.Scenes;
 public sealed class GameScene : IScene
 {
     private readonly Timer _timer;
+    
     private readonly World.World _world;
     private readonly WorldRenderer _worldRenderer;
+    
     private readonly PlayerEntity _playerEntity;
     private readonly Player _player;
+    
     private readonly EntitySystem _entitySystem;
     private readonly ParticleSystem _particleSystem;
+    private readonly ElementSystem _elementSystem;
     
     private int _fps;
     private int _frames;
@@ -29,6 +34,7 @@ public sealed class GameScene : IScene
         
         _entitySystem = new EntitySystem();
         _particleSystem = new ParticleSystem();
+        _elementSystem = new ElementSystem();
         
         _world = new World.World(256, 64, 256);
         _worldRenderer = new WorldRenderer(_world);
@@ -43,6 +49,9 @@ public sealed class GameScene : IScene
             zombie.SetRandomLevelPosition();
             _entitySystem.Add(zombie);
         }
+        
+        _elementSystem.Add(new TilePreviewElement(_player));
+        _elementSystem.Add(new CrosshairElement());
 
         Assets.SetMaterialShader("terrain.png", LoadShaderFromMemory(null, Assets.GetText("Terrain.fsh")));
     }
@@ -71,6 +80,8 @@ public sealed class GameScene : IScene
         
         HandleInput();
         _player.Update();
+        
+        _elementSystem.Update();
     }
 
     private void HandleInput()
@@ -113,8 +124,10 @@ public sealed class GameScene : IScene
         _player.Draw();
 
         EndMode3D();
+        
+        _elementSystem.Draw();
 
-        DrawText($"{_fps} FPS, {Chunklet.Updates} chunklet updates", 0, 0, 24, Color.White);
+        DrawText($"{_fps} FPS, {Chunklet.Updates} chunklet updates", 0, 0, 11, Color.White);
     }
     
     public void Dispose()

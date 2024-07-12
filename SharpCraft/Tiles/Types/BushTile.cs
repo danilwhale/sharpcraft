@@ -1,4 +1,5 @@
 using SharpCraft.Registries;
+using SharpCraft.Rendering;
 using SharpCraft.World.Rendering;
 
 namespace SharpCraft.Tiles.Types;
@@ -11,7 +12,7 @@ public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
 {
     private const int Rotations = 2;
     
-    protected override void Build(ChunkBuilder builder, World.World world, int x, int y, int z)
+    public override void Build(IVertexBuilder builder, World.World? world, int x, int y, int z)
     {
         var u0 = (TextureIndex & 15) * TileRender.TexFactor;
         var u1 = u0 + TileRender.TexFactor;
@@ -32,13 +33,11 @@ public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
             var z0 = z + 0.5f - zOff;
             var z1 = z + 0.5f + zOff;
             
-            builder.Quad();
             builder.VertexTex(x0, y1, z0, u1, v0);
             builder.VertexTex(x1, y1, z1, u0, v0);
             builder.VertexTex(x1, y, z1, u0, v1);
             builder.VertexTex(x0, y, z0, u1, v1);
             
-            builder.Quad();
             builder.VertexTex(x1, y1, z1, u0, v0);
             builder.VertexTex(x0, y1, z0, u1, v0);
             builder.VertexTex(x0, y, z0, u1, v1);

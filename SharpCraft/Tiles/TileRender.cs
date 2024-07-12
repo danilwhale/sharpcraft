@@ -1,3 +1,4 @@
+using SharpCraft.Rendering;
 using SharpCraft.World.Rendering;
 
 namespace SharpCraft.Tiles;
@@ -12,8 +13,8 @@ public static class TileRender
 
     // use OR to combine faces: Face.Left | Face.Right | Face.Top | Face.Bottom, etc.
     public static void Render(
-        ChunkBuilder b,
-        World.World world,
+        IVertexBuilder b,
+        World.World? world,
         Tile tile,
         Face faces,
         int x, int y, int z)
@@ -24,122 +25,141 @@ public static class TileRender
 
         if ((faces & Face.Left) == Face.Left)
         {
-            var texIndex = tile.GetFaceTextureIndex(Face.Left);
-
-            var u0 = (texIndex & 15) * TexFactor;
-            var u1 = u0 + TexFactor;
-            var v0 = (texIndex >> 4) * TexFactor;
-            var v1 = v0 + TexFactor;
-
             SetBrightness(b, world, x - 1, y, z, Darkest);
-
-            b.Quad();
-
-            b.VertexTex(x, y, z, u0, v1);
-            b.VertexTex(x, y, z1, u1, v1);
-            b.VertexTex(x, y1, z1, u1, v0);
-            b.VertexTex(x, y1, z, u0, v0);
+            RenderLeftFace(b, tile, x, y, z, z1, y1);
         }
 
         if ((faces & Face.Right) == Face.Right)
         {
-            var texIndex = tile.GetFaceTextureIndex(Face.Right);
-
-            var u0 = (texIndex & 15) * TexFactor;
-            var u1 = u0 + TexFactor;
-            var v0 = (texIndex >> 4) * TexFactor;
-            var v1 = v0 + TexFactor;
-
             SetBrightness(b, world, x + 1, y, z, Darkest);
-
-            b.Quad();
-
-            b.VertexTex(x1, y, z, u1, v1);
-            b.VertexTex(x1, y1, z, u1, v0);
-            b.VertexTex(x1, y1, z1, u0, v0);
-            b.VertexTex(x1, y, z1, u0, v1);
+            RenderRightFace(b, tile, y, z, x1, y1, z1);
         }
 
         if ((faces & Face.Top) == Face.Top)
         {
-            var texIndex = tile.GetFaceTextureIndex(Face.Top);
-
-            var u0 = (texIndex & 15) * TexFactor;
-            var u1 = u0 + TexFactor;
-            var v0 = (texIndex >> 4) * TexFactor;
-            var v1 = v0 + TexFactor;
-
             SetBrightness(b, world, x, y + 1, z, Light);
-
-            b.Quad();
-
-            b.VertexTex(x, y1, z, u0, v0);
-            b.VertexTex(x, y1, z1, u0, v1);
-            b.VertexTex(x1, y1, z1, u1, v1);
-            b.VertexTex(x1, y1, z, u1, v0);
+            RenderTopFace(b, tile, x, z, y1, z1, x1);
         }
 
         if ((faces & Face.Bottom) == Face.Bottom)
         {
-            var texIndex = tile.GetFaceTextureIndex(Face.Bottom);
-
-            var u0 = (texIndex & 15) * TexFactor;
-            var u1 = u0 + TexFactor;
-            var v0 = (texIndex >> 4) * TexFactor;
-            var v1 = v0 + TexFactor;
-
             SetBrightness(b, world, x, y - 1, z, Light);
-
-            b.Quad();
-
-            b.VertexTex(x, y, z, u1, v0);
-            b.VertexTex(x1, y, z, u0, v0);
-            b.VertexTex(x1, y, z1, u0, v1);
-            b.VertexTex(x, y, z1, u1, v1);
+            RenderBottomFace(b, tile, x, y, z, x1, z1);
         }
 
         if ((faces & Face.Front) == Face.Front)
         {
-            var texIndex = tile.GetFaceTextureIndex(Face.Back);
-
-            var u0 = (texIndex & 15) * TexFactor;
-            var u1 = u0 + TexFactor;
-            var v0 = (texIndex >> 4) * TexFactor;
-            var v1 = v0 + TexFactor;
-
             SetBrightness(b, world, x, y, z + 1, Darker);
-
-            b.Quad();
-
-            b.VertexTex(x, y, z1, u0, v1);
-            b.VertexTex(x1, y, z1, u1, v1);
-            b.VertexTex(x1, y1, z1, u1, v0);
-            b.VertexTex(x, y1, z1, u0, v0);
+            BuildFrontFace(b, tile, x, y, z1, x1, y1);
         }
 
         if ((faces & Face.Back) == Face.Back)
         {
-            var texIndex = tile.GetFaceTextureIndex(Face.Back);
-
-            var u0 = (texIndex & 15) * TexFactor;
-            var u1 = u0 + TexFactor;
-            var v0 = (texIndex >> 4) * TexFactor;
-            var v1 = v0 + TexFactor;
-
             SetBrightness(b, world, x, y, z - 1, Darker);
-
-            b.Quad();
-
-            b.VertexTex(x, y, z, u1, v1);
-            b.VertexTex(x, y1, z, u1, v0);
-            b.VertexTex(x1, y1, z, u0, v0);
-            b.VertexTex(x1, y, z, u0, v1);
+            BuildBackFace(b, tile, x, y, z, y1, x1);
         }
     }
-
-    private static void SetBrightness(ChunkBuilder b, World.World world, int x, int y, int z, float factor)
+    
+    private static void RenderLeftFace(IVertexBuilder b, Tile tile, int x, int y, int z, int z1, int y1)
     {
-        b.Light(world.GetBrightness(x, y, z) * factor);
+        var texIndex = tile.GetFaceTextureIndex(Face.Left);
+
+        var u0 = (texIndex & 15) * TexFactor;
+        var u1 = u0 + TexFactor;
+        var v0 = (texIndex >> 4) * TexFactor;
+        var v1 = v0 + TexFactor;
+        
+        b.VertexTex(x, y, z, u0, v1);
+        b.VertexTex(x, y, z1, u1, v1);
+        b.VertexTex(x, y1, z1, u1, v0);
+        b.VertexTex(x, y1, z, u0, v0);
+    }
+    
+    private static void RenderRightFace(IVertexBuilder b, Tile tile, int y, int z, int x1, int y1, int z1)
+    {
+        var texIndex = tile.GetFaceTextureIndex(Face.Right);
+
+        var u0 = (texIndex & 15) * TexFactor;
+        var u1 = u0 + TexFactor;
+        var v0 = (texIndex >> 4) * TexFactor;
+        var v1 = v0 + TexFactor;
+
+        b.VertexTex(x1, y, z, u1, v1);
+        b.VertexTex(x1, y1, z, u1, v0);
+        b.VertexTex(x1, y1, z1, u0, v0);
+        b.VertexTex(x1, y, z1, u0, v1);
+    }
+
+    private static void RenderTopFace(IVertexBuilder b, Tile tile, int x, int z, int y1, int z1, int x1)
+    {
+        var texIndex = tile.GetFaceTextureIndex(Face.Top);
+
+        var u0 = (texIndex & 15) * TexFactor;
+        var u1 = u0 + TexFactor;
+        var v0 = (texIndex >> 4) * TexFactor;
+        var v1 = v0 + TexFactor;
+
+        b.VertexTex(x, y1, z, u0, v0);
+        b.VertexTex(x, y1, z1, u0, v1);
+        b.VertexTex(x1, y1, z1, u1, v1);
+        b.VertexTex(x1, y1, z, u1, v0);
+    }
+    
+    private static void RenderBottomFace(IVertexBuilder b, Tile tile, int x, int y, int z, int x1, int z1)
+    {
+        var texIndex = tile.GetFaceTextureIndex(Face.Bottom);
+
+        var u0 = (texIndex & 15) * TexFactor;
+        var u1 = u0 + TexFactor;
+        var v0 = (texIndex >> 4) * TexFactor;
+        var v1 = v0 + TexFactor;
+
+        b.VertexTex(x, y, z, u1, v0);
+        b.VertexTex(x1, y, z, u0, v0);
+        b.VertexTex(x1, y, z1, u0, v1);
+        b.VertexTex(x, y, z1, u1, v1);
+    }
+    
+    private static void BuildFrontFace(IVertexBuilder b, Tile tile, int x, int y, int z1, int x1, int y1)
+    {
+        var texIndex = tile.GetFaceTextureIndex(Face.Back);
+
+        var u0 = (texIndex & 15) * TexFactor;
+        var u1 = u0 + TexFactor;
+        var v0 = (texIndex >> 4) * TexFactor;
+        var v1 = v0 + TexFactor;
+            
+        b.VertexTex(x, y, z1, u0, v1);
+        b.VertexTex(x1, y, z1, u1, v1);
+        b.VertexTex(x1, y1, z1, u1, v0);
+        b.VertexTex(x, y1, z1, u0, v0);
+    }
+    
+    private static void BuildBackFace(IVertexBuilder b, Tile tile, int x, int y, int z, int y1, int x1)
+    {
+        var texIndex = tile.GetFaceTextureIndex(Face.Back);
+
+        var u0 = (texIndex & 15) * TexFactor;
+        var u1 = u0 + TexFactor;
+        var v0 = (texIndex >> 4) * TexFactor;
+        var v1 = v0 + TexFactor;
+
+        b.VertexTex(x, y, z, u1, v1);
+        b.VertexTex(x, y1, z, u1, v0);
+        b.VertexTex(x1, y1, z, u0, v0);
+        b.VertexTex(x1, y, z, u0, v1);
+    }
+
+    private static void SetBrightness(IVertexBuilder b, World.World? world, int x, int y, int z, float factor)
+    {
+        if (world == null)
+        {
+            b.Light(factor);
+        }
+        else
+        {
+            b.Light(world.GetBrightness(x, y, z) * factor);
+        }
     }
     
     public static void RenderFace(TilePosition position, Face face)

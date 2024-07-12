@@ -12,5 +12,7 @@ public enum Face : byte
     Left = 8, // X-
     
     Front = 16, // Z+
-    Back = 32 // Z-
+    Back = 32, // Z-
+    
+    All = Left | Right | Top | Bottom | Front | Back,
 }

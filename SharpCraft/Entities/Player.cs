@@ -8,7 +8,7 @@ namespace SharpCraft.Entities;
 
 public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, ParticleSystem particleSystem)
 {
-    private byte _currentTile = 1;
+    public byte CurrentTile = 1;
     private RayCollision _rayCast;
     
     public void Update()
@@ -22,7 +22,7 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
         {
             var hitPoint = _rayCast.Point + _rayCast.Normal / 2;
 
-            entity.World.TrySetTile(hitPoint, _currentTile);
+            entity.World.TrySetTile(hitPoint, CurrentTile);
         }
 
         if (IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
@@ -37,14 +37,14 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
             }
         }
         
-        if (IsKeyPressed(KeyboardKey.One)) _currentTile = 1;
-        if (IsKeyPressed(KeyboardKey.Two)) _currentTile = 2;
-        if (IsKeyPressed(KeyboardKey.Three)) _currentTile = 3;
-        if (IsKeyPressed(KeyboardKey.Four)) _currentTile = 4;
-        if (IsKeyPressed(KeyboardKey.Five)) _currentTile = 5;
+        if (IsKeyPressed(KeyboardKey.One)) CurrentTile = 1;
+        if (IsKeyPressed(KeyboardKey.Two)) CurrentTile = 2;
+        if (IsKeyPressed(KeyboardKey.Three)) CurrentTile = 3;
+        if (IsKeyPressed(KeyboardKey.Four)) CurrentTile = 4;
+        if (IsKeyPressed(KeyboardKey.Five)) CurrentTile = 5;
         
         // hide silly sapling texture
-        if (IsKeyPressed(KeyboardKey.Seven)) _currentTile = 6;
+        if (IsKeyPressed(KeyboardKey.Seven)) CurrentTile = 6;
 
         if (IsKeyPressed(KeyboardKey.G))
         {

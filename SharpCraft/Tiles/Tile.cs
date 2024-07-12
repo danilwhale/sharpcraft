@@ -1,6 +1,7 @@
 ﻿using System.Numerics;
 using SharpCraft.Particles;
 using SharpCraft.Registries;
+using SharpCraft.Rendering;
 using SharpCraft.World.Rendering;
 using ChunkBuilder = SharpCraft.World.Rendering.ChunkBuilder;
 
@@ -39,20 +40,20 @@ public class Tile
         Capabilities = capabilities;
     }
 
-    public void Build(ChunkBuilder builder, World.World world, int x, int y, int z, RenderLayer layer)
+    public void Build(IVertexBuilder builder, World.World? world, int x, int y, int z, RenderLayer layer)
     {
         if (Capabilities.Layer != layer) return;
         Build(builder, world, x, y, z);
     }
 
-    protected virtual void Build(ChunkBuilder builder, World.World world, int x, int y, int z) 
+    public virtual void Build(IVertexBuilder builder, World.World? world, int x, int y, int z) 
     {
         TileRender.Render(builder, world, this, GetFaces(world, x, y, z), x, y, z);
     }
 
-    private bool ShouldKeepFace(World.World world, int x, int y, int z)
+    private bool ShouldKeepFace(World.World? world, int x, int y, int z)
     {
-        return !world.IsSolidTile(x, y, z);
+        return !world?.IsSolidTile(x, y, z) ?? true;
     }
 
     public virtual int GetFaceTextureIndex(Face face)
@@ -60,7 +61,7 @@ public class Tile
         return TextureIndex;
     }
 
-    private Face GetFaces(World.World world, int x, int y, int z)
+    private Face GetFaces(World.World? world, int x, int y, int z)
     {
         var faces = Face.None;
 

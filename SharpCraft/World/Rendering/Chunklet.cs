@@ -51,7 +51,7 @@ public sealed class Chunklet : IDisposable
     {
         var builder = _layers[(byte)layer];
 
-        builder.Begin();
+        builder.Begin(DrawMode.Quads);
 
         for (var x = X; x < MaxX; x++)
         {
