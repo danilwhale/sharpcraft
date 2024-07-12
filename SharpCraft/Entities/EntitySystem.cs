@@ -1,3 +1,6 @@
+using SharpCraft.Rendering;
+using SharpCraft.World.Rendering;
+
 namespace SharpCraft.Entities;
 
 public sealed class EntitySystem : IDisposable
@@ -28,10 +31,20 @@ public sealed class EntitySystem : IDisposable
         }
     }
 
-    public void Draw(float lastPartTicks)
+    public void Draw(float lastPartTicks, Frustum frustum, RenderLayer layer)
     {
         foreach (var entity in _entities)
         {
+            if (frustum.IsBoxOutside(entity.Box))
+            {
+                continue;
+            }
+            
+            if (entity.IsLit() ^ layer == RenderLayer.Lit)
+            {
+                continue;
+            }
+            
             entity.Draw(lastPartTicks);
         }
     }

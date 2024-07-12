@@ -31,7 +31,7 @@ public sealed class TilePreviewElement(Player player) : Element
         Rlgl.SetTexture(Assets.GetTexture("terrain.png").Id);
 
         var tile = Registries.Tiles.Registry[player.CurrentTile];
-        tile?.Build(RlglVertexBuilder.Instance, null, -2, 0, 0);
+        tile?.Build(RlglVertexBuilder.Instance, null, -2, 0, 0, RenderLayer.Lit);
 
         Rlgl.SetTexture(Rlgl.GetTextureIdDefault());
         Rlgl.End();

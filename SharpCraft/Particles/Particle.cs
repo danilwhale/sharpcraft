@@ -1,6 +1,7 @@
 using System.Numerics;
 using SharpCraft.Entities;
 using SharpCraft.Tiles;
+using SharpCraft.World.Rendering;
 
 namespace SharpCraft.Particles;
 
@@ -64,8 +65,6 @@ public sealed class Particle : Entity
 
     public void Draw(float lastPartTicks, float xOff1, float zOff1, float yOff, float xOff2, float zOff2)
     {
-        ApplyLighting(0.8f);
-        
         var u0 = ((_textureIndex & 15) + _uOffset * 0.25f) * TileRender.TexFactor;
         var u1 = u0 + TileRender.TexFactor * 0.25f;
         var v0 = ((_textureIndex >> 4) + _vOffset * 0.25f) * TileRender.TexFactor;

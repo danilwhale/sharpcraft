@@ -3,6 +3,7 @@ using SharpCraft.Entities;
 using SharpCraft.Gui;
 using SharpCraft.World.Rendering;
 using SharpCraft.Particles;
+using SharpCraft.Rendering;
 using SharpCraft.Utilities;
 using Timer = SharpCraft.Utilities.Timer;
 
@@ -11,34 +12,34 @@ namespace SharpCraft.Scenes;
 public sealed class GameScene : IScene
 {
     private readonly Timer _timer;
-    
+
     private readonly World.World _world;
     private readonly WorldRenderer _worldRenderer;
-    
+
     private readonly PlayerEntity _playerEntity;
     private readonly Player _player;
-    
+
     private readonly EntitySystem _entitySystem;
     private readonly ParticleSystem _particleSystem;
     private readonly ElementSystem _elementSystem;
-    
+
     private int _fps;
     private int _frames;
     private double _lastSecondTime;
-    
+
     public GameScene()
     {
         DisableCursor();
 
         _timer = new Timer(20.0f);
-        
+
         _entitySystem = new EntitySystem();
         _particleSystem = new ParticleSystem();
         _elementSystem = new ElementSystem();
-        
+
         _world = new World.World(256, 64, 256);
         _worldRenderer = new WorldRenderer(_world);
-        
+
         _playerEntity = new PlayerEntity(_world);
         _player = new Player(_playerEntity, _worldRenderer, _particleSystem);
         _entitySystem.Add(_playerEntity);
@@ -49,13 +50,14 @@ public sealed class GameScene : IScene
             zombie.SetRandomLevelPosition();
             _entitySystem.Add(zombie);
         }
-        
+
         _elementSystem.Add(new TilePreviewElement(_player));
         _elementSystem.Add(new CrosshairElement());
-
-        Assets.SetMaterialShader("terrain.png", LoadShaderFromMemory(null, Assets.GetText("Terrain.fsh")));
+        
+        Assets.SetMaterialShader("terrain.png", WorldShader.Shader);
+        Assets.SetMaterialShader("char.png", WorldShader.Shader);
     }
-    
+
     public void Update()
     {
         _timer.Advance();
@@ -77,10 +79,10 @@ public sealed class GameScene : IScene
 
             _lastSecondTime = time;
         }
-        
+
         HandleInput();
         _player.Update();
-        
+
         _elementSystem.Update();
     }
 
@@ -109,27 +111,40 @@ public sealed class GameScene : IScene
         _playerEntity.MoveCamera(_timer.LastPartialTicks);
 
         ClearBackground(new Color(128, 204, 255, 255));
-        
+
         BeginMode3D(_playerEntity.Camera);
 
         _worldRenderer.UpdateDirtyChunks();
+
+        var frustum = Frustum.Instance;
         
-        _worldRenderer.Draw(RenderLayer.Solid);
+        BeginShaderMode(WorldShader.Shader);
         
-        _entitySystem.Draw(_timer.LastPartialTicks);
-        _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks);
+        WorldShader.SetIsLit(true);
+        _worldRenderer.Draw(RenderLayer.Lit);
+        _entitySystem.Draw(_timer.LastPartialTicks, frustum, RenderLayer.Lit);
+        _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks, RenderLayer.Lit);
         
-        _worldRenderer.Draw(RenderLayer.Translucent);
+        EndShaderMode();
+
+        BeginShaderMode(WorldShader.Shader);
+
+        WorldShader.SetIsLit(false);
+        _worldRenderer.Draw(RenderLayer.Shadow);
+        _entitySystem.Draw(_timer.LastPartialTicks, frustum, RenderLayer.Shadow);
+        _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks, RenderLayer.Shadow);
         
+        EndShaderMode();
+
         _player.Draw();
 
         EndMode3D();
-        
+
         _elementSystem.Draw();
 
         DrawText($"{_fps} FPS, {Chunklet.Updates} chunklet updates", 0, 0, 11, Color.White);
     }
-    
+
     public void Dispose()
     {
         _world.Save();

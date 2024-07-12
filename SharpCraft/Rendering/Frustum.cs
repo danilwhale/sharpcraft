@@ -9,8 +9,8 @@ public sealed class Frustum
     private const int Right = 1;
     private const int Top = 2;
     private const int Bottom = 3;
-    private const int Near = 4;
-    private const int Far = 5;
+    // private const int Near = 4;
+    // private const int Far = 5;
     
     private static readonly Frustum FInstance = new();
 
@@ -23,7 +23,7 @@ public sealed class Frustum
         }
     }
 
-    private readonly Plane[] _planes = new Plane[6];
+    private readonly Plane[] _planes = new Plane[4];
     
     private void Recalculate()
     {
@@ -57,19 +57,19 @@ public sealed class Frustum
             mvp.M44 + mvp.M42
         ));
         
-        _planes[Near] = Plane.Normalize(new Plane(
-            mvp.M13,
-            mvp.M23,
-            mvp.M33,
-            mvp.M43
-        ));
-        
-        _planes[Far] = Plane.Normalize(new Plane(
-            mvp.M14 - mvp.M13,
-            mvp.M24 - mvp.M23,
-            mvp.M34 - mvp.M33,
-            mvp.M44 - mvp.M43
-        ));
+        // _planes[Near] = Plane.Normalize(new Plane(
+        //     mvp.M13,
+        //     mvp.M23,
+        //     mvp.M33,
+        //     mvp.M43
+        // ));
+        //
+        // _planes[Far] = Plane.Normalize(new Plane(
+        //     mvp.M14 - mvp.M13,
+        //     mvp.M24 - mvp.M23,
+        //     mvp.M34 - mvp.M33,
+        //     mvp.M44 - mvp.M43
+        // ));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -95,6 +95,14 @@ public sealed class Frustum
     public bool IsBoxOutsideVerticalPlane(BoundingBox box)
     {
         return IsBoxSideOutside(_planes[Top], box) ||
+               IsBoxSideOutside(_planes[Bottom], box);
+    }
+
+    public bool IsBoxOutside(BoundingBox box)
+    {
+        return IsBoxSideOutside(_planes[Left], box) || 
+               IsBoxSideOutside(_planes[Right], box) ||
+               IsBoxSideOutside(_planes[Top], box) ||
                IsBoxSideOutside(_planes[Bottom], box);
     }
 }

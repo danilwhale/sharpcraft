@@ -40,20 +40,16 @@ public class Tile
         Capabilities = capabilities;
     }
 
-    public void Build(IVertexBuilder builder, World.World? world, int x, int y, int z, RenderLayer layer)
+    public virtual void Build(IVertexBuilder builder, World.World? world, int x, int y, int z, RenderLayer layer) 
     {
-        if (Capabilities.Layer != layer) return;
-        Build(builder, world, x, y, z);
+        TileRender.Render(builder, world, this, GetFaces(world, x, y, z, layer), x, y, z);
     }
 
-    public virtual void Build(IVertexBuilder builder, World.World? world, int x, int y, int z) 
+    private bool ShouldKeepFace(World.World? world, int x, int y, int z, RenderLayer layer)
     {
-        TileRender.Render(builder, world, this, GetFaces(world, x, y, z), x, y, z);
-    }
-
-    private bool ShouldKeepFace(World.World? world, int x, int y, int z)
-    {
-        return !world?.IsSolidTile(x, y, z) ?? true;
+        if (world == null) return true;
+        
+        return !world.IsSolidTile(x, y, z) && world.IsLit(x, y, z) ^ layer == RenderLayer.Shadow;
     }
 
     public virtual int GetFaceTextureIndex(Face face)
@@ -61,16 +57,16 @@ public class Tile
         return TextureIndex;
     }
 
-    private Face GetFaces(World.World? world, int x, int y, int z)
+    private Face GetFaces(World.World? world, int x, int y, int z, RenderLayer layer)
     {
         var faces = Face.None;
 
-        if (ShouldKeepFace(world, x + 1, y, z)) faces |= Face.Right;
-        if (ShouldKeepFace(world, x - 1, y, z)) faces |= Face.Left;
-        if (ShouldKeepFace(world, x, y + 1, z)) faces |= Face.Top;
-        if (ShouldKeepFace(world, x, y - 1, z)) faces |= Face.Bottom;
-        if (ShouldKeepFace(world, x, y, z + 1)) faces |= Face.Front;
-        if (ShouldKeepFace(world, x, y, z - 1)) faces |= Face.Back;
+        if (ShouldKeepFace(world, x + 1, y, z, layer)) faces |= Face.Right;
+        if (ShouldKeepFace(world, x - 1, y, z, layer)) faces |= Face.Left;
+        if (ShouldKeepFace(world, x, y + 1, z, layer)) faces |= Face.Top;
+        if (ShouldKeepFace(world, x, y - 1, z, layer)) faces |= Face.Bottom;
+        if (ShouldKeepFace(world, x, y, z + 1, layer)) faces |= Face.Front;
+        if (ShouldKeepFace(world, x, y, z - 1, layer)) faces |= Face.Back;
 
         return faces;
     }

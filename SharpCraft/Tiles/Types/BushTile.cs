@@ -12,8 +12,10 @@ public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
 {
     private const int Rotations = 2;
     
-    public override void Build(IVertexBuilder builder, World.World? world, int x, int y, int z)
+    public override void Build(IVertexBuilder builder, World.World? world, int x, int y, int z, RenderLayer layer)
     {
+        if (world != null && world.IsLit(x, y, z) ^ layer == RenderLayer.Lit) return;
+
         var u0 = (TextureIndex & 15) * TileRender.TexFactor;
         var u1 = u0 + TileRender.TexFactor;
         var v0 = (TextureIndex >> 4) * TileRender.TexFactor;

@@ -16,7 +16,7 @@ public abstract class Entity(World.World world, float width, float height) : IDi
             var halfSize = new Vector3(Width * 0.5f, Height * 0.5f, Width * 0.5f);
 
             // center position
-            _bbox = new BoundingBox(
+            Box = new BoundingBox(
                 value - halfSize,
                 value + halfSize
             );
@@ -29,7 +29,7 @@ public abstract class Entity(World.World world, float width, float height) : IDi
     private Vector3 _position;
     private Vector3 _lastPosition;
     protected Vector3 Motion;
-    private BoundingBox _bbox;
+    public BoundingBox Box;
 
     protected bool IsOnGround;
 
@@ -79,28 +79,28 @@ public abstract class Entity(World.World world, float width, float height) : IDi
     {
         var oldMotion = motion;
 
-        var boxes = World.GetBoxes(_bbox.Expand(motion));
+        var boxes = World.GetBoxes(Box.Expand(motion));
 
         foreach (var box in boxes)
         {
-            motion.X = box.ClipXCollide(_bbox, motion.X);
+            motion.X = box.ClipXCollide(Box, motion.X);
         }
 
-        _bbox.Move(motion.X, 0.0f, 0.0f);
+        Box.Move(motion.X, 0.0f, 0.0f);
 
         foreach (var box in boxes)
         {
-            motion.Y = box.ClipYCollide(_bbox, motion.Y);
+            motion.Y = box.ClipYCollide(Box, motion.Y);
         }
 
-        _bbox.Move(0.0f, motion.Y, 0.0f);
+        Box.Move(0.0f, motion.Y, 0.0f);
 
         foreach (var box in boxes)
         {
-            motion.Z = box.ClipZCollide(_bbox, motion.Z);
+            motion.Z = box.ClipZCollide(Box, motion.Z);
         }
 
-        _bbox.Move(0.0f, 0.0f, motion.Z);
+        Box.Move(0.0f, 0.0f, motion.Z);
 
         // ReSharper disable CompareOfFloatsByEqualityOperator
         IsOnGround = oldMotion.Y != motion.Y && oldMotion.Y < 0.0f;
@@ -111,9 +111,9 @@ public abstract class Entity(World.World world, float width, float height) : IDi
         // ReSharper restore CompareOfFloatsByEqualityOperator
 
         _position = new Vector3(
-            (_bbox.Min.X + _bbox.Max.X) / 2.0f,
-            _bbox.Min.Y + HeightOffset,
-            (_bbox.Min.Z + _bbox.Max.Z) / 2.0f
+            (Box.Min.X + Box.Max.X) / 2.0f,
+            Box.Min.Y + HeightOffset,
+            (Box.Min.Z + Box.Max.Z) / 2.0f
         );
     }
 
@@ -135,22 +135,7 @@ public abstract class Entity(World.World world, float width, float height) : IDi
         Motion.Z += z * cos - x * sin;
     }
 
-    protected bool IsLit() => World.IsLit(Position);
-
-    private float GetLightingValue(float baseLightValue) =>
-        !IsLit() ? SharpCraft.World.World.DarkValue : baseLightValue;
-
-    protected void ApplyLighting(float baseLightValue)
-    {
-        var value = GetLightingValue(baseLightValue);
-        Rlgl.Color3f(value, value, value);
-    }
-
-    protected void ApplyLighting(string texturePath, float baseLightValue)
-    {
-        var value = (byte)(GetLightingValue(baseLightValue) * 255.0f);
-        Assets.SetMaterialColor(texturePath, MaterialMapIndex.Albedo, new Color(value, value, value, byte.MaxValue));
-    }
+    public bool IsLit() => World.IsLit(Position);
 
     public abstract void Dispose();
 }

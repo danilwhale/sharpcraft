@@ -25,37 +25,37 @@ public static class TileRender
 
         if ((faces & Face.Left) == Face.Left)
         {
-            SetBrightness(b, world, x - 1, y, z, Darkest);
+            b.Light(Darkest);
             RenderLeftFace(b, tile, x, y, z, z1, y1);
         }
 
         if ((faces & Face.Right) == Face.Right)
         {
-            SetBrightness(b, world, x + 1, y, z, Darkest);
+            b.Light(Darkest);
             RenderRightFace(b, tile, y, z, x1, y1, z1);
         }
 
         if ((faces & Face.Top) == Face.Top)
         {
-            SetBrightness(b, world, x, y + 1, z, Light);
+            b.Light(Light);
             RenderTopFace(b, tile, x, z, y1, z1, x1);
         }
 
         if ((faces & Face.Bottom) == Face.Bottom)
         {
-            SetBrightness(b, world, x, y - 1, z, Light);
+            b.Light(Light);
             RenderBottomFace(b, tile, x, y, z, x1, z1);
         }
 
         if ((faces & Face.Front) == Face.Front)
         {
-            SetBrightness(b, world, x, y, z + 1, Darker);
+            b.Light(Darker);
             BuildFrontFace(b, tile, x, y, z1, x1, y1);
         }
 
         if ((faces & Face.Back) == Face.Back)
         {
-            SetBrightness(b, world, x, y, z - 1, Darker);
+            b.Light(Darker);
             BuildBackFace(b, tile, x, y, z, y1, x1);
         }
     }
@@ -148,18 +148,6 @@ public static class TileRender
         b.VertexTex(x, y1, z, u1, v0);
         b.VertexTex(x1, y1, z, u0, v0);
         b.VertexTex(x1, y, z, u0, v1);
-    }
-
-    private static void SetBrightness(IVertexBuilder b, World.World? world, int x, int y, int z, float factor)
-    {
-        if (world == null)
-        {
-            b.Light(factor);
-        }
-        else
-        {
-            b.Light(world.GetBrightness(x, y, z) * factor);
-        }
     }
     
     public static void RenderFace(TilePosition position, Face face)

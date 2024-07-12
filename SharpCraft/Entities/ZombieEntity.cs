@@ -56,7 +56,6 @@ public sealed class ZombieEntity : WalkingEntity
 
     public override void Draw(float lastPartTicks)
     {
-        ApplyLighting("char.png", 1.0f);
         _model.Draw(lastPartTicks);
     }
 

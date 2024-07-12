@@ -3,11 +3,6 @@
 
 this is a clone of minecraft (ancient versions), that is using own codebase (kinda)
 
-## won't fix
-- no shadows like in the original
-  - this is a second implementation attempt, I had to do a lot of optimizations, yet it still runs like a shit.
-  - TLDR: nop, I won't add them
-
 ## how to get the latest version??????
 [click here to go to GitHub actions](https://github.com/danilwhale/SharpCraft/actions/),
 then select top most link with checkmark from the left, click on it,
