@@ -55,7 +55,7 @@ public sealed class World
 
             OnAreaUpdate?.Invoke(0, 0, 0, Width, Height, Depth);
 
-            return false;
+            return true;
         }
         catch (Exception e)
         {
