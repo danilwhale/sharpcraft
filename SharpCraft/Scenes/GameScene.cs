@@ -44,7 +44,7 @@ public sealed class GameScene : IScene
         _player = new Player(_playerEntity, _worldRenderer, _particleSystem);
         _entitySystem.Add(_playerEntity);
 
-        for (var i = 0; i < 100; i++)
+        for (var i = 0; i < 10; i++)
         {
             var zombie = new ZombieEntity(_world, new Vector3(128.0f, 0.0f, 128.0f));
             zombie.SetRandomLevelPosition();
