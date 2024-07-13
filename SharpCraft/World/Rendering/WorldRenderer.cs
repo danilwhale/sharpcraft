@@ -40,7 +40,8 @@ public sealed class WorldRenderer : IDisposable
     {
         Parallel.Invoke(RebuildDirtyChunks);
 
-        while (_finishStack.TryPop(out var chunklet))
+        var uploads = 0;
+        while (uploads++ < MaxUpdatesPerFrame && _finishStack.TryPop(out var chunklet))
         {
             chunklet.FinishRebuild();
         }
@@ -54,7 +55,7 @@ public sealed class WorldRenderer : IDisposable
         {
             foreach (var chunklet in chunk.Chunklets)
             {
-                if (updates > MaxUpdatesPerFrame) return;
+                if (updates >= MaxUpdatesPerFrame) return;
                     
                 if (!chunklet.IsDirty) continue;
                     
@@ -101,8 +102,10 @@ public sealed class WorldRenderer : IDisposable
 
     public void DrawHit(RayCollision hit)
     {
-        var alpha = MathF.Sin((float)GetTime() * 10.0f) * 0.2f + 0.4f;
+        var alpha = (MathF.Sin((float)GetTime() * 10.0f) * 0.2f + 0.4f) * 0.5f;
 
+        // reset to default texture, in case one of previous function didn't reset texture
+        Rlgl.SetTexture(Rlgl.GetTextureIdDefault());
         Rlgl.Begin(DrawMode.Quads);
         Rlgl.Color4f(1.0f, 1.0f, 1.0f, alpha);
 
