@@ -37,14 +37,13 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
             }
         }
         
-        if (IsKeyPressed(KeyboardKey.One)) CurrentTile = 1;
-        if (IsKeyPressed(KeyboardKey.Two)) CurrentTile = 2;
-        if (IsKeyPressed(KeyboardKey.Three)) CurrentTile = 3;
-        if (IsKeyPressed(KeyboardKey.Four)) CurrentTile = 4;
-        if (IsKeyPressed(KeyboardKey.Five)) CurrentTile = 5;
-        
+        if (IsKeyPressed(KeyboardKey.One)) CurrentTile = Registries.Tiles.Rock.Id;
+        if (IsKeyPressed(KeyboardKey.Two)) CurrentTile = Registries.Tiles.Dirt.Id;
+        if (IsKeyPressed(KeyboardKey.Three)) CurrentTile = Registries.Tiles.Stone.Id;
+        if (IsKeyPressed(KeyboardKey.Four)) CurrentTile = Registries.Tiles.Wood.Id;
+
         // hide silly sapling texture
-        if (IsKeyPressed(KeyboardKey.Seven)) CurrentTile = 6;
+        if (IsKeyPressed(KeyboardKey.Six)) CurrentTile = Registries.Tiles.Bush.Id;
 
         if (IsKeyPressed(KeyboardKey.G))
         {
