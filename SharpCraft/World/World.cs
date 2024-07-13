@@ -37,16 +37,7 @@ public sealed class World
 
         if (!TryLoad())
         {
-            for (var x = 0; x < width; x++)
-            {
-                for (var y = 0; y < height; y++)
-                {
-                    for (var z = 0; z < depth; z++)
-                    {
-                        _data[GetDataIndex(x, y, z)] = (byte)(y > height * 2 / 3 ? 0 : 1);
-                    }
-                }
-            }
+            WorldGen.Generate(this);
         }
 
         UpdateLightLevels(0, 0, width, depth);
@@ -64,7 +55,7 @@ public sealed class World
 
             OnAreaUpdate?.Invoke(0, 0, 0, Width, Height, Depth);
 
-            return true;
+            return false;
         }
         catch (Exception e)
         {
@@ -178,6 +169,12 @@ public sealed class World
     }
 
     public bool TrySetTile(TilePosition position, byte value) => TrySetTile(position.X, position.Y, position.Z, value);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void DirectSetTile(int x, int y, int z, byte value)
+    {
+        _data[GetDataIndex(x, y, z)] = value;
+    }
 
     public void Tick()
     {
