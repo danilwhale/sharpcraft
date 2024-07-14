@@ -54,8 +54,8 @@ public sealed class GameScene : IScene
         _elementSystem.Add(new TilePreviewElement(_player));
         _elementSystem.Add(new CrosshairElement());
         
-        Assets.SetMaterialShader("terrain.png", WorldShader.Shader);
         Assets.SetMaterialShader("char.png", WorldShader.Shader);
+        Assets.SetMaterialShader("terrain.png", WorldShader.ChunkShader);
     }
 
     public void Update()

@@ -1,22 +1,8 @@
-using System.Numerics;
-using System.Runtime.InteropServices;
-
 namespace SharpCraft.World.Rendering;
 
-[StructLayout(LayoutKind.Sequential, Size = 14)]
-public readonly struct ChunkVertex(
-    Half x,
-    Half y,
-    Half z,
-    Half u,
-    Half v,
-    byte light)
+public readonly struct ChunkVertex(float x, float y, float z, float u, float v, float light)
 {
-    public readonly Half X = x, Y = y, Z = z;
-    public readonly Half U = u, V = v;
-    public readonly byte Light = light;
-
-    public Vector3 Position => new((float)X, (float)Y, (float)Z);
-    public Vector2 TexCoords => new((float)U, (float)V);
-    public Color Color => new(Light, Light, Light, byte.MaxValue);
+    public readonly float X = x, Y = y, Z = z;
+    public readonly float U = u, V = v;
+    public readonly float Light = light;
 }
