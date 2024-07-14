@@ -1,68 +1,57 @@
-﻿using System.Numerics;
+using SharpCraft.Extensions;
+using SharpCraft.World.Rendering;
+using SharpCraft.Particles;
+using SharpCraft.Tiles;
 
 namespace SharpCraft.Entities;
 
-public sealed class Player : Entity
+public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, ParticleSystem particleSystem)
 {
-    private const float MouseSensitivity = 0.075f;
-    private const float HalfWidth = 0.3f;
-    private const float HalfHeight = 0.9f;
+    public byte CurrentTile = 1;
+    private RayCollision _rayCast;
     
-    public Camera3D Camera;
-
-    public Player(Level.Level level) : base(level, HalfWidth, HalfHeight)
+    public void Update()
     {
-        HeightOffset = 1.62f;
-        Camera = new Camera3D(Vector3.Zero, Vector3.Zero, Vector3.UnitY, 70.0f, CameraProjection.Perspective);
-        SetRandomLevelPosition();
-    }
-    
-    public void MoveCamera(float lastPartTicks)
-    {
-        Camera.Position = GetInterpolatedPosition(lastPartTicks);
-
-        var rotation = Matrix4x4.CreateFromYawPitchRoll(
-            Yaw * DEG2RAD,
-            Pitch * DEG2RAD,
-            0.0f
-        );
-
-        var forward = Vector3.Transform(Vector3.UnitZ, rotation);
-
-        Camera.Target = Camera.Position + forward;
-    }
-
-    public override void Rotate(float pitch, float yaw)
-    {
-        base.Rotate(pitch * MouseSensitivity, yaw * MouseSensitivity);
-        Pitch = Math.Clamp(Pitch, -89.9f, 89.9f);
-    }
-
-    public override void Tick()
-    {
-        base.Tick();
+        var mouseDelta = GetMouseDelta();
+        entity.Rotate(mouseDelta.Y, -mouseDelta.X);
         
-        if (IsKeyDown(KeyboardKey.R)) SetRandomLevelPosition();
-
-        var x = IsKeyDown(KeyboardKey.A) || IsKeyDown(KeyboardKey.Left) ? 1
-            : IsKeyDown(KeyboardKey.D) || IsKeyDown(KeyboardKey.Right) ? -1
-            : 0;
-
-        var z = IsKeyDown(KeyboardKey.W) || IsKeyDown(KeyboardKey.Up) ? 1
-            : IsKeyDown(KeyboardKey.S) || IsKeyDown(KeyboardKey.Down) ? -1
-            : 0;
-
-        if (IsOnGround && (IsKeyDown(KeyboardKey.Space) || IsKeyDown(KeyboardKey.LeftSuper)))
+        _rayCast = entity.World.DoRayCast(entity.Camera.GetForwardRay(), 4.0f);
+        
+        if (IsMouseButtonPressed(MouseButton.Left) && _rayCast.Hit)
         {
-            Motion.Y = 0.12f;
+            var hitPoint = _rayCast.Point + _rayCast.Normal / 2;
+
+            entity.World.TrySetTile(hitPoint, CurrentTile);
         }
 
-        ApplyRelativeMotion(x, z, IsOnGround ? 0.02f : 0.005f);
-        Motion.Y -= 0.005f;
-        ApplyMotion(Motion);
-        
-        Motion *= new Vector3(0.91f, 0.98f, 0.91f);
+        if (IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
+        {
+            var hitPoint = _rayCast.Point - _rayCast.Normal / 2;
 
-        if (IsOnGround) Motion *= new Vector3(0.8f, 1.0f, 0.8f);
+            var oldTile = entity.World.GetTile(hitPoint);
+            if (entity.World.TrySetTile(hitPoint, 0))
+            {
+                var position = (TilePosition)hitPoint;
+                Registries.Tiles.Registry[oldTile]?.Break(entity.World, position.X, position.Y, position.Z, particleSystem);
+            }
+        }
+        
+        if (IsKeyPressed(KeyboardKey.One)) CurrentTile = Registries.Tiles.Rock.Id;
+        if (IsKeyPressed(KeyboardKey.Two)) CurrentTile = Registries.Tiles.Dirt.Id;
+        if (IsKeyPressed(KeyboardKey.Three)) CurrentTile = Registries.Tiles.Stone.Id;
+        if (IsKeyPressed(KeyboardKey.Four)) CurrentTile = Registries.Tiles.Wood.Id;
+
+        // hide silly sapling texture
+        if (IsKeyPressed(KeyboardKey.Six)) CurrentTile = Registries.Tiles.Bush.Id;
+
+        if (IsKeyPressed(KeyboardKey.G))
+        {
+            entity.System?.Add(new ZombieEntity(entity.World, entity.Position));
+        }
+    }
+
+    public void Draw()
+    {
+        worldRenderer.DrawHit(_rayCast);
     }
 }

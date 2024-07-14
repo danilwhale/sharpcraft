@@ -3,10 +3,8 @@ using SharpCraft.Entities.Models;
 
 namespace SharpCraft.Entities;
 
-public sealed class Zombie : Entity, IDisposable
+public sealed class ZombieEntity : WalkingEntity
 {
-    private const float HalfWidth = 0.3f;
-    private const float HalfHeight = 0.9f;
     private const float TimeOffsetSize = 1_239_831.0f;
 
     private readonly ZombieModel _model;
@@ -16,10 +14,10 @@ public sealed class Zombie : Entity, IDisposable
     public float Rotation;
     private float _rotationDelta;
 
-    public Zombie(Level.Level level)
-        : base(level, HalfWidth, HalfHeight)
+    public ZombieEntity(World.World world, Vector3 position)
+        : base(world, 0.6f, 1.8f)
     {
-        SetRandomLevelPosition();
+        Position = position;
 
         TimeOffset = Random.Shared.NextSingle() * TimeOffsetSize;
         Rotation = Random.Shared.NextSingle() * MathF.PI * 2.0f;
@@ -33,7 +31,7 @@ public sealed class Zombie : Entity, IDisposable
         base.Tick();
 
         Rotation += _rotationDelta;
-        
+
         _rotationDelta *= 0.99f;
         _rotationDelta +=
             (Random.Shared.NextSingle() - Random.Shared.NextSingle()) *
@@ -45,33 +43,23 @@ public sealed class Zombie : Entity, IDisposable
 
         if (IsOnGround && Random.Shared.NextSingle() < 0.01f)
         {
-            Motion.Y = 0.12f;
+            Jump();
         }
 
-        ApplyRelativeMotion(x, z, IsOnGround ? 0.02f : 0.005f);
-        Motion.Y -= 0.005f;
-        ApplyMotion(Motion);
+        TickPhysics(x, z);
 
-        Motion *= new Vector3(0.91f, 0.98f, 0.91f);
-        
         if (Position.Y < -100.0f)
         {
-            SetRandomLevelPosition();
-        }
-
-        if (IsOnGround)
-        {
-            Motion.X *= 0.8f;
-            Motion.Z *= 0.8f;
+            Destroy();
         }
     }
 
-    public void Draw(float lastPartTicks)
+    public override void Draw(float lastPartTicks)
     {
         _model.Draw(lastPartTicks);
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         _model.Dispose();
     }

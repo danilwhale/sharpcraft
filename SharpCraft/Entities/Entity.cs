@@ -3,7 +3,7 @@ using SharpCraft.Extensions;
 
 namespace SharpCraft.Entities;
 
-public class Entity(Level.Level level, float halfWidth, float halfHeight)
+public abstract class Entity(World.World world, float width, float height) : IDisposable
 {
     public Vector3 Position
     {
@@ -11,37 +11,47 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
         set
         {
             _position = value;
-            
+
+            var halfSize = new Vector3(Width * 0.5f, Height * 0.5f, Width * 0.5f);
+
             // center position
-            _bbox = new BoundingBox(
-                value - new Vector3(halfWidth, halfHeight, halfWidth),
-                value + new Vector3(halfWidth, halfHeight, halfWidth)
+            Box = new BoundingBox(
+                value - halfSize,
+                value + halfSize
             );
         }
     }
 
+    protected float Width = width;
+    protected float Height = height;
+
     private Vector3 _position;
     private Vector3 _lastPosition;
     protected Vector3 Motion;
-    private BoundingBox _bbox;
-    
+    public BoundingBox Box;
+
     protected bool IsOnGround;
-    
-    protected float Yaw;
-    protected float Pitch;
+
+    public float Yaw;
+    public float Pitch;
 
     protected float HeightOffset;
+
+    public bool IsDestroyed;
+
+    public EntitySystem? System;
+    public readonly World.World World = world;
 
     public Vector3 GetInterpolatedPosition(float lastPartTicks)
     {
         return _lastPosition + (Position - _lastPosition) * lastPartTicks;
     }
-    
-    protected void SetRandomLevelPosition()
+
+    public void SetRandomLevelPosition()
     {
-        var x = Random.Shared.NextSingle() * level.Width;
-        var y = level.Height + 10;
-        var z = Random.Shared.NextSingle() * level.Depth;
+        var x = Random.Shared.NextSingle() * World.Width;
+        var y = World.Height + 10;
+        var z = Random.Shared.NextSingle() * World.Depth;
 
         Position = new Vector3(x, y, z);
     }
@@ -56,33 +66,40 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
     {
         _lastPosition = Position;
     }
-    
+
+    public abstract void Draw(float lastPartTicks);
+
+    public void Destroy()
+    {
+        IsDestroyed = true;
+    }
+
     protected void ApplyMotion(Vector3 motion)
     {
         var oldMotion = motion;
 
-        var boxes = level.GetBoxes(_bbox.Expand(motion));
-        
+        var boxes = World.GetBoxes(Box.Expand(motion));
+
         foreach (var box in boxes)
         {
-            motion.X = box.ClipXCollide(_bbox, motion.X);
+            motion.X = box.ClipXCollide(Box, motion.X);
         }
 
-        _bbox.Move(motion.X, 0.0f, 0.0f);
-        
+        Box.Move(motion.X, 0.0f, 0.0f);
+
         foreach (var box in boxes)
         {
-            motion.Y = box.ClipYCollide(_bbox, motion.Y);
+            motion.Y = box.ClipYCollide(Box, motion.Y);
         }
 
-        _bbox.Move(0.0f, motion.Y, 0.0f);
-        
+        Box.Move(0.0f, motion.Y, 0.0f);
+
         foreach (var box in boxes)
         {
-            motion.Z = box.ClipZCollide(_bbox, motion.Z);
+            motion.Z = box.ClipZCollide(Box, motion.Z);
         }
 
-        _bbox.Move(0.0f, 0.0f, motion.Z);
+        Box.Move(0.0f, 0.0f, motion.Z);
 
         // ReSharper disable CompareOfFloatsByEqualityOperator
         IsOnGround = oldMotion.Y != motion.Y && oldMotion.Y < 0.0f;
@@ -93,9 +110,9 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
         // ReSharper restore CompareOfFloatsByEqualityOperator
 
         _position = new Vector3(
-            (_bbox.Min.X + _bbox.Max.X) / 2.0f,
-            _bbox.Min.Y + HeightOffset,
-            (_bbox.Min.Z + _bbox.Max.Z) / 2.0f
+            (Box.Min.X + Box.Max.X) / 2.0f,
+            Box.Min.Y + HeightOffset,
+            (Box.Min.Z + Box.Max.Z) / 2.0f
         );
     }
 
@@ -116,4 +133,8 @@ public class Entity(Level.Level level, float halfWidth, float halfHeight)
         Motion.X += x * cos + z * sin;
         Motion.Z += z * cos - x * sin;
     }
+
+    public bool IsLit() => World.IsLit(Position);
+
+    public abstract void Dispose();
 }
