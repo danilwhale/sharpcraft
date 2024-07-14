@@ -1,6 +1,4 @@
 ﻿using System.Numerics;
-using SharpCraft.Registries;
-using SharpCraft.Tiles;
 using SharpCraft.Utilities;
 
 namespace SharpCraft.World.Rendering;

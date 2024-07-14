@@ -1,4 +1,3 @@
-using SharpCraft.Entities;
 using SharpCraft.Utilities;
 
 namespace SharpCraft.Rendering;

@@ -1,7 +1,6 @@
 using System.Numerics;
 using SharpCraft.Entities;
 using SharpCraft.Tiles;
-using SharpCraft.World.Rendering;
 
 namespace SharpCraft.Particles;
 

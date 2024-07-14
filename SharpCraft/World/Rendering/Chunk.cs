@@ -7,24 +7,19 @@ public sealed class Chunk : IDisposable
 {
     private readonly BoundingBox _bbox;
     public readonly Chunklet[] Chunklets;
-    
-    private readonly int _x;
-    private readonly int _z;
-    private readonly int _height;
 
     public Chunk(World world, int x, int z)
     {
-        _x = x;
-        _z = z;
-        _height = world.Height >> 4;
+        var height = world.Height >> 4;
+        
         _bbox = new BoundingBox(
             new Vector3(x * Chunklet.Size, 0.0f, z * Chunklet.Size), 
             new Vector3((x + 1) * Chunklet.Size, world.Height, (z + 1) * Chunklet.Size)
         );
         
-        Chunklets = new Chunklet[_height];
+        Chunklets = new Chunklet[height];
 
-        for (var y = 0; y < _height; y++)
+        for (var y = 0; y < height; y++)
         {
             Chunklets[y] = new Chunklet(world, x, y, z);
         }

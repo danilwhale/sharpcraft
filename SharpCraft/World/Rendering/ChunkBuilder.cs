@@ -1,7 +1,4 @@
-﻿using System.Numerics;
-using System.Runtime.InteropServices;
-using System.Security;
-using NoAlloq;
+﻿using System.Runtime.InteropServices;
 using SharpCraft.Rendering;
 
 namespace SharpCraft.World.Rendering;
@@ -12,8 +9,8 @@ public sealed class ChunkBuilder : IVertexBuilder, IDisposable
     private ChunkMesh _previous;
     private bool _drawPrevious;
 
-    private List<ChunkVertex> _vertices;
-    private List<ushort> _indices;
+    private List<ChunkVertex> _vertices = null!;
+    private List<ushort> _indices = null!;
 
     private float _u, _v;
     private float _light;

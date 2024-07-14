@@ -1,7 +1,6 @@
 ﻿using System.IO.Compression;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using SharpCraft.Registries;
 using SharpCraft.Tiles;
 
 namespace SharpCraft.World;

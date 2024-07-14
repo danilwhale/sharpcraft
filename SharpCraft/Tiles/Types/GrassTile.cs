@@ -1,5 +1,3 @@
-using SharpCraft.Registries;
-
 namespace SharpCraft.Tiles.Types;
 
 public sealed class GrassTile(byte id) : Tile(id, 3)

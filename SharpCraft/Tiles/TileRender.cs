@@ -1,5 +1,4 @@
 using SharpCraft.Rendering;
-using SharpCraft.World.Rendering;
 
 namespace SharpCraft.Tiles;
 

@@ -1,7 +1,6 @@
 using SharpCraft.Extensions;
 using SharpCraft.World.Rendering;
 using SharpCraft.Particles;
-using SharpCraft.Registries;
 using SharpCraft.Tiles;
 
 namespace SharpCraft.Entities;

@@ -1,9 +1,7 @@
 ﻿using System.Numerics;
 using SharpCraft.Particles;
-using SharpCraft.Registries;
 using SharpCraft.Rendering;
 using SharpCraft.World.Rendering;
-using ChunkBuilder = SharpCraft.World.Rendering.ChunkBuilder;
 
 namespace SharpCraft.Tiles;
 

@@ -1,6 +1,5 @@
 using SharpCraft.Entities;
 using SharpCraft.Rendering;
-using SharpCraft.Tiles;
 using SharpCraft.Utilities;
 using SharpCraft.World.Rendering;
 
