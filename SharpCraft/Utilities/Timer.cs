@@ -13,11 +13,11 @@ public sealed class Timer(float ticksPerSecond)
     private float _partialTicks;
     public float LastPartialTicks;
 
-    private double _lastTime = GetTicks();
+    private double _lastTime = GetNanosecondsSinceStart();
 
     public void Advance()
     {
-        var now = GetTicks();
+        var now = GetNanosecondsSinceStart();
         var passedNs = Math.Clamp(now - _lastTime, 0, NanosecondsPerSecond);
         _lastTime = now;
 
