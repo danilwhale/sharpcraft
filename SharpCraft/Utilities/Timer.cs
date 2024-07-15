@@ -28,7 +28,7 @@ public sealed class Timer(float ticksPerSecond)
         LastPartialTicks = _partialTicks;
     }
 
-    private static double GetTicks()
+    private static double GetNanosecondsSinceStart()
     {
         return GetTime() * NanosecondsPerSecond;
     }
