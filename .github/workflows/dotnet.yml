@@ -50,7 +50,7 @@ jobs:
       run: dotnet publish SharpCraft/SharpCraft.csproj -c Release -o Build/Linux/ --nologo -r linux-x64 --self-contained
     - name: Calculate SHA-256 hash for executable
       shell: bash
-      run: sha256sum ${{ github.workspace }}/Build/Windows/SharpCraft
+      run: sha256sum ${{ github.workspace }}/Build/Linux/SharpCraft
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4.3.1
       with:
