@@ -9,11 +9,12 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
 {
     public byte CurrentTile = 1;
     private RayCollision _rayCast;
+    private int _pitchFactor = 1;
     
     public void Update()
     {
         var mouseDelta = GetMouseDelta();
-        entity.Rotate(mouseDelta.Y, -mouseDelta.X);
+        entity.Rotate(mouseDelta.Y * _pitchFactor, -mouseDelta.X);
         
         _rayCast = entity.World.DoRayCast(entity.Camera.GetForwardRay(), 4.0f);
         
@@ -47,6 +48,11 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
         if (IsKeyPressed(KeyboardKey.G))
         {
             entity.System?.Add(new ZombieEntity(entity.World, entity.Position));
+        }
+
+        if (IsKeyPressed(KeyboardKey.Y))
+        {
+            _pitchFactor *= -1;
         }
     }
 
