@@ -12,7 +12,7 @@ public sealed class World
     public const float LightValue = 1.0f;
     public const float DarkValue = 0.6f;
 
-    private readonly byte[] _data;
+    public readonly byte[] Data;
     private readonly byte[] _lightLevels;
 
     public readonly int Width;
@@ -29,7 +29,7 @@ public sealed class World
         Height = height;
         Depth = depth;
 
-        _data = new byte[width * height * depth];
+        Data = new byte[width * height * depth];
         _lightLevels = new byte[width * depth];
 
         _random = new Random();
@@ -50,7 +50,7 @@ public sealed class World
         {
             using var fileStream = File.OpenRead(path);
             using var stream = new GZipStream(fileStream, CompressionMode.Decompress);
-            stream.ReadExactly(_data);
+            stream.ReadExactly(Data);
 
             OnAreaUpdate?.Invoke(0, 0, 0, Width, Height, Depth);
 
@@ -70,7 +70,7 @@ public sealed class World
         {
             using var fileStream = File.OpenWrite(path);
             using var stream = new GZipStream(fileStream, CompressionMode.Compress);
-            stream.Write(_data);
+            stream.Write(Data);
         }
         catch (Exception e)
         {
@@ -102,7 +102,7 @@ public sealed class World
         }
     }
 
-    public byte GetTile(int x, int y, int z) => !IsInRange(x, y, z) ? (byte)0 : _data[GetDataIndex(x, y, z)];
+    public byte GetTile(int x, int y, int z) => !IsInRange(x, y, z) ? (byte)0 : Data[GetDataIndex(x, y, z)];
 
     public byte GetTile(TilePosition position) => GetTile(position.X, position.Y, position.Z);
 
@@ -158,9 +158,9 @@ public sealed class World
     public bool TrySetTile(int x, int y, int z, byte value)
     {
         if (!IsInRange(x, y, z)) return false;
-        if (_data[GetDataIndex(x, y, z)] == value) return false;
+        if (Data[GetDataIndex(x, y, z)] == value) return false;
 
-        _data[GetDataIndex(x, y, z)] = value;
+        Data[GetDataIndex(x, y, z)] = value;
         UpdateLightLevels(x, z, 1, 1);
         OnAreaUpdate?.Invoke(x - 1, y - 1, z - 1, x + 1, y + 1, z + 1);
 
@@ -172,7 +172,7 @@ public sealed class World
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void DirectSetTile(int x, int y, int z, byte value)
     {
-        _data[GetDataIndex(x, y, z)] = value;
+        Data[GetDataIndex(x, y, z)] = value;
     }
 
     public void Tick()
@@ -294,5 +294,5 @@ public sealed class World
 
     // use original indexing to have compatibility with original levels
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private int GetDataIndex(int x, int y, int z) => (y * Depth + z) * Width + x;
+    public int GetDataIndex(int x, int y, int z) => (y * Depth + z) * Width + x;
 }

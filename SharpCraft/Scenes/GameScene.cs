@@ -81,14 +81,6 @@ public sealed class GameScene : IScene
 
     private void FrameRateUpdate()
     {
-        if (!IsWindowFocused() && _isMouseLocked) UnlockMouse();
-        
-        if (IsKeyPressed(KeyboardKey.Escape))
-        {
-            if (_isMouseLocked) UnlockMouse();
-            else LockMouse();
-        }
-        
         _frames++;
 
         var time = GetTime();
@@ -110,6 +102,14 @@ public sealed class GameScene : IScene
 
     private void HandleInput()
     {
+        if (!IsWindowFocused() && _isMouseLocked) UnlockMouse();
+        
+        if (IsKeyPressed(KeyboardKey.Escape))
+        {
+            if (_isMouseLocked) UnlockMouse();
+            else LockMouse();
+        }
+        
         if (IsKeyPressed(KeyboardKey.Enter))
         {
             _world.Save();
