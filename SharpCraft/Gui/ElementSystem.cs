@@ -1,9 +1,11 @@
+using System.Numerics;
+
 namespace SharpCraft.Gui;
 
 public sealed class ElementSystem
 {
-    public int ViewWidth;
-    public int ViewHeight;
+    public float ViewWidth;
+    public float ViewHeight;
     
     private readonly List<Element> _elements = [];
 
@@ -36,8 +38,8 @@ public sealed class ElementSystem
         var width = GetScreenWidth();
         var height = GetScreenHeight();
 
-        ViewWidth = width * 240 / height;
-        ViewHeight = height * 240 / height;
+        ViewWidth = width * 240.0f / height;
+        ViewHeight = height * 240.0f / height;
     }
     
     public void Draw()
@@ -50,6 +52,8 @@ public sealed class ElementSystem
         Rlgl.MatrixMode(MatrixMode.ModelView);
         Rlgl.LoadIdentity();
         Rlgl.Translatef(0.0f, 0.0f, -200.0f);
+        
+        FontManager.Draw($"{ViewWidth}x{ViewHeight}", new Vector2(0.0f, ViewHeight - 12), Color.White, false);
         
         foreach (var element in _elements)
         {

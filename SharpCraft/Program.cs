@@ -1,6 +1,7 @@
 ﻿global using static Raylib_cs.Raylib;
 global using Raylib_cs;
 using System.Runtime.CompilerServices;
+using SharpCraft.Gui;
 using SharpCraft.Scenes;
 using SharpCraft.Utilities;
 using TinyDialogsNet;
@@ -11,7 +12,7 @@ namespace SharpCraft;
 
 internal static class Program
 {
-    private const string Version = "rd-161348";
+    public const string Version = "0.0.2a";
 
     public static IScene Scene = null!;
     
@@ -19,7 +20,7 @@ internal static class Program
     {
         GpuUtil.TryForceNvidiaGpu();
 
-        InitWindow(1024, 768, "SharpCraft");
+        InitWindow(960, 720, "SharpCraft");
         SetTraceLogLevel(TraceLogLevel.Warning);
 
         if (!TryPrepareAssets())
@@ -44,6 +45,7 @@ internal static class Program
         Scene.Dispose();
 
         Assets.Unload();
+        FontManager.Unload();
 
         CloseWindow();
     }

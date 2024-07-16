@@ -23,9 +23,10 @@ public sealed class GameScene : IScene
     private readonly ParticleSystem _particleSystem;
     private readonly ElementSystem _elementSystem;
 
-    private int _fps;
     private int _frames;
     private double _lastSecondTime;
+
+    private TextElement _statsText;
 
     public GameScene()
     {
@@ -53,7 +54,18 @@ public sealed class GameScene : IScene
 
         _elementSystem.Add(new TilePreviewElement(_player));
         _elementSystem.Add(new CrosshairElement());
-        
+        _elementSystem.Add(new TextElement
+        {
+            Text = Program.Version, 
+            Position = new Vector2(2.0f, 2.0f), 
+            DropShadow = true
+        });
+        _elementSystem.Add(_statsText = new TextElement
+        {
+            Position = new Vector2(2.0f, 12.0f),
+            DropShadow = true
+        });
+
         Assets.SetMaterialShader("char.png", WorldShader.Shader);
         Assets.SetMaterialShader("terrain.png", WorldShader.ChunkShader);
     }
@@ -72,9 +84,9 @@ public sealed class GameScene : IScene
         var time = GetTime();
         if (time - _lastSecondTime >= 1.0)
         {
-            _fps = _frames;
+            _statsText.Text = $"{_frames} fps, {Chunklet.Updates} chunk updates";
+            
             _frames = 0;
-
             Chunklet.Updates = 0;
 
             _lastSecondTime = time;
@@ -82,7 +94,7 @@ public sealed class GameScene : IScene
 
         HandleInput();
         _player.Update();
-
+        
         _elementSystem.Update();
     }
 
@@ -117,14 +129,14 @@ public sealed class GameScene : IScene
         _worldRenderer.UpdateDirtyChunks();
 
         var frustum = Frustum.Instance;
-        
+
         BeginShaderMode(WorldShader.Shader);
-        
+
         WorldShader.SetIsLit(true);
         _worldRenderer.Draw(RenderLayer.Lit);
         _entitySystem.Draw(_timer.LastPartialTicks, frustum, RenderLayer.Lit);
         _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks, RenderLayer.Lit);
-        
+
         EndShaderMode();
 
         BeginShaderMode(WorldShader.Shader);
@@ -133,7 +145,7 @@ public sealed class GameScene : IScene
         _worldRenderer.Draw(RenderLayer.Shadow);
         _entitySystem.Draw(_timer.LastPartialTicks, frustum, RenderLayer.Shadow);
         _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks, RenderLayer.Shadow);
-        
+
         EndShaderMode();
 
         _player.Draw();
@@ -141,8 +153,6 @@ public sealed class GameScene : IScene
         EndMode3D();
 
         _elementSystem.Draw();
-
-        DrawText($"{_fps} FPS, {Chunklet.Updates} chunklet updates", 0, 0, 11, Color.White);
     }
 
     public void Dispose()

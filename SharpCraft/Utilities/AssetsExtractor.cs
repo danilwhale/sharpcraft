@@ -4,7 +4,7 @@ namespace SharpCraft.Utilities;
 
 public static class AssetsExtractor
 {
-    private static readonly string[] RequiredFiles = ["terrain.png", "char.png"];
+    private static readonly string[] RequiredFiles = ["terrain.png", "char.png", "default.gif"];
 
     public static bool AreFilesPresent()
     {
