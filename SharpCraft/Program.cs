@@ -21,6 +21,7 @@ internal static class Program
         GpuUtil.TryForceNvidiaGpu();
 
         InitWindow(960, 720, "SharpCraft");
+        SetExitKey(KeyboardKey.Null);
         SetTraceLogLevel(TraceLogLevel.Warning);
 
         if (!TryPrepareAssets())

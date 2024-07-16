@@ -10,12 +10,15 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
     public byte CurrentTile = 1;
     private RayCollision _rayCast;
     private int _pitchFactor = 1;
-    
-    public void Update()
+
+    public void Rotate()
     {
         var mouseDelta = GetMouseDelta();
         entity.Rotate(mouseDelta.Y * _pitchFactor, -mouseDelta.X);
-        
+    }
+    
+    public void Update()
+    {
         _rayCast = entity.World.DoRayCast(entity.Camera.GetForwardRay(), 4.0f);
         
         if (IsMouseButtonPressed(MouseButton.Left) && _rayCast.Hit)

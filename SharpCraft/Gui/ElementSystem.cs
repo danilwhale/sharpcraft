@@ -53,8 +53,6 @@ public sealed class ElementSystem
         Rlgl.LoadIdentity();
         Rlgl.Translatef(0.0f, 0.0f, -200.0f);
         
-        FontManager.Draw($"{ViewWidth}x{ViewHeight}", new Vector2(0.0f, ViewHeight - 12), Color.White, false);
-        
         foreach (var element in _elements)
         {
             Rlgl.PushMatrix();

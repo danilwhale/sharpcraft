@@ -28,9 +28,11 @@ public sealed class GameScene : IScene
 
     private TextElement _statsText;
 
+    private bool _isMouseLocked;
+
     public GameScene()
     {
-        DisableCursor();
+        LockMouse();
 
         _timer = new Timer(20.0f);
 
@@ -79,6 +81,14 @@ public sealed class GameScene : IScene
 
     private void FrameRateUpdate()
     {
+        if (!IsWindowFocused() && _isMouseLocked) UnlockMouse();
+        
+        if (IsKeyPressed(KeyboardKey.Escape))
+        {
+            if (_isMouseLocked) UnlockMouse();
+            else LockMouse();
+        }
+        
         _frames++;
 
         var time = GetTime();
@@ -109,6 +119,20 @@ public sealed class GameScene : IScene
         {
             ToggleBorderlessWindowed();
         }
+        
+        if (_isMouseLocked) _player.Rotate();
+    }
+
+    private void LockMouse()
+    {
+        DisableCursor();
+        _isMouseLocked = true;
+    }
+
+    private void UnlockMouse()
+    {
+        EnableCursor();
+        _isMouseLocked = false;
     }
 
     private void TickedUpdate()
