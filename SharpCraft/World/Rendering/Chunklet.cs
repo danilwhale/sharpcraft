@@ -7,17 +7,14 @@ public sealed class Chunklet : IDisposable
 {
     public const int Size = 16;
 
-    // cache amount of ChunkLayer values
+    // cache amount of RenderLayer values
     private static readonly int Layers = Enum.GetValues<RenderLayer>().Length;
 
     public static int Updates;
-    public static int Rebuilds;
 
     public readonly int X;
     public readonly int Y;
     public readonly int Z;
-
-    public readonly Vector3 Center;
 
     public readonly int MaxX;
     public readonly int MaxY;
@@ -39,7 +36,6 @@ public sealed class Chunklet : IDisposable
         MaxX = (x + 1) << 4;
         MaxY = (y + 1) << 4;
         MaxZ = (z + 1) << 4;
-        Center = new Vector3(X + MaxX, Y + MaxY, Z + MaxZ) * 0.5f;
         BBox = new BoundingBox(new Vector3(X, Y, Z), new Vector3(MaxX, MaxY, MaxZ));
 
         for (var i = 0; i < _layers.Length; i++) _layers[i] = new ChunkBuilder();

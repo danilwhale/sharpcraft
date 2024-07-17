@@ -7,7 +7,7 @@ public static class WorldShader
     public static readonly Shader Shader = LoadShaderFromMemory(
         Assets.GetText("World.vert"),
         Assets.GetText("World.frag")
-        );
+    );
 
     public static readonly Shader ChunkShader = LoadShaderFromMemory(
         Assets.GetText("Chunk.vert"),

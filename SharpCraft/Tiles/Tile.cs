@@ -40,7 +40,7 @@ public class Tile
 
     public virtual void Build(IVertexBuilder builder, World.World? world, int x, int y, int z, RenderLayer layer) 
     {
-        TileRender.Render(builder, world, this, GetFaces(world, x, y, z, layer), x, y, z);
+        TileRender.Render(builder, this, GetFaces(world, x, y, z, layer), x, y, z);
     }
 
     private bool ShouldKeepFace(World.World? world, int x, int y, int z, RenderLayer layer)

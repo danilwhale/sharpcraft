@@ -13,7 +13,6 @@ public static class TileRender
     // use OR to combine faces: Face.Left | Face.Right | Face.Top | Face.Bottom, etc.
     public static void Render(
         IVertexBuilder b,
-        World.World? world,
         Tile tile,
         Face faces,
         int x, int y, int z)
@@ -63,7 +62,7 @@ public static class TileRender
     {
         var texIndex = tile.GetFaceTextureIndex(Face.Left);
 
-        var u0 = (texIndex & 15) * TexFactor;
+        var u0 = (texIndex & 0xF) * TexFactor;
         var u1 = u0 + TexFactor;
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;
@@ -78,7 +77,7 @@ public static class TileRender
     {
         var texIndex = tile.GetFaceTextureIndex(Face.Right);
 
-        var u0 = (texIndex & 15) * TexFactor;
+        var u0 = (texIndex & 0xF) * TexFactor;
         var u1 = u0 + TexFactor;
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;
@@ -93,7 +92,7 @@ public static class TileRender
     {
         var texIndex = tile.GetFaceTextureIndex(Face.Top);
 
-        var u0 = (texIndex & 15) * TexFactor;
+        var u0 = (texIndex & 0xF) * TexFactor;
         var u1 = u0 + TexFactor;
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;
@@ -108,7 +107,7 @@ public static class TileRender
     {
         var texIndex = tile.GetFaceTextureIndex(Face.Bottom);
 
-        var u0 = (texIndex & 15) * TexFactor;
+        var u0 = (texIndex & 0xF) * TexFactor;
         var u1 = u0 + TexFactor;
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;
@@ -123,7 +122,7 @@ public static class TileRender
     {
         var texIndex = tile.GetFaceTextureIndex(Face.Back);
 
-        var u0 = (texIndex & 15) * TexFactor;
+        var u0 = (texIndex & 0xF) * TexFactor;
         var u1 = u0 + TexFactor;
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;
@@ -138,7 +137,7 @@ public static class TileRender
     {
         var texIndex = tile.GetFaceTextureIndex(Face.Back);
 
-        var u0 = (texIndex & 15) * TexFactor;
+        var u0 = (texIndex & 0xF) * TexFactor;
         var u1 = u0 + TexFactor;
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;

@@ -69,7 +69,6 @@ public sealed class WorldRenderer : IDisposable
 
     public void Draw(RenderLayer layer)
     {
-        Chunklet.Rebuilds = 0;
         var frustum = Frustum.Instance;
 
         foreach (var chunk in _chunks)
@@ -141,7 +140,6 @@ public sealed class WorldRenderer : IDisposable
                 
                 var tile = Registries.Tiles.Registry[tileId];
                 tile?.Build(RlglVertexBuilder.Instance, null, position.X, position.Y, position.Z, RenderLayer.Lit);
-                tile?.Build(RlglVertexBuilder.Instance, null, position.X, position.Y, position.Z, RenderLayer.Shadow);
 
                 RlglVertexBuilder.Instance.EnableColor = true;
                 Rlgl.SetTexture(Rlgl.GetTextureIdDefault());

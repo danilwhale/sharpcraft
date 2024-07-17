@@ -103,6 +103,10 @@ public static class WorldGen
                     {
                         for (var zz = (int)(z - size); zz <= (int)(z + size); zz++)
                         {
+                            if (xx < 1 || xx >= world.Width - 1 ||
+                                yy < 1 || yy >= world.Height - 1 ||
+                                zz < 1 || zz >= world.Depth - 1) continue;
+                            
                             var distanceX = xx - x;
                             var distanceY = yy - y;
                             var distanceZ = zz - z;
@@ -112,15 +116,11 @@ public static class WorldGen
                                 distanceY * distanceY * 2.0f + 
                                 distanceZ * distanceZ;
 
-                            if (distanceSq >= size * size ||
-                                xx < 1 || xx >= world.Width ||
-                                yy < 1 || yy >= world.Height ||
-                                zz < 1 || zz >= world.Depth) continue;
+                            if (distanceSq >= size * size) continue;
                             
-                            var index = world.GetDataIndex(xx, yy, zz);
-                            if (world.Data[index] != Registries.Tiles.Rock.Id) continue;
+                            if (world.DirectGetTile(xx, yy, zz) != Registries.Tiles.Rock.Id) continue;
 
-                            world.Data[index] = 0;
+                            world.DirectSetTile(xx, yy, zz, 0);
                         }
                     }
                 }

@@ -13,12 +13,6 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
     private RayCollision _rayCast;
     private int _pitchFactor = 1;
     private EditMode _editMode = EditMode.Remove;
-
-    public void Rotate()
-    {
-        var mouseDelta = GetMouseDelta();
-        entity.Rotate(mouseDelta.Y * _pitchFactor, -mouseDelta.X);
-    }
     
     public void Update()
     {
@@ -31,6 +25,9 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
     private void HandleMouseInput()
     {
         if (!IsCursorHidden()) return;
+        
+        var mouseDelta = GetMouseDelta();
+        entity.Rotate(mouseDelta.Y * _pitchFactor, -mouseDelta.X);
         
         if (IsMouseButtonPressed(MouseButton.Left) && _rayCast.Hit)
         {

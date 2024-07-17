@@ -12,7 +12,7 @@ namespace SharpCraft;
 
 internal static class Program
 {
-    public const string Version = "0.0.9a";
+    public const string Version = "0.0.11a";
 
     public static IScene Scene = null!;
     

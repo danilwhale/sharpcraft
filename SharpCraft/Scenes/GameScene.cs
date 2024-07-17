@@ -28,11 +28,9 @@ public sealed class GameScene : IScene
 
     private TextElement _statsText;
 
-    private bool _isMouseLocked;
-
     public GameScene()
     {
-        LockMouse();
+        DisableCursor();
 
         _timer = new Timer(20.0f);
 
@@ -100,26 +98,31 @@ public sealed class GameScene : IScene
         _elementSystem.Update();
     }
 
-    private void HandleInput()
+    private void HandleCursor()
     {
-        if (!IsWindowFocused() && _isMouseLocked) UnlockMouse();
+        if (!IsWindowFocused() && IsCursorHidden()) EnableCursor();
 
-        if (!_isMouseLocked)
+        if (!IsCursorHidden())
         {
             for (var i = 0; i <= (int)MouseButton.Back; i++)
             {
                 if (!IsMouseButtonPressed((MouseButton)i)) continue;
                 
-                LockMouse();
+                DisableCursor();
                 break;
             }
         }
         
-        if (IsKeyPressed(KeyboardKey.Escape))
+        if (IsKeyPressed(KeyboardKey.Escape) && !IsWindowState(ConfigFlags.BorderlessWindowMode))
         {
-            if (_isMouseLocked) UnlockMouse();
-            else LockMouse();
+            if (IsCursorHidden()) EnableCursor();
+            else DisableCursor();
         }
+    }
+
+    private void HandleInput()
+    {
+        HandleCursor();
         
         if (IsKeyPressed(KeyboardKey.Enter))
         {
@@ -130,20 +133,6 @@ public sealed class GameScene : IScene
         {
             ToggleBorderlessWindowed();
         }
-        
-        if (_isMouseLocked) _player.Rotate();
-    }
-
-    private void LockMouse()
-    {
-        DisableCursor();
-        _isMouseLocked = true;
-    }
-
-    private void UnlockMouse()
-    {
-        EnableCursor();
-        _isMouseLocked = false;
     }
 
     private void TickedUpdate()
@@ -166,8 +155,8 @@ public sealed class GameScene : IScene
         var frustum = Frustum.Instance;
 
         BeginShaderMode(WorldShader.Shader);
-
         WorldShader.SetIsLit(true);
+        
         _worldRenderer.Draw(RenderLayer.Lit);
         _entitySystem.Draw(_timer.LastPartialTicks, frustum, RenderLayer.Lit);
         _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks, RenderLayer.Lit);
@@ -175,8 +164,8 @@ public sealed class GameScene : IScene
         EndShaderMode();
 
         BeginShaderMode(WorldShader.Shader);
-
         WorldShader.SetIsLit(false);
+        
         _worldRenderer.Draw(RenderLayer.Shadow);
         _entitySystem.Draw(_timer.LastPartialTicks, frustum, RenderLayer.Shadow);
         _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks, RenderLayer.Shadow);
