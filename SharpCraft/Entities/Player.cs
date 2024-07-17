@@ -30,6 +30,8 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
 
     private void HandleMouseInput()
     {
+        if (!IsCursorHidden()) return;
+        
         if (IsMouseButtonPressed(MouseButton.Left) && _rayCast.Hit)
         {
             TilePosition hitPoint;
@@ -42,8 +44,7 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
                     var oldTile = entity.World.GetTile(hitPoint);
                     if (entity.World.TrySetTile(hitPoint, 0))
                     {
-                        var position = (TilePosition)hitPoint;
-                        Registries.Tiles.Registry[oldTile]?.Break(entity.World, position.X, position.Y, position.Z, particleSystem);
+                        Registries.Tiles.Registry[oldTile]?.Break(entity.World, hitPoint.X, hitPoint.Y, hitPoint.Z, particleSystem);
                     }
                     
                     break;

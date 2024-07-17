@@ -94,8 +94,8 @@ public sealed class GameScene : IScene
             _lastSecondTime = time;
         }
 
-        HandleInput();
         _player.Update();
+        HandleInput();
         
         _elementSystem.Update();
     }
@@ -103,6 +103,17 @@ public sealed class GameScene : IScene
     private void HandleInput()
     {
         if (!IsWindowFocused() && _isMouseLocked) UnlockMouse();
+
+        if (!_isMouseLocked)
+        {
+            for (var i = 0; i <= (int)MouseButton.Back; i++)
+            {
+                if (!IsMouseButtonPressed((MouseButton)i)) continue;
+                
+                LockMouse();
+                break;
+            }
+        }
         
         if (IsKeyPressed(KeyboardKey.Escape))
         {
