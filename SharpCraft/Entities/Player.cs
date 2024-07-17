@@ -1,7 +1,9 @@
+using System.Numerics;
 using SharpCraft.Extensions;
 using SharpCraft.World.Rendering;
 using SharpCraft.Particles;
 using SharpCraft.Tiles;
+using SharpCraft.World;
 
 namespace SharpCraft.Entities;
 
@@ -10,6 +12,7 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
     public byte CurrentTile = 1;
     private RayCollision _rayCast;
     private int _pitchFactor = 1;
+    private EditMode _editMode = EditMode.Remove;
 
     public void Rotate()
     {
@@ -21,25 +24,47 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
     {
         _rayCast = entity.World.DoRayCast(entity.Camera.GetForwardRay(), 4.0f);
         
+        HandleMouseInput();
+        HandleInput();
+    }
+
+    private void HandleMouseInput()
+    {
         if (IsMouseButtonPressed(MouseButton.Left) && _rayCast.Hit)
         {
-            var hitPoint = _rayCast.Point + _rayCast.Normal / 2;
+            TilePosition hitPoint;
+            
+            switch (_editMode)
+            {
+                case EditMode.Remove:
+                    hitPoint = _rayCast.Point - _rayCast.Normal / 2;
 
-            entity.World.TrySetTile(hitPoint, CurrentTile);
+                    var oldTile = entity.World.GetTile(hitPoint);
+                    if (entity.World.TrySetTile(hitPoint, 0))
+                    {
+                        var position = (TilePosition)hitPoint;
+                        Registries.Tiles.Registry[oldTile]?.Break(entity.World, position.X, position.Y, position.Z, particleSystem);
+                    }
+                    
+                    break;
+                
+                case EditMode.Place:
+                    hitPoint = _rayCast.Point + _rayCast.Normal / 2;
+
+                    entity.World.TrySetTile(hitPoint, CurrentTile);
+                    
+                    break;
+            }
         }
 
         if (IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
         {
-            var hitPoint = _rayCast.Point - _rayCast.Normal / 2;
-
-            var oldTile = entity.World.GetTile(hitPoint);
-            if (entity.World.TrySetTile(hitPoint, 0))
-            {
-                var position = (TilePosition)hitPoint;
-                Registries.Tiles.Registry[oldTile]?.Break(entity.World, position.X, position.Y, position.Z, particleSystem);
-            }
+            _editMode = _editMode == EditMode.Remove ? EditMode.Place : EditMode.Remove;
         }
-        
+    }
+
+    private void HandleInput()
+    {
         if (IsKeyPressed(KeyboardKey.One)) CurrentTile = Registries.Tiles.Rock.Id;
         if (IsKeyPressed(KeyboardKey.Two)) CurrentTile = Registries.Tiles.Dirt.Id;
         if (IsKeyPressed(KeyboardKey.Three)) CurrentTile = Registries.Tiles.Stone.Id;
@@ -61,6 +86,6 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
 
     public void Draw()
     {
-        worldRenderer.DrawHit(_rayCast);
+        worldRenderer.DrawHit(_rayCast, _editMode, CurrentTile);
     }
 }

@@ -2,6 +2,7 @@
 using System.Numerics;
 using SharpCraft.Rendering;
 using SharpCraft.Tiles;
+using SharpCraft.Utilities;
 
 namespace SharpCraft.World.Rendering;
 
@@ -99,26 +100,54 @@ public sealed class WorldRenderer : IDisposable
         }
     }
 
-    public void DrawHit(RayCollision hit)
+    public void DrawHit(RayCollision hit, EditMode mode, int tileId)
     {
-        var alpha = (MathF.Sin((float)GetTime() * 10.0f) * 0.2f + 0.4f) * 0.5f;
-
+        if (!hit.Hit) return;
+        
         // reset to default texture, in case one of previous function didn't reset texture
         Rlgl.SetTexture(Rlgl.GetTextureIdDefault());
         Rlgl.Begin(DrawMode.Quads);
-        Rlgl.Color4f(1.0f, 1.0f, 1.0f, alpha);
 
-        var position = (TilePosition)(hit.Point - hit.Normal / 2.0f);
+        var time = (float)GetTime() * 1000.0f;
 
-        var face = Face.None;
-        if (hit.Normal == Vector3.UnitX) face = Face.Right;
-        if (hit.Normal == -Vector3.UnitX) face = Face.Left;
-        if (hit.Normal == Vector3.UnitY) face = Face.Top;
-        if (hit.Normal == -Vector3.UnitY) face = Face.Bottom;
-        if (hit.Normal == Vector3.UnitZ) face = Face.Front;
-        if (hit.Normal == -Vector3.UnitZ) face = Face.Back;
+        TilePosition position;
+        float alpha;
+        
+        switch (mode)
+        {
+            case EditMode.Remove:
+                position = hit.Point - hit.Normal / 2.0f;
+                
+                alpha = (MathF.Sin(time / 100.0f) * 0.2f + 0.4f) * 0.5f;
+                Rlgl.Color4f(1.0f, 1.0f, 1.0f, alpha);
+                
+                TileRender.RenderFace(position, Face.Top);
+                TileRender.RenderFace(position, Face.Bottom);
+                TileRender.RenderFace(position, Face.Right);
+                TileRender.RenderFace(position, Face.Left);
+                TileRender.RenderFace(position, Face.Front);
+                TileRender.RenderFace(position, Face.Back);
+                
+                break;
+            
+            case EditMode.Place:
+                position = hit.Point + hit.Normal / 2.0f;
+                
+                alpha = MathF.Sin(time / 200.0f) * 0.2f + 0.5f;
+                Rlgl.Color4f(1.0f, 1.0f, 1.0f, alpha);
+                
+                Rlgl.SetTexture(Assets.GetTexture("terrain.png").Id);
+                RlglVertexBuilder.Instance.EnableColor = false;
+                
+                var tile = Registries.Tiles.Registry[tileId];
+                tile?.Build(RlglVertexBuilder.Instance, null, position.X, position.Y, position.Z, RenderLayer.Lit);
+                tile?.Build(RlglVertexBuilder.Instance, null, position.X, position.Y, position.Z, RenderLayer.Shadow);
 
-        TileRender.RenderFace(position, face);
+                RlglVertexBuilder.Instance.EnableColor = true;
+                Rlgl.SetTexture(Rlgl.GetTextureIdDefault());
+                
+                break;
+        }
 
         Rlgl.End();
     }
