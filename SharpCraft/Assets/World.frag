@@ -24,7 +24,7 @@ void main() {
     
     vec4 ambient = isLit ? vec4(1.0, 1.0, 1.0, 1.0) : vec4(0.6, 0.6, 0.6, 1.0);
     vec4 fogColor = isLit ? vec4(0.996, 0.984, 0.98, 1.0) : vec4(0.055, 0.043, 0.039, 1);
-    float fogDensity = isLit ? 0.001f : 0.06f;
+    float fogDensity = isLit ? 0.001f : 0.01f;
     
     finalColor += texelColor * (ambient / 10.0);
     
