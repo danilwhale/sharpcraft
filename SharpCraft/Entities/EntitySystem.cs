@@ -49,6 +49,11 @@ public sealed class EntitySystem : IDisposable
         }
     }
 
+    public bool IsAreaFree(BoundingBox box)
+    {
+        return !_entities.Any(e => CheckCollisionBoxes(e.Box, box));
+    }
+
     public void Dispose()
     {
         foreach (var entity in _entities)

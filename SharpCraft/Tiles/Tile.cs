@@ -95,4 +95,9 @@ public class Tile
             }
         }
     }
+
+    public BoundingBox GetBox(int x, int y, int z)
+    {
+        return new BoundingBox(new Vector3(x, y, z), new Vector3(x + 1, y + 1, z + 1));
+    }
 }

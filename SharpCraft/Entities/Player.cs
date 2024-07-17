@@ -44,13 +44,21 @@ public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, Par
                     var oldTile = entity.World.GetTile(hitPoint);
                     if (entity.World.TrySetTile(hitPoint, 0))
                     {
-                        Registries.Tiles.Registry[oldTile]?.Break(entity.World, hitPoint.X, hitPoint.Y, hitPoint.Z, particleSystem);
+                        Registries.Tiles.Registry[oldTile]?.Break(entity.World, hitPoint.X, hitPoint.Y, hitPoint.Z,
+                            particleSystem);
                     }
                     
                     break;
                 
                 case EditMode.Place:
                     hitPoint = _rayCast.Point + _rayCast.Normal / 2;
+
+                    var tile = Registries.Tiles.Registry[CurrentTile];
+                    var box = tile!.GetBox(hitPoint.X, hitPoint.Y, hitPoint.Z);
+                    if (!entity.System?.IsAreaFree(box) ?? false)
+                    {
+                        break;
+                    }
 
                     entity.World.TrySetTile(hitPoint, CurrentTile);
                     
