@@ -20,7 +20,7 @@ internal static class Program
     {
         GpuUtil.TryForceNvidiaGpu();
 
-        InitWindow(960, 720, "SharpCraft");
+        InitWindow(640, 480, "SharpCraft");
         SetExitKey(KeyboardKey.Null);
         SetTraceLogLevel(TraceLogLevel.Warning);
 
