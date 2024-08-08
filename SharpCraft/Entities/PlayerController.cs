@@ -7,7 +7,7 @@ using SharpCraft.World;
 
 namespace SharpCraft.Entities;
 
-public sealed class Player(PlayerEntity entity, WorldRenderer worldRenderer, ParticleSystem particleSystem)
+public sealed class PlayerController(PlayerEntity entity, WorldRenderer worldRenderer, ParticleSystem particleSystem)
 {
     public byte CurrentTile = 1;
     private RayCollision _rayCast;

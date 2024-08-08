@@ -4,11 +4,9 @@ public readonly struct TileGroup(Tile[] tiles)
 {
     public bool HasTile(byte tileId)
     {
-        // ignore linq, it's too slow
-        for (var i = 0; i < tiles.Length; i++)
+        foreach (var t in tiles)
         {
-            var otherTileId = tiles[i].Id;
-            if (otherTileId == tileId)
+            if (t.Id == tileId)
             {
                 return true;
             }

@@ -17,7 +17,7 @@ public sealed class GameScene : IScene
     private readonly WorldRenderer _worldRenderer;
 
     private readonly PlayerEntity _playerEntity;
-    private readonly Player _player;
+    private readonly PlayerController _playerController;
 
     private readonly EntitySystem _entitySystem;
     private readonly ParticleSystem _particleSystem;
@@ -42,7 +42,7 @@ public sealed class GameScene : IScene
         _worldRenderer = new WorldRenderer(_world);
 
         _playerEntity = new PlayerEntity(_world);
-        _player = new Player(_playerEntity, _worldRenderer, _particleSystem);
+        _playerController = new PlayerController(_playerEntity, _worldRenderer, _particleSystem);
         _entitySystem.Add(_playerEntity);
 
         for (var i = 0; i < 10; i++)
@@ -52,7 +52,7 @@ public sealed class GameScene : IScene
             _entitySystem.Add(zombie);
         }
 
-        _elementSystem.Add(new TilePreviewElement(_player));
+        _elementSystem.Add(new TilePreviewElement(_playerController));
         _elementSystem.Add(new CrosshairElement());
         _elementSystem.Add(new TextElement
         {
@@ -92,7 +92,7 @@ public sealed class GameScene : IScene
             _lastSecondTime = time;
         }
 
-        _player.Update();
+        _playerController.Update();
         HandleInput();
         
         _elementSystem.Update();
@@ -172,7 +172,7 @@ public sealed class GameScene : IScene
 
         EndShaderMode();
 
-        _player.Draw();
+        _playerController.Draw();
 
         EndMode3D();
 

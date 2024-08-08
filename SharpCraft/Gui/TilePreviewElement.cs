@@ -5,7 +5,7 @@ using SharpCraft.World.Rendering;
 
 namespace SharpCraft.Gui;
 
-public sealed class TilePreviewElement(Player player) : Element
+public sealed class TilePreviewElement(PlayerController playerController) : Element
 {
     public override void Update()
     {
@@ -29,7 +29,7 @@ public sealed class TilePreviewElement(Player player) : Element
         Rlgl.Begin(DrawMode.Quads);
         Rlgl.SetTexture(Assets.GetTexture("terrain.png").Id);
 
-        var tile = Registries.Tiles.Registry[player.CurrentTile];
+        var tile = Registries.Tiles.Registry[playerController.CurrentTile];
         tile?.Build(RlglVertexBuilder.Instance, null, -2, 0, 0, RenderLayer.Lit);
 
         Rlgl.SetTexture(Rlgl.GetTextureIdDefault());
