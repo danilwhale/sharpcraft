@@ -51,7 +51,14 @@ public sealed class EntitySystem : IDisposable
 
     public bool IsAreaFree(BoundingBox box)
     {
-        return !_entities.Any(e => CheckCollisionBoxes(e.Box, box));
+        return !_entities.Any(e =>
+        {
+            if (!(box.Max.X > e.Box.Min.X && box.Min.X < e.Box.Max.X)) return false;
+            if (!(box.Max.Y > e.Box.Min.Y && box.Min.Y < e.Box.Max.Y)) return false;
+            if (!(box.Max.Z > e.Box.Min.Z && box.Min.Z < e.Box.Max.Z)) return false;
+
+            return true;
+        });
     }
 
     public void Dispose()
