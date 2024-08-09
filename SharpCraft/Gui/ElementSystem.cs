@@ -35,11 +35,7 @@ public sealed class ElementSystem
 
     private void UpdateViewSize()
     {
-        var width = GetScreenWidth();
-        var height = GetScreenHeight();
-
-        ViewWidth = width * 240.0f / height;
-        ViewHeight = height * 240.0f / height;
+        CalculateViewSize(out ViewWidth, out ViewHeight);
     }
     
     public void Draw()
@@ -67,5 +63,14 @@ public sealed class ElementSystem
         
         Rlgl.MatrixMode(MatrixMode.Projection);
         Rlgl.PopMatrix();
+    }
+    
+    public static void CalculateViewSize(out float width, out float height)
+    {
+        var screenWidth = GetScreenWidth();
+        var screenHeight = GetScreenHeight();
+
+        width = screenWidth * 240.0f / screenHeight;
+        height = screenHeight * 240.0f / screenHeight;
     }
 }

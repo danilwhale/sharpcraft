@@ -30,8 +30,6 @@ public sealed class GameScene : IScene
 
     public GameScene()
     {
-        DisableCursor();
-
         _timer = new Timer(20.0f);
 
         _entitySystem = new EntitySystem();
@@ -68,6 +66,8 @@ public sealed class GameScene : IScene
 
         Assets.SetMaterialShader("char.png", WorldShader.Shader);
         Assets.SetMaterialShader("terrain.png", WorldShader.ChunkShader);
+        
+        DisableCursor();
     }
 
     public void Update()

@@ -1,3 +1,5 @@
+using SharpCraft.Gui;
+
 namespace SharpCraft.World;
 
 public static class WorldGen
@@ -6,7 +8,10 @@ public static class WorldGen
     
     public static void Generate(World world)
     {
+        LoadingScreen.Display("Generating level...", "Raising...");
         DoTerrainPass(world);
+        
+        LoadingScreen.Display("Generating level...", "Carving...");
         DoCavePass(world);
     }
 

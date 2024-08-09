@@ -79,6 +79,14 @@ public static class FontManager
         DrawTextEx(Font, text, position, CharSize, 0.0f, color);
     }
 
+    public static void DrawWithShadow(string text, Vector2 position, Color color)
+    {
+        Draw(text, new Vector2(position.X + 1.0f, position.Y + 1.0f), color, true);
+        Draw(text, position, color, false);
+    }
+
+    public static float GetTextWidth(string text) => MeasureTextEx(Font, text, CharSize, 0.0f).X;
+
     public static void Unload()
     {
         UnloadFont(Font);
