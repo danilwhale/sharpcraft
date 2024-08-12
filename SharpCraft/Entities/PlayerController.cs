@@ -63,7 +63,7 @@ public sealed class PlayerController(PlayerEntity entity, WorldRenderer worldRen
             }
         }
 
-        if (IsMouseButtonPressed(MouseButton.Right) && _rayCast.Hit)
+        if (IsMouseButtonPressed(MouseButton.Right))
         {
             _editMode = _editMode == EditMode.Remove ? EditMode.Place : EditMode.Remove;
         }
