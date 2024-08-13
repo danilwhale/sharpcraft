@@ -1,12 +1,9 @@
-﻿<img src="Assets/logo_readme.png" alt="logo" align="left" style="margin-right: 10px">
+﻿<img src="Assets/logo.png" alt="logo" align="left" width="96">
 
-## SharpCraft
+### SharpCraft
+clone of ancient minecraft versions, but on raylib (5.0) and c# (.net 8)
 
 ---
-
-### clone of minecraft, but on raylib (5.0) and c# (.net 8)
-
-this is a clone of minecraft (ancient versions), that is using own codebase (kinda)
 
 ## how to get the game
 
