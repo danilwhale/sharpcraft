@@ -132,7 +132,8 @@ public sealed class WorldRenderer : IDisposable
                 position = hit.Point + hit.Normal / 2.0f;
                 
                 alpha = MathF.Sin(time / 200.0f) * 0.2f + 0.5f;
-                Rlgl.Color4f(1.0f, 1.0f, 1.0f, alpha);
+                var tint = MathF.Sin(time / 100.0f) * 0.2f + 0.8f;
+                Rlgl.Color4f(tint, tint, tint, alpha);
                 
                 Rlgl.SetTexture(Assets.GetTexture("terrain.png").Id);
                 RlglVertexBuilder.Instance.EnableColor = false;
