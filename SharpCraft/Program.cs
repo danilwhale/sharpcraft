@@ -26,6 +26,7 @@ internal static class Program
         InitializeLogging();
         
         InitWindow(854, 480, "SharpCraft " + Version);
+        SetWindowState(ConfigFlags.ResizableWindow);
         SetTraceLogLevel(TraceLogLevel.Warning);
         SetExitKey(KeyboardKey.Null);
 
