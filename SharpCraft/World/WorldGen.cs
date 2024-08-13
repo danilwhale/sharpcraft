@@ -5,12 +5,12 @@ namespace SharpCraft.World;
 public static class WorldGen
 {
     private static readonly Random Random = new();
-    
+
     public static void Generate(World world)
     {
         // LoadingScreen.Display("Generating level...", "Raising...");
         DoTerrainPass(world);
-        
+
         // LoadingScreen.Display("Generating level...", "Carving...");
         DoCavePass(world);
     }
@@ -35,7 +35,7 @@ public static class WorldGen
                     {
                         secondValue = firstValue;
                     }
-                    
+
                     var maxHeight = Math.Max(firstValue, secondValue) / 8 + world.Height / 3;
                     var maxRockHeight = rockMap[x + z * world.Width] / 8 + world.Height / 3;
 
@@ -58,7 +58,7 @@ public static class WorldGen
                     {
                         id = Registries.Tiles.Dirt.Id;
                     }
-                    
+
                     world.DirectSetTile(x, y, z, id);
                 }
             }
@@ -67,9 +67,9 @@ public static class WorldGen
 
     private static void DoCavePass(World world)
     {
-        var wormCount = world.Width * world.Height * world.Depth / 256 / 64;
+        var caveCount = world.Width * world.Height * world.Depth / 256 / 64;
 
-        for (var worm = 0; worm < wormCount; worm++)
+        for (var cave = 0; cave < caveCount; cave++)
         {
             var x = Random.NextSingle() * world.Width;
             var y = Random.NextSingle() * world.Height;
@@ -87,7 +87,7 @@ public static class WorldGen
             {
                 x += MathF.Sin(yaw) * MathF.Cos(pitch);
                 y += MathF.Sin(pitch);
-                z += MathF.Sin(yaw) * MathF.Cos(pitch);
+                z += MathF.Cos(yaw) * MathF.Cos(pitch);
 
                 yaw += yawDelta * 0.2f;
                 
@@ -124,7 +124,6 @@ public static class WorldGen
                             if (distanceSq >= size * size) continue;
                             
                             if (world.DirectGetTile(xx, yy, zz) != Registries.Tiles.Rock.Id) continue;
-
                             world.DirectSetTile(xx, yy, zz, 0);
                         }
                     }
