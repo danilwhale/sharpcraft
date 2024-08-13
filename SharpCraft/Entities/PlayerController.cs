@@ -1,4 +1,3 @@
-using System.Numerics;
 using SharpCraft.Extensions;
 using SharpCraft.World.Rendering;
 using SharpCraft.Particles;

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Numerics;
 using SharpCraft.Rendering;
 using SharpCraft.Tiles;
 using SharpCraft.Utilities;

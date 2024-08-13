@@ -1,4 +1,3 @@
-using SharpCraft.Registries;
 using SharpCraft.Rendering;
 using SharpCraft.World.Rendering;
 
@@ -51,7 +50,7 @@ public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
     public override void Tick(World.World world, int x, int y, int z, Random random)
     {
         var tileBelow = world.GetTile(x, y - 1, z);
-        if (!world.IsLit(x, y, z) || !TileGroups.Growable.HasTile(tileBelow))
+        if (!world.IsLit(x, y, z) || !Registries.TileGroups.Growable.HasTile(tileBelow))
         {   
             world.TrySetTile(x, y, z, 0);
         }

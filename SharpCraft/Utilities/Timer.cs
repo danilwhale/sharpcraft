@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace SharpCraft.Utilities;
+﻿namespace SharpCraft.Utilities;
 
 public sealed class Timer(float ticksPerSecond)
 {

@@ -1,5 +1,4 @@
 ﻿using System.IO.Compression;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 using SharpCraft.Tiles;
 using SharpCraft.Utilities;

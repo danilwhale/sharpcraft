@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace SharpCraft.Gui;
 
 public sealed class ElementSystem

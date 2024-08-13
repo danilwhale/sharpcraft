@@ -5,10 +5,8 @@ using System.Runtime.InteropServices;
 using Serilog;
 using Serilog.Events;
 using SharpCraft.Gui;
-using SharpCraft.Rendering;
 using SharpCraft.Scenes;
 using SharpCraft.Utilities;
-using SharpCraft.World.Rendering;
 using TinyDialogsNet;
 
 [assembly: DisableRuntimeMarshalling]
@@ -19,7 +17,12 @@ internal static class Program
 {
     public const string Version = "0.0.12a_03";
     public const string? InternalVersion = null;
+    
+    // the
+#pragma warning disable CS0162 // Unreachable code detected
+    // ReSharper disable once HeuristicUnreachableCode
     public static readonly string DisplayVersion = InternalVersion != null ? $"{Version}+{InternalVersion}" : Version;
+#pragma warning restore CS0162 // Unreachable code detected
 
     public static IScene Scene = null!;
     
