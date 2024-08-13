@@ -17,7 +17,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="NoAlloq" Version="0.2.0" />
       <PackageReference Include="Raylib-cs" Version="6.1.1" />
       <PackageReference Include="Serilog" Version="4.0.1" />
       <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
