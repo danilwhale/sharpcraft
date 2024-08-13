@@ -1,6 +1,9 @@
 ﻿global using static Raylib_cs.Raylib;
 global using Raylib_cs;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Serilog;
+using Serilog.Events;
 using SharpCraft.Gui;
 using SharpCraft.Scenes;
 using SharpCraft.Utilities;
@@ -19,10 +22,12 @@ internal static class Program
     private static void Main()
     {
         GpuUtil.TryForceNvidiaGpu();
-
+        
+        InitializeLogging();
+        
         InitWindow(854, 480, "SharpCraft " + Version);
-        SetExitKey(KeyboardKey.Null);
         SetTraceLogLevel(TraceLogLevel.Warning);
+        SetExitKey(KeyboardKey.Null);
 
         if (!TryPrepareAssets())
         {
@@ -49,6 +54,32 @@ internal static class Program
         FontManager.Unload();
 
         CloseWindow();
+    }
+
+    private static unsafe void InitializeLogging()
+    {
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Verbose()
+            .WriteTo.File("Latest.log")
+            .WriteTo.Console()
+            .CreateLogger();
+        
+        SetTraceLogCallback(&RaylibTraceLogCallback);
+    }
+
+    [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
+    private static unsafe void RaylibTraceLogCallback(int logLevel, sbyte* format, sbyte* args)
+    {
+        Log.Write((TraceLogLevel)logLevel switch
+        {
+            TraceLogLevel.Trace => LogEventLevel.Verbose,
+            TraceLogLevel.Debug => LogEventLevel.Debug,
+            TraceLogLevel.Info => LogEventLevel.Information,
+            TraceLogLevel.Warning => LogEventLevel.Warning,
+            TraceLogLevel.Error => LogEventLevel.Error,
+            TraceLogLevel.Fatal => LogEventLevel.Fatal,
+            _ => LogEventLevel.Verbose
+        }, Logging.GetLogMessage((nint)format, (nint)args));
     }
 
     private static bool TryPrepareAssets()
