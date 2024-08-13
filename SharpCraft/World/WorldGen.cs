@@ -8,10 +8,10 @@ public static class WorldGen
     
     public static void Generate(World world)
     {
-        LoadingScreen.Display("Generating level...", "Raising...");
+        // LoadingScreen.Display("Generating level...", "Raising...");
         DoTerrainPass(world);
         
-        LoadingScreen.Display("Generating level...", "Carving...");
+        // LoadingScreen.Display("Generating level...", "Carving...");
         DoCavePass(world);
     }
 
