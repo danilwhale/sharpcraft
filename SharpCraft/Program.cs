@@ -17,8 +17,9 @@ namespace SharpCraft;
 
 internal static class Program
 {
-    public const string Version = "0.0.11a";
-    private const string InternalVersion = "2";
+    public const string Version = "0.0.12a_03";
+    public const string? InternalVersion = null;
+    public static readonly string DisplayVersion = InternalVersion != null ? $"{Version}+{InternalVersion}" : Version;
 
     public static IScene Scene = null!;
     
@@ -28,7 +29,7 @@ internal static class Program
         
         InitializeLogging();
         
-        InitWindow(854, 480, $"SharpCraft {Version}+{InternalVersion}");
+        InitWindow(854, 480, $"SharpCraft {DisplayVersion}");
         SetWindowState(ConfigFlags.ResizableWindow);
         LoadWindowIcon();
         SetTraceLogLevel(TraceLogLevel.Warning);

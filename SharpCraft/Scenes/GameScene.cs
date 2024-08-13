@@ -26,7 +26,7 @@ public sealed class GameScene : IScene
     private int _frames;
     private double _lastSecondTime;
 
-    private TextElement _statsText;
+    private readonly TextElement _statsText;
 
     public GameScene()
     {
@@ -54,7 +54,7 @@ public sealed class GameScene : IScene
         _elementSystem.Add(new CrosshairElement());
         _elementSystem.Add(new TextElement
         {
-            Text = Program.Version, 
+            Text = Program.DisplayVersion, 
             Position = new Vector2(2.0f, 2.0f), 
             DropShadow = true
         });
