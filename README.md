@@ -1,4 +1,8 @@
-﻿## SharpCraft
+﻿<img src="Assets/logo_readme.png" alt="logo" align="left" style="margin-right: 10px">
+
+## SharpCraft
+
+---
 
 ### clone of minecraft, but on raylib (5.0) and c# (.net 8)
 
@@ -30,19 +34,19 @@ scroll down, download artifact for your os (windows or linux)
 ![build downloads location](Assets/workflows_download.png)
 
 > [!IMPORTANT]
-> if you don't see download button login to your GitHub account
+> login to your GitHub account if you don't see the download button
 
 ---
 
 > [!WARNING]
-> untested on linux, except bugs
+> untested on linux, expect bugs
 
 ## how to build
 
-1. clone repo (using download button, git clone or ide's vcs clone system)
+1. clone repo (using download button, `git clone` or ide's vcs clone feature)
 2. open project in any ide you want
-    - in case you don't have any ide, open project's folder in command prompt
+    - in case you don't have any ide, open the project folder in your terminal
 3. build it!
-    - no ide? dotnet build inside project's folder
+    - no ide? `dotnet build` inside the project folder
 
 **NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT**
