@@ -153,29 +153,28 @@ public sealed class GameScene : IScene
         _worldRenderer.UpdateDirtyChunks();
 
         var frustum = Frustum.Instance;
-
-        BeginShaderMode(WorldShader.Shader);
-        WorldShader.SetIsLit(true);
+        WorldShader.SetViewPos(_playerEntity.Camera.Position);
         
+        WorldShader.SetIsLit(true);
+        BeginShaderMode(WorldShader.Shader);
         _worldRenderer.Draw(RenderLayer.Lit);
         _entitySystem.Draw(_timer.LastPartialTicks, frustum, RenderLayer.Lit);
         _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks, RenderLayer.Lit);
-
         EndShaderMode();
 
-        BeginShaderMode(WorldShader.Shader);
         WorldShader.SetIsLit(false);
-        
+        BeginShaderMode(WorldShader.Shader);
         _worldRenderer.Draw(RenderLayer.Shadow);
         _entitySystem.Draw(_timer.LastPartialTicks, frustum, RenderLayer.Shadow);
         _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks, RenderLayer.Shadow);
-
         EndShaderMode();
-
+        
         _playerController.Draw();
 
         EndMode3D();
-
+        
+        // Rlgl.DrawRenderBatchActive();
+        
         _elementSystem.Draw();
     }
 

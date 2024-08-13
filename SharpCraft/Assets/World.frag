@@ -8,6 +8,7 @@ uniform sampler2D texture0;
 uniform vec4 colDiffuse;
 
 uniform bool isLit;
+uniform vec3 viewPos;
 
 void main() {
     vec4 texelColor = texture2D(texture0, fragTexCoord);
@@ -21,12 +22,12 @@ void main() {
     }
     
     vec4 ambient = isLit ? vec4(1.0, 1.0, 1.0, 1.0) : vec4(0.6, 0.6, 0.6, 1.0);
-    vec4 fogColor = isLit ? vec4(0.996, 0.984, 0.98, 1.0) : vec4(0.055, 0.043, 0.039, 1);
-    float fogDensity = isLit ? 0.001f : 0.01f;
+    vec4 fogColor = isLit ? vec4(0.5, 0.8, 1.0, 1.0) : vec4(14 / 255.0, 11 / 255.0, 10 / 255.0, 1);
+    float fogDensity = isLit ? 0.002f : 0.01f;
     
     finalColor += texelColor * (ambient / 10.0);
     
-    float dist = length(fragPosition);
+    float dist = length(viewPos - fragPosition);
     float fogFactor = 1.0 / exp((dist * fogDensity) * (dist * fogDensity));
     fogFactor = clamp(fogFactor, 0.0, 1.0);
     

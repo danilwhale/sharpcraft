@@ -1,4 +1,5 @@
 using SharpCraft.Entities;
+using SharpCraft.Rendering;
 using SharpCraft.Utilities;
 using SharpCraft.World.Rendering;
 
@@ -49,6 +50,7 @@ public sealed class ParticleSystem
             }
             
             particle.Draw(lastPartTicks, xOff1, zOff1, yOff, xOff2, zOff2);
+            WorldShader.UpdateWorldModelMatrix();
         }
         
         Rlgl.SetTexture(Rlgl.GetTextureIdDefault());

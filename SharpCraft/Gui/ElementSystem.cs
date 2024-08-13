@@ -59,7 +59,7 @@ public sealed class ElementSystem
             Rlgl.PopMatrix();
         }
         
-        Rlgl.PopMatrix();
+        Rlgl.PopMatrix(); // how the fuck does this even work?????
         
         Rlgl.MatrixMode(MatrixMode.Projection);
         Rlgl.PopMatrix();

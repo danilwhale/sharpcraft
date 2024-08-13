@@ -42,9 +42,7 @@ internal static class Program
             Scene.Update();
 
             BeginDrawing();
-
             Scene.Draw();
-
             EndDrawing();
         }
 
