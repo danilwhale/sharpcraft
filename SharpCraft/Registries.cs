@@ -5,24 +5,22 @@ namespace SharpCraft;
 
 public static class Registries
 {
-    public static readonly TileRegistry Tiles = new();
-    public static readonly TileGroupRegistry TileGroups = new();
-    
-    public sealed class TileRegistry
+    public static class Tiles
     {
-        public readonly Tile?[] Registry = new Tile?[byte.MaxValue];
+        public static readonly Tile?[] Registry = new Tile?[byte.MaxValue];
 
-        public readonly Tile
+        public static readonly Tile
             Rock = new(1, 1),
             Grass = new GrassTile(2),
             Dirt = new(3, 2),
             Stone = new(4, 16),
             Wood = new(5, 4),
-            Bush = new BushTile(6);
+            Bush = new BushTile(6),
+            Bedrock = new Tile(7, 17);
     }
 
-    public sealed class TileGroupRegistry
+    public static class TileGroups
     {
-        public readonly TileGroup Growable = new([Tiles.Grass, Tiles.Dirt]);
+        public static readonly TileGroup Growable = new([Tiles.Grass, Tiles.Dirt]);
     }
 }
