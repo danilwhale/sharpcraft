@@ -1,7 +1,5 @@
 #version 120
 
-precision mediump float;
-
 varying vec2 fragTexCoord;
 varying vec4 fragColor;
 varying vec3 fragPosition;

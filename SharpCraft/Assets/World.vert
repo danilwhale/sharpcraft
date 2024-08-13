@@ -1,7 +1,5 @@
 #version 120
 
-precision mediump float;
-
 attribute vec3 vertexPosition;   // Vertex input attribute: position
 attribute vec2 vertexTexCoord;   // Vertex input attribute: texture coordinate
 attribute vec4 vertexColor;      // Vertex input attribute: color
