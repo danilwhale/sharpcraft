@@ -30,7 +30,7 @@ internal static class Program
         
         InitWindow(854, 480, $"SharpCraft {Version}+{InternalVersion}");
         SetWindowState(ConfigFlags.ResizableWindow);
-        GenerateWindowIcon();
+        LoadWindowIcon();
         SetTraceLogLevel(TraceLogLevel.Warning);
         SetExitKey(KeyboardKey.Null);
 
@@ -85,48 +85,11 @@ internal static class Program
         }, Logging.GetLogMessage((nint)format, (nint)args));
     }
 
-    private static void GenerateWindowIcon()
+    private static void LoadWindowIcon()
     {
-        var target = LoadRenderTexture(64, 64);
-        
-        BeginDrawing();
-        BeginTextureMode(target);
-        
-        ClearBackground(Color.Blank);
-        
-        Rlgl.MatrixMode(MatrixMode.Projection);
-        Rlgl.LoadIdentity();
-        Rlgl.Ortho(0.0, target.Texture.Width, target.Texture.Height, 0.0, 0.01, 1000.0);
-        
-        Rlgl.MatrixMode(MatrixMode.ModelView);
-        Rlgl.LoadIdentity();
-        Rlgl.Translatef(0.0f, 0.0f, -200.0f);
-        
-        Rlgl.Scalef(40.0f, 40.0f, 40.0f);
-
-        Rlgl.Rotatef(30.0f, 1.0f, 0.0f, 0.0f);
-        Rlgl.Rotatef(45.0f, 0.0f, 1.0f, 0.0f);
-
-        Rlgl.Translatef(2.6f, -0.85f, -1.5f);
-        
-        Rlgl.Scalef(-1.0f, 1.0f, 1.0f);
-        
-        Rlgl.Begin(DrawMode.Quads);
-        Rlgl.SetTexture(Assets.GetTexture("IconResources.png").Id);
-        
-        Registries.Tiles.Grass.Build(RlglVertexBuilder.Instance, null, 0, 0, 0, RenderLayer.Lit);
-
-        Rlgl.SetTexture(Rlgl.GetTextureIdDefault());
-        Rlgl.End();
-        
-        EndTextureMode();
-        EndDrawing();
-
-        var image = LoadImageFromTexture(target.Texture);
-        UnloadRenderTexture(target);
-
-        SetWindowIcon(image);
-        UnloadImage(image);
+        var icon = LoadImage(Assets.Root + "/Icon.png");
+        SetWindowIcon(icon);
+        UnloadImage(icon);
     }
 
     private static bool TryPrepareAssets()
