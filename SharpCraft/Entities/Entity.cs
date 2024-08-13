@@ -11,6 +11,11 @@ public abstract class Entity(World.World world, float width, float height) : IDi
         set
         {
             _position = value;
+            if (!_hasSetPositionBefore)
+            {
+                _lastPosition = value;
+                _hasSetPositionBefore = true;
+            }
 
             var halfSize = new Vector3(Width * 0.5f, Height * 0.5f, Width * 0.5f);
 
@@ -27,6 +32,7 @@ public abstract class Entity(World.World world, float width, float height) : IDi
 
     private Vector3 _position;
     private Vector3 _lastPosition;
+    private bool _hasSetPositionBefore;
     protected Vector3 Motion;
     public BoundingBox Box;
 
