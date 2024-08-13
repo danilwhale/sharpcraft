@@ -9,7 +9,7 @@ public class Tile
 {
     private const int ParticlesPerTile = 4;
     private const float ParticlesPerTileFactor = 1.0f / ParticlesPerTile;
-    
+
     public readonly TileCapabilities Capabilities = TileCapabilities.Default;
 
     public readonly byte Id;
@@ -38,7 +38,7 @@ public class Tile
         Capabilities = capabilities;
     }
 
-    public virtual void Build(IVertexBuilder builder, World.World? world, int x, int y, int z, RenderLayer layer) 
+    public virtual void Build(IVertexBuilder builder, World.World? world, int x, int y, int z, RenderLayer layer)
     {
         TileRender.Render(builder, this, GetFaces(world, x, y, z, layer), x, y, z);
     }
@@ -46,7 +46,7 @@ public class Tile
     private bool ShouldKeepFace(World.World? world, int x, int y, int z, RenderLayer layer)
     {
         if (world == null) return true;
-        
+
         return !world.IsSolidTile(x, y, z) && world.IsLit(x, y, z) ^ layer == RenderLayer.Shadow;
     }
 
@@ -85,7 +85,7 @@ public class Tile
                     var particleY = y + (j + 0.5f) * ParticlesPerTileFactor;
                     var particleZ = z + (k + 0.5f) * ParticlesPerTileFactor;
                     var particlePosition = new Vector3(particleX, particleY, particleZ);
-                    
+
                     particleSystem.Add(new Particle(
                         world,
                         particlePosition,
@@ -96,8 +96,23 @@ public class Tile
         }
     }
 
-    public BoundingBox GetBox(int x, int y, int z)
+    public BoundingBox? GetCollisionBox(int x, int y, int z)
     {
-        return new BoundingBox(new Vector3(x, y, z), new Vector3(x + 1, y + 1, z + 1));
+        var position = new Vector3(x, y, z);
+        if (Capabilities.CollisionBox == null) return null;
+
+        return new BoundingBox(
+            position + Capabilities.CollisionBox.Value.Min,
+            position + Capabilities.CollisionBox.Value.Max
+        );
+    }
+
+    public BoundingBox GetSelectionBox(int x, int y, int z)
+    {
+        var position = new Vector3(x, y, z);
+        return new BoundingBox(
+            position + Capabilities.SelectionBox.Min,
+            position + Capabilities.SelectionBox.Max
+        );
     }
 }

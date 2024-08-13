@@ -7,7 +7,8 @@ namespace SharpCraft.Tiles.Types;
 public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
 {
     IsSolid = false,
-    CanBlockLight = false
+    CanBlockLight = false,
+    CollisionBox = null
 })
 {
     private const int Rotations = 2;

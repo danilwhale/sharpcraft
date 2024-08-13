@@ -51,8 +51,8 @@ public sealed class PlayerController(PlayerEntity entity, WorldRenderer worldRen
                     hitPoint = _rayCast.Point + _rayCast.Normal / 2;
 
                     var tile = Registries.Tiles.Registry[CurrentTile];
-                    var box = tile!.GetBox(hitPoint.X, hitPoint.Y, hitPoint.Z);
-                    if (!entity.System?.IsAreaFree(box) ?? false)
+                    var box = tile!.GetCollisionBox(hitPoint.X, hitPoint.Y, hitPoint.Z);
+                    if (box != null && (!entity.System?.IsAreaFree(box.Value) ?? false))
                     {
                         break;
                     }

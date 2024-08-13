@@ -2,6 +2,7 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using SharpCraft.Tiles;
+using SharpCraft.Utilities;
 
 namespace SharpCraft.World;
 
@@ -120,16 +121,16 @@ public sealed class World
     {
         var boxes = new List<BoundingBox>();
 
-        int minX = (int)area.Min.X, minY = (int)area.Min.Y, minZ = (int)area.Min.Z;
-        int maxX = (int)area.Max.X, maxY = (int)area.Max.Y, maxZ = (int)area.Max.Z;
+        int minX = MathHelper.FFloor(area.Min.X), minY = MathHelper.FFloor(area.Min.Y), minZ = MathHelper.FFloor(area.Min.Z);
+        int maxX = MathHelper.FFloor(area.Max.X), maxY = MathHelper.FFloor(area.Max.Y), maxZ = MathHelper.FFloor(area.Max.Z);
 
-        minX = Math.Clamp(minX, 0, Width);
-        minY = Math.Clamp(minY, 0, Height);
-        minZ = Math.Clamp(minZ, 0, Depth);
+        minX = Math.Clamp(minX, 0, Width - 1);
+        minY = Math.Clamp(minY, 0, Height - 1);
+        minZ = Math.Clamp(minZ, 0, Depth - 1);
 
-        maxX = Math.Clamp(maxX, 0, Width);
-        maxY = Math.Clamp(maxY, 0, Height);
-        maxZ = Math.Clamp(maxZ, 0, Depth);
+        maxX = Math.Clamp(maxX, 0, Width - 1);
+        maxY = Math.Clamp(maxY, 0, Height - 1);
+        maxZ = Math.Clamp(maxZ, 0, Depth - 1);
 
         for (var x = minX; x <= maxX; x++)
         {
@@ -137,9 +138,12 @@ public sealed class World
             {
                 for (var z = minZ; z <= maxZ; z++)
                 {
-                    if (!IsSolidTile(x, y, z)) continue;
+                    var tile = Registries.Tiles.Registry[DirectGetTile(x, y, z)];
 
-                    boxes.Add(new BoundingBox(new Vector3(x, y, z), new Vector3(x + 1, y + 1, z + 1)));
+                    var collisionBox = tile?.GetCollisionBox(x, y, z);
+                    if (collisionBox == null) continue;
+
+                    boxes.Add(collisionBox.Value);
                 }
             }
         }
@@ -194,9 +198,9 @@ public sealed class World
 
         var t = 0.0f;
 
-        var ix = Floor(ray.Position.X) | 0;
-        var iy = Floor(ray.Position.Y) | 0;
-        var iz = Floor(ray.Position.Z) | 0;
+        var ix = MathHelper.FFloor(ray.Position.X) | 0;
+        var iy = MathHelper.FFloor(ray.Position.Y) | 0;
+        var iz = MathHelper.FFloor(ray.Position.Z) | 0;
 
         var stepX = ray.Direction.X > 0 ? 1 : -1;
         var stepY = ray.Direction.Y > 0 ? 1 : -1;
@@ -282,11 +286,6 @@ public sealed class World
         col.Distance = t;
 
         return col;
-
-        int Floor(float f)
-        {
-            return (int)MathF.Floor(f);
-        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
