@@ -33,12 +33,20 @@ public sealed class Chunklet : IDisposable
         X = x << 4;
         Y = y << 4;
         Z = z << 4;
-        MaxX = (x + 1) << 4;
-        MaxY = (y + 1) << 4;
-        MaxZ = (z + 1) << 4;
+        MaxX = x + 1 << 4;
+        MaxY = y + 1 << 4;
+        MaxZ = z + 1 << 4;
         BBox = new BoundingBox(new Vector3(X, Y, Z), new Vector3(MaxX, MaxY, MaxZ));
 
         for (var i = 0; i < _layers.Length; i++) _layers[i] = new ChunkBuilder();
+    }
+
+    public float DistanceSquared(Vector3 point)
+    {
+        var dx = point.X - (X + Size * 0.5f);
+        var dy = point.Y - (Y + Size * 0.5f);
+        var dz = point.Z - (Z + Size * 0.5f);
+        return dx * dx + dy * dy + dz * dz;
     }
 
     private void Rebuild(RenderLayer layer)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using SharpCraft.Entities;
 using SharpCraft.Rendering;
 using SharpCraft.Tiles;
 using SharpCraft.Utilities;
@@ -8,7 +9,13 @@ namespace SharpCraft.World.Rendering;
 public sealed class WorldRenderer : IDisposable
 {
     private const int MaxUpdatesPerFrame = 8;
+    public const int MaxDrawDistance = 4; // in chunks
 
+    public int DrawDistance = 0; // if set to 0, draw everything
+    public int DrawDistanceBlocks => Math.Min(World.Width, World.Depth) / (1 << DrawDistance);
+
+    public readonly World World;
+    
     private readonly int _chunksX;
     private readonly int _chunksY;
     private readonly int _chunksZ;
@@ -19,7 +26,8 @@ public sealed class WorldRenderer : IDisposable
 
     public WorldRenderer(World world)
     {
-        world.OnAreaUpdate += SetDirtyArea;
+        World = world;
+        World.OnAreaUpdate += SetDirtyArea;
 
         _chunksX = world.Width >> 4;
         _chunksY = world.Height >> 4;
@@ -30,7 +38,7 @@ public sealed class WorldRenderer : IDisposable
         {
             for (var z = 0; z < _chunksZ; z++)
             {
-                _chunks[z * _chunksX + x] = new Chunk(world, x, z);
+                _chunks[z * _chunksX + x] = new Chunk(this, x, z);
             }
         }
     }
@@ -66,13 +74,13 @@ public sealed class WorldRenderer : IDisposable
         }
     }
 
-    public void Draw(RenderLayer layer)
+    public void Draw(PlayerEntity playerEntity, RenderLayer layer)
     {
         var frustum = Frustum.Instance;
 
         foreach (var chunk in _chunks)
         {
-            chunk.Draw(layer, frustum);
+            chunk.Draw(layer, playerEntity, frustum);
         }
     }
 

@@ -133,6 +133,11 @@ public sealed class GameScene : IScene
         {
             ToggleBorderlessWindowed();
         }
+
+        if (IsKeyPressed(KeyboardKey.F))
+        {
+            _worldRenderer.DrawDistance = (_worldRenderer.DrawDistance + 1) % WorldRenderer.MaxDrawDistance;
+        }
     }
 
     private void TickedUpdate()
@@ -157,14 +162,14 @@ public sealed class GameScene : IScene
         
         WorldShader.SetIsLit(true);
         BeginShaderMode(WorldShader.Shader);
-        _worldRenderer.Draw(RenderLayer.Lit);
+        _worldRenderer.Draw(_playerEntity, RenderLayer.Lit);
         _entitySystem.Draw(_timer.LastPartialTicks, frustum, RenderLayer.Lit);
         _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks, RenderLayer.Lit);
         EndShaderMode();
 
         WorldShader.SetIsLit(false);
         BeginShaderMode(WorldShader.Shader);
-        _worldRenderer.Draw(RenderLayer.Shadow);
+        _worldRenderer.Draw(_playerEntity, RenderLayer.Shadow);
         _entitySystem.Draw(_timer.LastPartialTicks, frustum, RenderLayer.Shadow);
         _particleSystem.Draw(_playerEntity, _timer.LastPartialTicks, RenderLayer.Shadow);
         EndShaderMode();
