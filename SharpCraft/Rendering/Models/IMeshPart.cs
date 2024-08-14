@@ -1,4 +1,4 @@
-namespace SharpCraft.Rendering.Parts;
+namespace SharpCraft.Rendering.Models;
 
 public interface IMeshPart
 {

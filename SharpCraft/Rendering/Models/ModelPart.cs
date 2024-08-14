@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace SharpCraft.Rendering.Parts;
+namespace SharpCraft.Rendering.Models;
 
 public sealed class ModelPart(int texOffsetX, int texOffsetY, float textureWidth, float textureHeight) : IDisposable
 {
@@ -16,43 +16,43 @@ public sealed class ModelPart(int texOffsetX, int texOffsetY, float textureWidth
         var z1 = z + depth;
 
         // back vertices
-        var b0 = new Vertex(textureWidth, textureHeight, x, y, z);
-        var b1 = new Vertex(textureWidth, textureHeight, x1, y, z);
-        var b2 = new Vertex(textureWidth, textureHeight, x1, y1, z);
-        var b3 = new Vertex(textureWidth, textureHeight, x, y1, z);
+        var b0 = new ModelVertex(textureWidth, textureHeight, x, y, z);
+        var b1 = new ModelVertex(textureWidth, textureHeight, x1, y, z);
+        var b2 = new ModelVertex(textureWidth, textureHeight, x1, y1, z);
+        var b3 = new ModelVertex(textureWidth, textureHeight, x, y1, z);
 
         // front vertices
-        var f0 = new Vertex(textureWidth, textureHeight, x, y, z1);
-        var f1 = new Vertex(textureWidth, textureHeight, x1, y, z1);
-        var f2 = new Vertex(textureWidth, textureHeight, x1, y1, z1);
-        var f3 = new Vertex(textureWidth, textureHeight, x, y1, z1);
+        var f0 = new ModelVertex(textureWidth, textureHeight, x, y, z1);
+        var f1 = new ModelVertex(textureWidth, textureHeight, x1, y, z1);
+        var f2 = new ModelVertex(textureWidth, textureHeight, x1, y1, z1);
+        var f3 = new ModelVertex(textureWidth, textureHeight, x, y1, z1);
 
         /*
          * polygons are inverted
          * you need to invert Y axis (Rlgl.Scalef or Matrix4x4.CreateScale) to make them look correct
          * see Entities.Models.ZombieModel
          */
-        var p0 = new Polygon(
+        var p0 = new ModelPolygon(
             f1, b1, b2, f2,
             texOffsetX + depth + width, texOffsetY + depth,
             texOffsetX + width + width + depth, texOffsetY + depth + height);
-        var p1 = new Polygon(
+        var p1 = new ModelPolygon(
             b0, f0, f3, b3,
             texOffsetX, texOffsetY + depth,
             texOffsetX + depth, texOffsetY + depth + height);
-        var p2 = new Polygon(
+        var p2 = new ModelPolygon(
             f1, f0, b0, b1,
             texOffsetX + depth, texOffsetY,
             texOffsetX + depth + width, texOffsetY + depth);
-        var p3 = new Polygon(
+        var p3 = new ModelPolygon(
             b2, b3, f3, f2,
             texOffsetX + depth + width, texOffsetY,
             texOffsetX + depth + width + width, texOffsetY + depth);
-        var p4 = new Polygon(
+        var p4 = new ModelPolygon(
             b1, b0, b3, b2,
             texOffsetX + depth, texOffsetY + depth,
             texOffsetX + depth + width, texOffsetY + depth + height);
-        var p5 = new Polygon(
+        var p5 = new ModelPolygon(
             f0, f1, f2, f3,
             texOffsetX + depth + width + depth, texOffsetY + depth,
             texOffsetX + depth + width + depth + width, texOffsetY + depth + height);

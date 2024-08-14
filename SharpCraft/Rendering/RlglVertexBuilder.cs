@@ -18,25 +18,30 @@ public sealed class RlglVertexBuilder : IVertexBuilder
         Rlgl.End();
     }
 
-    public void Light(float light)
+    public void SetLight(float light)
     {
         if (!EnableColor) return;
         Rlgl.Color4f(light, light, light, 1.0f);
     }
 
-    public void TexCoords(float u, float v)
+    public void SetColor(byte r, byte g, byte b)
+    {
+        Rlgl.Color4ub(r, g, b, byte.MaxValue);
+    }
+
+    public void SetUv(float u, float v)
     {
         Rlgl.TexCoord2f(u, v);
     }
 
-    public void Vertex(float x, float y, float z)
+    public void AddVertex(float x, float y, float z)
     {
         Rlgl.Vertex3f(x, y, z);
     }
 
-    public void VertexTex(float x, float y, float z, float u, float v)
+    public void AddVertexWithUv(float x, float y, float z, float u, float v)
     {
-        TexCoords(u, v);
-        Vertex(x, y, z);
+        SetUv(u, v);
+        AddVertex(x, y, z);
     }
 }

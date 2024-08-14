@@ -1,8 +1,8 @@
-namespace SharpCraft.Rendering.Parts;
+namespace SharpCraft.Rendering.Models;
 
-public readonly struct Polygon(Vertex a, Vertex b, Vertex c, Vertex d) : IMeshPart
+public readonly struct ModelPolygon(ModelVertex a, ModelVertex b, ModelVertex c, ModelVertex d) : IMeshPart
 {
-    public Polygon(Vertex a, Vertex b, Vertex c, Vertex d, float u0, float v0, float u1, float v1)
+    public ModelPolygon(ModelVertex a, ModelVertex b, ModelVertex c, ModelVertex d, float u0, float v0, float u1, float v1)
         : this(a.WithTexCoords(u1, v0), b.WithTexCoords(u0, v0), c.WithTexCoords(u0, v1), d.WithTexCoords(u1, v1))
     {
     }

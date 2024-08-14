@@ -20,13 +20,11 @@ public static class WorldShader
     private static readonly int ChunkIsLitLoc;
     private static readonly int ViewPosLoc;
 
-    unsafe static WorldShader()
+    static WorldShader()
     {
         IsLitLoc = GetShaderLocation(Shader, "isLit");
         ChunkIsLitLoc = GetShaderLocation(ChunkShader, "isLit");
         ViewPosLoc = GetShaderLocation(ChunkShader, "viewPos");
-        Log.Debug("World.isLit: {0}, Chunk.isLit: {1}, viewPos: {2}, World.matModel: {3}", 
-            IsLitLoc, ChunkIsLitLoc, ViewPosLoc, Shader.Locs[(int)ShaderLocationIndex.MatrixModel]);
     }
 
     public static void SetIsLit(bool isLit)

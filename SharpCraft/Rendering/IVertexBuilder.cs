@@ -5,8 +5,9 @@ public interface IVertexBuilder
     void Begin(DrawMode mode);
     void End();
     
-    void Light(float light);
-    void TexCoords(float u, float v);
-    void Vertex(float x, float y, float z);
-    void VertexTex(float x, float y, float z, float u, float v);
+    void SetLight(float light);
+    void SetColor(byte r, byte g, byte b);
+    void SetUv(float u, float v);
+    void AddVertex(float x, float y, float z);
+    void AddVertexWithUv(float x, float y, float z, float u, float v);
 }

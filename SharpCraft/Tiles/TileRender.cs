@@ -23,37 +23,37 @@ public static class TileRender
 
         if ((faces & Face.Left) == Face.Left)
         {
-            b.Light(Darkest);
+            b.SetLight(Darkest);
             RenderLeftFace(b, tile, x, y, z, z1, y1);
         }
 
         if ((faces & Face.Right) == Face.Right)
         {
-            b.Light(Darkest);
+            b.SetLight(Darkest);
             RenderRightFace(b, tile, y, z, x1, y1, z1);
         }
 
         if ((faces & Face.Top) == Face.Top)
         {
-            b.Light(Light);
+            b.SetLight(Light);
             RenderTopFace(b, tile, x, z, y1, z1, x1);
         }
 
         if ((faces & Face.Bottom) == Face.Bottom)
         {
-            b.Light(Light);
+            b.SetLight(Light);
             RenderBottomFace(b, tile, x, y, z, x1, z1);
         }
 
         if ((faces & Face.Front) == Face.Front)
         {
-            b.Light(Darker);
+            b.SetLight(Darker);
             BuildFrontFace(b, tile, x, y, z1, x1, y1);
         }
 
         if ((faces & Face.Back) == Face.Back)
         {
-            b.Light(Darker);
+            b.SetLight(Darker);
             BuildBackFace(b, tile, x, y, z, y1, x1);
         }
     }
@@ -67,10 +67,10 @@ public static class TileRender
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;
         
-        b.VertexTex(x, y, z, u0, v1);
-        b.VertexTex(x, y, z1, u1, v1);
-        b.VertexTex(x, y1, z1, u1, v0);
-        b.VertexTex(x, y1, z, u0, v0);
+        b.AddVertexWithUv(x, y, z, u0, v1);
+        b.AddVertexWithUv(x, y, z1, u1, v1);
+        b.AddVertexWithUv(x, y1, z1, u1, v0);
+        b.AddVertexWithUv(x, y1, z, u0, v0);
     }
     
     private static void RenderRightFace(IVertexBuilder b, Tile tile, int y, int z, int x1, int y1, int z1)
@@ -82,10 +82,10 @@ public static class TileRender
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;
 
-        b.VertexTex(x1, y, z, u1, v1);
-        b.VertexTex(x1, y1, z, u1, v0);
-        b.VertexTex(x1, y1, z1, u0, v0);
-        b.VertexTex(x1, y, z1, u0, v1);
+        b.AddVertexWithUv(x1, y, z, u1, v1);
+        b.AddVertexWithUv(x1, y1, z, u1, v0);
+        b.AddVertexWithUv(x1, y1, z1, u0, v0);
+        b.AddVertexWithUv(x1, y, z1, u0, v1);
     }
 
     private static void RenderTopFace(IVertexBuilder b, Tile tile, int x, int z, int y1, int z1, int x1)
@@ -97,10 +97,10 @@ public static class TileRender
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;
 
-        b.VertexTex(x, y1, z, u0, v0);
-        b.VertexTex(x, y1, z1, u0, v1);
-        b.VertexTex(x1, y1, z1, u1, v1);
-        b.VertexTex(x1, y1, z, u1, v0);
+        b.AddVertexWithUv(x, y1, z, u0, v0);
+        b.AddVertexWithUv(x, y1, z1, u0, v1);
+        b.AddVertexWithUv(x1, y1, z1, u1, v1);
+        b.AddVertexWithUv(x1, y1, z, u1, v0);
     }
     
     private static void RenderBottomFace(IVertexBuilder b, Tile tile, int x, int y, int z, int x1, int z1)
@@ -112,10 +112,10 @@ public static class TileRender
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;
 
-        b.VertexTex(x, y, z, u1, v0);
-        b.VertexTex(x1, y, z, u0, v0);
-        b.VertexTex(x1, y, z1, u0, v1);
-        b.VertexTex(x, y, z1, u1, v1);
+        b.AddVertexWithUv(x, y, z, u1, v0);
+        b.AddVertexWithUv(x1, y, z, u0, v0);
+        b.AddVertexWithUv(x1, y, z1, u0, v1);
+        b.AddVertexWithUv(x, y, z1, u1, v1);
     }
     
     private static void BuildFrontFace(IVertexBuilder b, Tile tile, int x, int y, int z1, int x1, int y1)
@@ -127,10 +127,10 @@ public static class TileRender
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;
             
-        b.VertexTex(x, y, z1, u0, v1);
-        b.VertexTex(x1, y, z1, u1, v1);
-        b.VertexTex(x1, y1, z1, u1, v0);
-        b.VertexTex(x, y1, z1, u0, v0);
+        b.AddVertexWithUv(x, y, z1, u0, v1);
+        b.AddVertexWithUv(x1, y, z1, u1, v1);
+        b.AddVertexWithUv(x1, y1, z1, u1, v0);
+        b.AddVertexWithUv(x, y1, z1, u0, v0);
     }
     
     private static void BuildBackFace(IVertexBuilder b, Tile tile, int x, int y, int z, int y1, int x1)
@@ -142,10 +142,10 @@ public static class TileRender
         var v0 = (texIndex >> 4) * TexFactor;
         var v1 = v0 + TexFactor;
 
-        b.VertexTex(x, y, z, u1, v1);
-        b.VertexTex(x, y1, z, u1, v0);
-        b.VertexTex(x1, y1, z, u0, v0);
-        b.VertexTex(x1, y, z, u0, v1);
+        b.AddVertexWithUv(x, y, z, u1, v1);
+        b.AddVertexWithUv(x, y1, z, u1, v0);
+        b.AddVertexWithUv(x1, y1, z, u0, v0);
+        b.AddVertexWithUv(x1, y, z, u0, v1);
     }
     
     public static void RenderFace(TilePosition position, Face face)

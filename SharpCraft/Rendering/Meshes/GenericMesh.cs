@@ -1,75 +1,98 @@
-namespace SharpCraft.World.Rendering;
+namespace SharpCraft.Rendering.Meshes;
 
-public readonly struct ChunkMesh : IDisposable
+public unsafe readonly struct GenericMesh<TVertex> : IDisposable
+    where TVertex : unmanaged, IVertex
 {
     private const uint PositionLoc = 0;
     private const uint TexCoordLoc = 1;
-    private const uint LightLoc = 2;
-
+    private const uint ColorLoc = 2;
+    
     public readonly uint Vao;
     public readonly uint Vbo;
     public readonly uint Ebo;
 
     private readonly int _indicesCount;
+    private readonly int _vertexCount;
 
-    public unsafe ChunkMesh(Span<ChunkVertex> vertexBuffer, Span<ushort> indexBuffer)
+    public GenericMesh(ReadOnlySpan<TVertex> vertexBuffer, ReadOnlySpan<ushort> indexBuffer)
     {
         Vao = Rlgl.LoadVertexArray();
         Rlgl.EnableVertexArray(Vao);
 
-        fixed (ChunkVertex* pVertexBuffer = vertexBuffer)
+        fixed (TVertex* pVertexBuffer = vertexBuffer)
         {
-            Vbo = Rlgl.LoadVertexBuffer(pVertexBuffer, vertexBuffer.Length * sizeof(ChunkVertex), false);
+            Vbo = Rlgl.LoadVertexBuffer(pVertexBuffer, vertexBuffer.Length * sizeof(TVertex), false);
         }
+
+        _vertexCount = vertexBuffer.Length;
 
         SetupAttributes();
 
-        fixed (ushort* pIndexBuffer = indexBuffer)
+        if (!indexBuffer.IsEmpty)
         {
-            Ebo = Rlgl.LoadVertexBufferElement(pIndexBuffer, indexBuffer.Length * sizeof(ushort), false);
-        }
+            fixed (ushort* pIndexBuffer = indexBuffer)
+            {
+                Ebo = Rlgl.LoadVertexBufferElement(pIndexBuffer, indexBuffer.Length * sizeof(ushort), false);
+            }
 
-        _indicesCount = indexBuffer.Length;
+            _indicesCount = indexBuffer.Length;
+        }
 
         Rlgl.DisableVertexArray();
     }
 
-    private static unsafe void SetupAttributes()
+    private static void SetupAttributes()
     {
-        var stride = sizeof(ChunkVertex);
-
-        Rlgl.SetVertexAttribute(
-            PositionLoc,
-            3,
-            Rlgl.FLOAT,
-            false,
-            stride,
-            (void*)0
-        );
-        Rlgl.EnableVertexAttribute(PositionLoc);
-
-        Rlgl.SetVertexAttribute(
-            TexCoordLoc,
-            2,
-            Rlgl.FLOAT,
-            false,
-            stride,
-            (void*)(3 * sizeof(float))
-        );
-        Rlgl.EnableVertexAttribute(TexCoordLoc);
-
-        Rlgl.SetVertexAttribute(
-            LightLoc,
-            1,
-            Rlgl.FLOAT,
-            false,
-            stride,
-            (void*)(5 * sizeof(float))
-        );
-        Rlgl.EnableVertexAttribute(LightLoc);
+        var stride = sizeof(TVertex);
+    
+        var attributes = TVertex.Attributes;
+        
+        // it's expected that vertex is implemented without duplicated attributes
+        // and has all required attributes
+        foreach (var attribute in attributes)
+        {
+            switch (attribute.Location)
+            {
+                case VertexAttributeLocation.Position:
+                    Rlgl.SetVertexAttribute(
+                        PositionLoc,
+                        attribute.Size,
+                        (int)attribute.Type,
+                        attribute.Normalize,
+                        stride,
+                        (void*)attribute.OffsetBytes
+                    );
+                    Rlgl.EnableVertexAttribute(PositionLoc);
+                    break;
+                
+                case VertexAttributeLocation.TexCoord:
+                    Rlgl.SetVertexAttribute(
+                        TexCoordLoc,
+                        attribute.Size,
+                        (int)attribute.Type,
+                        attribute.Normalize,
+                        stride,
+                        (void*)attribute.OffsetBytes
+                    );
+                    Rlgl.EnableVertexAttribute(TexCoordLoc);
+                    break;
+                
+                case VertexAttributeLocation.Color:
+                    Rlgl.SetVertexAttribute(
+                        ColorLoc,
+                        attribute.Size,
+                        (int)attribute.Type,
+                        attribute.Normalize,
+                        stride,
+                        (void*)attribute.OffsetBytes
+                    );
+                    Rlgl.EnableVertexAttribute(ColorLoc);
+                    break;
+            }
+        }
     }
 
-    public unsafe void Draw(Material material)
+    public void Draw(Material material)
     {
         Rlgl.EnableShader(material.Shader.Id);
 
@@ -115,8 +138,15 @@ public readonly struct ChunkMesh : IDisposable
 
         // finally we can draw mesh!
         Rlgl.EnableVertexArray(Vao);
-        
-        Rlgl.DrawVertexArrayElements(0, _indicesCount, (void*)0);
+
+        if (_indicesCount > 0)
+        {
+            Rlgl.DrawVertexArrayElements(0, _indicesCount, (void*)0);
+        }
+        else
+        {
+            Rlgl.DrawVertexArray(0, _vertexCount);
+        }
         
         // now unbind everything we bound before
         Rlgl.DisableVertexArray();

@@ -23,7 +23,7 @@ public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
 
         var y1 = y + 1.0f;
         
-        builder.Light(1.0f);
+        builder.SetLight(1.0f);
 
         for (var rot = 0; rot < Rotations; rot++)
         {
@@ -35,15 +35,15 @@ public sealed class BushTile(byte id) : Tile(id, 15, new TileCapabilities
             var z0 = z + 0.5f - zOff;
             var z1 = z + 0.5f + zOff;
             
-            builder.VertexTex(x0, y1, z0, u1, v0);
-            builder.VertexTex(x1, y1, z1, u0, v0);
-            builder.VertexTex(x1, y, z1, u0, v1);
-            builder.VertexTex(x0, y, z0, u1, v1);
+            builder.AddVertexWithUv(x0, y1, z0, u1, v0);
+            builder.AddVertexWithUv(x1, y1, z1, u0, v0);
+            builder.AddVertexWithUv(x1, y, z1, u0, v1);
+            builder.AddVertexWithUv(x0, y, z0, u1, v1);
             
-            builder.VertexTex(x1, y1, z1, u0, v0);
-            builder.VertexTex(x0, y1, z0, u1, v0);
-            builder.VertexTex(x0, y, z0, u1, v1);
-            builder.VertexTex(x1, y, z1, u0, v1);
+            builder.AddVertexWithUv(x1, y1, z1, u0, v0);
+            builder.AddVertexWithUv(x0, y1, z0, u1, v0);
+            builder.AddVertexWithUv(x0, y, z0, u1, v1);
+            builder.AddVertexWithUv(x1, y, z1, u0, v1);
         }
     }
 

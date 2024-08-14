@@ -1,10 +1,10 @@
-namespace SharpCraft.Rendering.Parts;
+namespace SharpCraft.Rendering.Models;
 
-public readonly struct Vertex(float textureWidth, float textureHeight, float x, float y, float z, float u = 0.0f, float v = 0.0f) : IMeshPart
+public readonly struct ModelVertex(float textureWidth, float textureHeight, float x, float y, float z, float u = 0.0f, float v = 0.0f) : IMeshPart
 {
-    public Vertex WithTexCoords(float u0, float v0)
+    public ModelVertex WithTexCoords(float u0, float v0)
     {
-        return new Vertex(textureWidth, textureHeight, x, y, z, u0, v0);
+        return new ModelVertex(textureWidth, textureHeight, x, y, z, u0, v0);
     }
     
     public unsafe void CopyTo(ref Mesh mesh, int vertexOffset)

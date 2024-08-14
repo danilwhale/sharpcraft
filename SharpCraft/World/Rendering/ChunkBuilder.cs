@@ -1,25 +1,26 @@
 ﻿using System.Runtime.InteropServices;
 using SharpCraft.Rendering;
+using SharpCraft.Rendering.Meshes;
 
 namespace SharpCraft.World.Rendering;
 
 public sealed class ChunkBuilder : IVertexBuilder, IDisposable
 {
-    private ChunkMesh _current;
-    private ChunkMesh _previous;
+    private GenericMesh<ChunkVertex> _current;
+    private GenericMesh<ChunkVertex> _previous;
     private bool _drawPrevious;
 
     private List<ChunkVertex> _vertices = null!;
     private List<ushort> _indices = null!;
 
     private float _u, _v;
-    private float _light;
+    private byte _light;
 
-    private bool _drawQuads;
+    private bool _buildQuads;
 
     public void Begin(DrawMode mode)
     {
-        _drawQuads = mode == DrawMode.Quads;
+        _buildQuads = mode == DrawMode.Quads;
 
         if (_current.Vao != 0)
         {
@@ -35,26 +36,32 @@ public sealed class ChunkBuilder : IVertexBuilder, IDisposable
         _vertices = [];
         _indices = [];
 
-        _u = _v = _light = 0.0f;
+        _u = _v = 0.0f;
+        _light = 0;
 
         _drawPrevious = false;
     }
 
-    public void TexCoords(float u, float v)
+    public void SetColor(byte r, byte g, byte b)
+    {
+        
+    }
+
+    public void SetUv(float u, float v)
     {
         (_u, _v) = (u, v);
     }
 
-    public void Light(float light)
+    public void SetLight(float light)
     {
-        _light = light;
+        _light = (byte)(light * 255.0f);
     }
 
-    public void Vertex(float x, float y, float z)
+    public void AddVertex(float x, float y, float z)
     {
         _vertices.Add(new ChunkVertex(x, y, z, _u, _v, _light));
 
-        if (!_drawQuads || _vertices.Count == 0 || _vertices.Count % 4 != 0) return;
+        if (!_buildQuads || _vertices.Count % 4 != 0) return;
         
         var a = (ushort)(_vertices.Count - 4);
         var b = (ushort)(_vertices.Count - 3);
@@ -70,21 +77,21 @@ public sealed class ChunkBuilder : IVertexBuilder, IDisposable
         _indices.Add(d);
     }
 
-    public void VertexTex(float x, float y, float z, float u, float v)
+    public void AddVertexWithUv(float x, float y, float z, float u, float v)
     {
-        TexCoords(u, v);
-        Vertex(x, y, z);
+        SetUv(u, v);
+        AddVertex(x, y, z);
     }
 
     public void End()
     {
-        _current = new ChunkMesh(
+        _current = new GenericMesh<ChunkVertex>(
             CollectionsMarshal.AsSpan(_vertices),
             CollectionsMarshal.AsSpan(_indices)
         );
 
         _drawPrevious = false;
-        _previous.Dispose();
+        if (_previous.Vao != 0) _previous.Dispose();
     }
 
     public void Draw(Material material)

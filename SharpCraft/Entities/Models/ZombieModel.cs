@@ -1,5 +1,5 @@
 using System.Numerics;
-using SharpCraft.Rendering.Parts;
+using SharpCraft.Rendering.Models;
 using SharpCraft.Utilities;
 
 namespace SharpCraft.Entities.Models;
