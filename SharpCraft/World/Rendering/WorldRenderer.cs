@@ -24,11 +24,13 @@ public sealed class WorldRenderer : IDisposable
 
     private readonly ConcurrentStack<Chunklet> _finishStack = new();
 
+    public readonly SurroundingWorldRenderer Surrounding;
+
     public WorldRenderer(World world)
     {
         World = world;
         World.OnAreaUpdate += SetDirtyArea;
-
+        
         _chunksX = world.Width >> 4;
         _chunksY = world.Height >> 4;
         _chunksZ = world.Depth >> 4;
@@ -41,6 +43,8 @@ public sealed class WorldRenderer : IDisposable
                 _chunks[z * _chunksX + x] = new Chunk(this, x, z);
             }
         }
+        
+        Surrounding = new SurroundingWorldRenderer(world);
     }
 
     public void UpdateDirtyChunks()
@@ -160,6 +164,8 @@ public sealed class WorldRenderer : IDisposable
 
     public void Dispose()
     {
+        Surrounding.Dispose();
+        
         foreach (var chunk in _chunks)
         {
             chunk.Dispose();
