@@ -102,6 +102,9 @@ public sealed class World
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Depth;
+
     public byte GetTile(int x, int y, int z) => !IsInRange(x, y, z) ? (byte)0 : _data[GetDataIndex(x, y, z)];
 
     public byte GetTile(TilePosition position) => GetTile(position.X, position.Y, position.Z);
@@ -286,9 +289,6 @@ public sealed class World
 
         return col;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private bool IsInRange(int x, int y, int z) => x >= 0 && y >= 0 && z >= 0 && x < Width && y < Height && z < Depth;
 
     // use original indexing to have compatibility with original levels
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

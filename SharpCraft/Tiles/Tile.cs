@@ -46,8 +46,11 @@ public class Tile
     private bool ShouldKeepFace(World.World? world, int x, int y, int z, RenderLayer layer)
     {
         if (world == null) return true;
+        if (!world.IsInRange(x, y, z)) return false;
 
-        return !world.IsSolidTile(x, y, z) && world.IsLit(x, y, z) ^ layer == RenderLayer.Shadow;
+        // inline IsSolidTile and use DirectGetTile, because we already know that this position is inside the world
+        return !(Registries.Tiles.Registry[world.DirectGetTile(x, y, z)]?.Capabilities.IsSolid ?? false) && 
+               world.IsLit(x, y, z) ^ layer == RenderLayer.Shadow;
     }
 
     public virtual int GetFaceTextureIndex(Face face)
