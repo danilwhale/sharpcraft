@@ -126,21 +126,26 @@ public sealed class World
         int minX = MathHelper.FFloor(area.Min.X), minY = MathHelper.FFloor(area.Min.Y), minZ = MathHelper.FFloor(area.Min.Z);
         int maxX = MathHelper.FFloor(area.Max.X), maxY = MathHelper.FFloor(area.Max.Y), maxZ = MathHelper.FFloor(area.Max.Z);
 
-        minX = Math.Clamp(minX, 0, Width - 1);
-        minY = Math.Clamp(minY, 0, Height - 1);
-        minZ = Math.Clamp(minZ, 0, Depth - 1);
-
-        maxX = Math.Clamp(maxX, 0, Width - 1);
-        maxY = Math.Clamp(maxY, 0, Height - 1);
-        maxZ = Math.Clamp(maxZ, 0, Depth - 1);
-
         for (var x = minX; x <= maxX; x++)
         {
             for (var y = minY; y <= maxY; y++)
             {
                 for (var z = minZ; z <= maxZ; z++)
                 {
-                    var tile = Registries.Tiles.Registry[DirectGetTile(x, y, z)];
+                    Tile? tile;
+                    
+                    if (x < 0 || y < 0 || z < 0 || x >= Width || z >= Depth)
+                    {
+                        tile = Registries.Tiles.Bedrock;
+                    }
+                    else if (x < Width && y < Height && z < Depth)
+                    {
+                        tile = Registries.Tiles.Registry[DirectGetTile(x, y, z)];
+                    }
+                    else
+                    {
+                        continue;
+                    }
 
                     var collisionBox = tile?.GetCollisionBox(x, y, z);
                     if (collisionBox == null) continue;
